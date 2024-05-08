@@ -12,9 +12,9 @@ People also use symmetric authentication with their server, and this is set up b
 
 The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A tentative format for a datagram in the system:
 
-  typedef struct {
-      char username[32];       // Username, up to 31 characters + null terminator
-      uint8_t opcode;          // Numeric code representing the command
-      char arguments[256];     // Adjusted size for arguments to utilize remaining space
-      char signature[32];      // SHA-256 hash signature for verification
-  } Datagram;
+    typedef struct {
+        char username[32];       // Username, up to 31 characters + null terminator
+        uint8_t opcode;          // Numeric code representing the command
+        char arguments[256];     // Adjusted size for arguments to utilize remaining space
+        char signature[32];      // SHA-256 hash signature for verification
+    } Datagram;
