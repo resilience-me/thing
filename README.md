@@ -38,7 +38,7 @@ The system can probably run over UDP, and be based on broadcast, and if the fram
 
 ### Commands
 
-Tentatively, the opcodes will be divided between client and server opcodes. 0-127 will be client opcodes and 128-255 will be server opcodes.
+Client commands:
 
     1. SET_TRUSTLINE
     Value: 0x01
@@ -53,11 +53,10 @@ Tentatively, the opcodes will be divided between client and server opcodes. 0-12
     Parameters Encoding:
     username (32 byte)
     
-    [...]
+Server commands:
     
-    128. SET_TRUSTLINE
-    Value: 0x80
+    1. SET_TRUSTLINE
+    Value: 0x01
     Description: Synchronize trustline update between two accounts
     Parameters Encoding:
-    username (32 byte)
     size (64 byte)
