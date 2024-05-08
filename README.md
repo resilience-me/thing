@@ -18,3 +18,29 @@ The system can probably run over UDP, and be based on broadcast, and if the fram
         char arguments[256];     // Adjusted size for arguments to utilize remaining space
         char signature[32];      // SHA-256 hash signature for verification
     } Datagram;
+
+### Opcodes
+
+Tentatively, the opcodes will be divided between client and server opcodes. 0-127 will be client opcodes and 128-255 will be server opcodes.
+
+1. SET_TRUSTLINE
+Opcode Value: 0x01
+Description: Sets or updates a trustline to a person.
+Parameters Encoding:
+username (32 byte)
+size (64 byte)
+
+2. GET_TRUSTLINE
+Opcode Value: 0x02
+Description: Retrieves size of trustline to a person.
+Parameters Encoding:
+username (32 byte)
+
+[...]
+
+128. SET_TRUSTLINE
+Opcode Value: 0x80
+Description: Synchronize trustline update between two accounts
+Parameters Encoding:
+username (32 byte)
+size (64 byte)
