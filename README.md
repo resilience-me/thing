@@ -33,20 +33,18 @@ Client commands:
     1. SET_TRUSTLINE
     Value: 0x01
     Description: Sets or updates a trustline to a person.
-    Parameters Encoding:
-    username (32 byte)
+    Arguments:
     size (64 byte)
     
     2. GET_TRUSTLINE
     Value: 0x02
     Description: Retrieves size of trustline to a person.
-    Parameters Encoding:
-    username (32 byte)
-    
+    Arguments Encoding:
+
 Server commands:
     
     1. SET_TRUSTLINE
     Value: 0x01
     Description: Synchronize trustline update between two accounts
-    Parameters Encoding:
+    Arguments Encoding:
     size (64 byte)
