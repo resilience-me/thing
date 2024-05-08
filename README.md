@@ -13,28 +13,28 @@ People also use symmetric authentication with their server, and this is set up b
 The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A tentative format for a datagram in the system:
 
     typedef struct {
-        uint8_t connectionType;  // Type of connection: 0 for client, 1 for server, etc.
-        union {
-            ClientDatagram client;
-            ServerDatagram server;
-        } data;                   // Union holding either client or server datagram
+        char originDomain[32];     // Domain of the source server
+        char originUser[32];       // Source account username
+        char targetUser[32];       // Target account username
+        uint8_t command;           // Numeric code representing the command
+        char arguments[256];       // Arguments for the command
+        char signature[32];        // SHA-256 hash signature for verification
     } Datagram;
-    
-    typedef struct {
-        char sourceUser[32];      // Username, up to 31 characters + null terminator
-        uint8_t command;          // Numeric code representing the command
-        char arguments[256];      // Arguments for the command
-        char signature[32];       // SHA-256 hash signature for verification
-    } ClientDatagram;
-    
-    typedef struct {
-        char sourceDomain[32];    // Domain of the source server
-        char sourceUser[32];      // Source account username
-        char destinationUser[32]; // Target account username
-        uint8_t command;          // Operation code
-        char arguments[256];      // Command arguments
-        char signature[32];       // Signature for verification
-    } ServerDatagram;
+
+If originDomain is empty, the datagram is assumed to be for a client-to-server interaction rather than a server-to-server interaction.
+
+
+
+typedef struct {
+    uint8_t connectionType;    // Type of connection: 0 for client, 1 for server, etc.
+    char x_username[32];       //
+    char y_username[32];       //
+    char y_domain[32];         //
+    uint8_t command;           // Numeric code representing the command
+    char arguments[256];       // Arguments for the command
+    char signature[32];        // SHA-256 hash signature for verification
+}
+
 
 ### Commands
 
