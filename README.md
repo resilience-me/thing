@@ -34,6 +34,7 @@ Client commands:
     Value: 0x01
     Description: Sets or updates a trustline to a person.
     Arguments:
+    nonce (16 bytes)
     size (64 byte)
     
     2. GET_TRUSTLINE
@@ -47,4 +48,5 @@ Server commands:
     Value: 0x01
     Description: Synchronize trustline update between two accounts
     Arguments Encoding:
+    nonce (16 bytes)
     size (64 byte)
