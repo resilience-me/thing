@@ -8,6 +8,11 @@
 #define BUFLEN 512  // Max length of buffer
 #define PORT 8888   // The port on which to listen for incoming data
 
+#define OPCODE_MESSAGE 1
+#define OPCODE_GET_LAST_CMD 2
+#define OPCODE_SET_TRUSTLINE 3
+#define OPCODE_PAY 4
+
 void die(char *s) {
     perror(s);
     exit(1);
@@ -42,11 +47,17 @@ char* get_last_command() {
     return last_command;
 }
 
+typedef struct {
+    int opcode;
+    char data[BUFLEN];
+} Command;
+
 int main(void) {
     struct sockaddr_in si_me, si_other;
     
     int s, slen = sizeof(si_other), recv_len;
     char buf[BUFLEN];
+    Command cmd;
     
     // Create a UDP socket
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
@@ -71,23 +82,27 @@ int main(void) {
         fflush(stdout);
         
         // Try to receive some data, this is a blocking call
-        if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1) {
-        die("recvfrom()");
+        if ((recv_len = recvfrom(s, &cmd, sizeof(cmd), 0, (struct sockaddr *) &si_other, &slen)) == -1) {
+            die("recvfrom()");
         }
         
-        buf[recv_len] = '\0'; // Null-terminate the string
-        
         printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-        printf("Data: %s\n", buf);
+        printf("Data: %s with opcode %d\n", cmd.data, cmd.opcode);
         
-        // Check if the command is to get the last command
-        if (strcmp(buf, "GET_LAST_COMMAND") == 0) {
-            char *last_command = get_last_command();
-            sendto(s, last_command, strlen(last_command), 0, (struct sockaddr*) &si_other, slen);
-        } else {
-            // Send an ACK back to the client
-            sendto(s, "ACK", 3, 0, (struct sockaddr*) &si_other, slen);
-            log_command(buf);  // Log the command after the response
+        switch (cmd.opcode) {
+            case OPCODE_MESSAGE:
+            case OPCODE_SET_TRUSTLINE:
+            case OPCODE_PAY:
+                log_command(cmd.data);
+                sendto(s, "ACK", 3, 0, (struct sockaddr*)&si_other, slen);
+                break;
+            case OPCODE_GET_LAST_CMD:
+                char *last_command = get_last_command();
+                sendto(s, last_command, strlen(last_command), 0, (struct sockaddr*)&si_other, slen);
+                break;
+            default:
+                sendto(s, "Invalid opcode", 14, 0, (struct sockaddr*)&si_other, slen);
+                break;
         }
     }
 
