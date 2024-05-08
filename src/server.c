@@ -36,7 +36,7 @@ char* get_last_command() {
     fclose(file);
     // Remove newline if present
     size_t len = strlen(last_command);
-    if (last_command[len - 1] == '\n') {
+    if (len > 0 && last_command[len - 1] == '\n') {
         last_command[len - 1] = '\0';
     }
     return last_command;
@@ -76,7 +76,7 @@ int main(void) {
         }
         
         buf[recv_len] = '\0'; // Null-terminate the string
-        log_command(buf);
+        
         printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
         printf("Data: %s\n", buf);
         
@@ -87,6 +87,7 @@ int main(void) {
         } else {
             // Send an ACK back to the client
             sendto(s, "ACK", 3, 0, (struct sockaddr*) &si_other, slen);
+            log_command(buf);  // Log the command after the response
         }
     }
 
