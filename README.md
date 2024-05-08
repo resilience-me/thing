@@ -29,6 +29,10 @@ Domain name can of course be fetched via reverse DNS lookup, but it seems simple
 
 The nonce is either between user (client) and server, or per account relationship in server-to-server.
 
+### Database
+
+A datadirectory (tentatively at ~/.ripple, but configurable) for both client and server. In server, stores a folder "accounts", that stores each account on the server in a folder with the account's name. Here there is a file "secretkey.txt" with the symmetric authorization key, and also a file "nonce.txt" with the account nonce. In each account folder, there is a folder "peers", that stores account relationships. Peers are stored under both their username and their domain, first in a folder named with the domain such as "server.xyz" (or could also be an IPD address), and then in a folder under their username. In the peer folders, there is also a file "secretkey.txt", and also a file "nonce.txt", as well as a the files "incoming_trustlines.txt" and "outgoing_trustlines.txt".
+
 ### Commands
 
 Client commands:
