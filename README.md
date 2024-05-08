@@ -27,6 +27,8 @@ In most client-to-server interactions as well as server-to-server interactions, 
 
 Domain name can of course be fetched via reverse DNS lookup, but it seems simpler to just pass it with the datagram, since it is part of the user idenfifier information.
 
+The nonce is either between user (client) and server, or per account relationship in server-to-server.
+
 ### Commands
 
 Client commands:
