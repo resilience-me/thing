@@ -13,14 +13,18 @@ People also use symmetric authentication with their server, and this is set up b
 The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A tentative format for a datagram in the system:
 
     typedef struct {
-        uint8_t connectionType;    // Type of connection: 0 for client, 1 for server, etc.
-        char x_username[32];       //
-        char y_username[32];       //
-        char y_domain[32];         //
-        uint8_t command;           // Numeric code representing the command
-        char arguments[256];       // Arguments for the command
-        char signature[32];        // SHA-256 hash signature for verification
+        uint8_t connectionType;    // 0 for client-server, 1 for server-server interactions.
+        char x_username[32];       // Username for user X, context-dependent.
+        char y_username[32];       // Username for user Y, context-dependent.
+        char y_domain[32];         // Domain of user Y, context-dependent.
+        uint8_t command;           // Numeric code for the command to be executed.
+        char arguments[256];       // Data necessary for executing the command.
+        char signature[32];        // SHA-256 hash for verifying data integrity and authenticity.
     } Datagram;
+
+In most client-to-server interactions as well as server-to-server interactions, two users are involved. One of the users is on the server that receives the datagram, and thus organized under "localhost", whereas the other needs a domain name as part of their identifier. These are "user X" and "user Y" in the datagram, where "user Y" also has a domain name identifier. When a user interacts with a server via a client, user X will be their account, and user Y will be the account they may want to interact with (such as setting the trustline for. ) And vice versa, when a server interacts with another server (on behalf of a user account), "user Y" will be their account and they also provide a domain name as part of the identifier, and user X will be the account they want to interact with.
+
+Domain name can of course be fetched via reverse DNS lookup, but it seems simpler to just pass it with the datagram, since it is part of the user idenfifier information.
 
 ### Commands
 
