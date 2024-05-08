@@ -19,6 +19,7 @@ The system can probably run over UDP, and be based on broadcast, and if the fram
         char y_domain[32];         // Domain of user Y, context-dependent.
         uint8_t command;           // Numeric code for the command to be executed.
         char arguments[256];       // Data necessary for executing the command.
+        uint32_t timestamp;        // 4-byte timestamp field for replay protection.
         char signature[32];        // SHA-256 hash for verifying data integrity and authenticity.
     } Datagram;
 
@@ -34,7 +35,6 @@ Client commands:
     Value: 0x01
     Description: Sets or updates a trustline to a person.
     Arguments:
-    nonce (16 bytes)
     size (64 byte)
     
     2. GET_TRUSTLINE
@@ -48,5 +48,4 @@ Server commands:
     Value: 0x01
     Description: Synchronize trustline update between two accounts
     Arguments Encoding:
-    nonce (16 bytes)
     size (64 byte)
