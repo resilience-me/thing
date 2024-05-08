@@ -19,7 +19,7 @@ The system can probably run over UDP, and be based on broadcast, and if the fram
         char y_domain[32];         // Domain of user Y, context-dependent.
         uint8_t command;           // Numeric code for the command to be executed.
         char arguments[256];       // Data necessary for executing the command.
-        uint32_t nonce;            // 4-byte nonce field for replay protection.
+        uint32_t nonce;            // 4-byte nonce field for replay protection, context-dependent.
         char signature[32];        // SHA-256 hash for verifying data integrity and authenticity.
     } Datagram;
 
