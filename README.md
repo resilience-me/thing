@@ -9,3 +9,12 @@ Practically, this also works well with symmetric keys, which the people exchange
 This implementation will then use no encryption of the messages. It will use no encryption since encryption isn't strictly needed to run Ripple. It is easy to add. Note that assuming account-to-account encryption, the account identifier has to be plaintext anyway.
 
 People also use symmetric authentication with their server, and this is set up by exchanging a shared secret key with the server admin. The key is stored (on the server) in `accounts/your_account/secret_key.txt`, and in the client, in `client_datadir/secret_key.txt`. Besides that, all messages in plaintext. No persistent connection to server needed, craft a message (a command with argments, and your username as parameter), generate hash as signature, and submit the message and the signature to the server. Asymmetric key could be used too, but the benefit of asymmetric cryptography is in public contexts, and in person-to-person (including person-to-server where its still a personal exchange between two entities) they're not required.
+
+The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A tentative format for a datagram in the system:
+
+  typedef struct {
+      char username[32];       // Username, up to 31 characters + null terminator
+      uint8_t opcode;          // Numeric code representing the command
+      char arguments[256];     // Adjusted size for arguments to utilize remaining space
+      char signature[32];      // SHA-256 hash signature for verification
+  } Datagram;
