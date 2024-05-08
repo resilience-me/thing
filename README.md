@@ -55,3 +55,39 @@ Server commands:
     Description: Synchronize trustline update between two accounts
     Arguments Encoding:
     size (64 byte)
+
+### Routing
+
+The routing is very simple. It is practically “stateless”, no routing tables are stored, all routing is generated for each payment request. The benefit is that paths change constantly in Ripple (as trust lines fill up or credit is cleared), so a “routing table” would not reflect the true state anyway.
+
+The path-finding optimizes for never going too deep. It is bidirectional, reducing accounts queried to 2*sqrt(unidirectional). And, it searches in increments of 1, always returning to the root before increasing the depth by 1 (the root then sends out a new request, with depth incremented by 1. ) Thus, whenever a path is found, the search ends (the root stops replying to response by incrementing request. ) Path requests use an identifier that is a simple random number, and are sent both from buyer and receiver. Whenever these “fronts” meet, a path is found, and the first path found is chosen. To enforce the “return to root before incrementing” approach, accounts should only accept queries that grow in increments of 1.
+
+Ability to select for paths other than the "first found" can be added later.
+
+Thus the path-finding is not actually aware of the sender or receiver account address. This is not for privacy reasons, it is just because it is redundant to provide accounts with that information in this routing system.
+
+The routing is centered around caches that keep track of paths an account is involved in searching for. Accounts track when they’re currently involved in a request, and they track the depth they are at for the request. Technically, linked lists are used, and linear search. During linear search (to either find a path identifier within an account’s caches, or an account within the overall routing cache) old queries are also cleared, and accounts with no active queries are cleared.
+
+    #define CACHE_RETENTION_SECONDS 300
+
+    typedef struct CacheEntry {
+        time_t timestamp;
+        int depth;
+        struct CacheEntry *next;
+    } CacheEntry;
+
+    typedef struct PathCacheEntry {
+        int identifier;
+        CacheEntry *incomingHead;
+        CacheEntry *outgoingHead;
+        char *nextHop;
+        struct PathCacheEntry *next;
+    } PathCacheEntry;
+
+    typedef struct AccountNode {
+        char *accountId;
+        PathCacheEntry *cacheHead;
+        struct AccountNode *next;
+    } AccountNode;
+
+    AccountNode *head = NULL;
