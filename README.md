@@ -115,11 +115,12 @@ We serialize and deserialize the datagram to ensure the format is well defined (
 And for verifying the signature:
 
     int verify_signature(const unsigned char *serialized_dg, const unsigned char *signature) {
-        unsigned char data_with_key[DG_DATA_SIZE + SECRET_KEY_SIZE];
+        size_t data_size = DATAGRAM_SIZE - SIGNATURE_SIZE;
+        unsigned char data_with_key[data_size + SECRET_KEY_SIZE];
     
         // Concatenate serialized data (excluding signature) and secret key
-        memcpy(data_with_key, serialized_dg, DG_DATA_SIZE);
-        memcpy(data_with_key + DG_DATA_SIZE, secret_key, SECRET_KEY_SIZE);
+        memcpy(data_with_key, serialized_dg, data_size);
+        memcpy(data_with_key + data_size, secret_key, SECRET_KEY_SIZE);
     
         // Compute SHA-256 hash of concatenated data
         unsigned char computed_hash[32];
