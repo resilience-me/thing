@@ -1,57 +1,67 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <sys/socket.h>
 
-void die(char *s) {
-    perror(s);
-    exit(1);
-}
+#define PORT 2012
+#define DATAGRAM_SIZE 389
 
-int main(void) {
-    struct sockaddr_in si_me, si_other;
-    int s, i, slen = sizeof(si_other) , recv_len;
-    char buf[512];
+int main() {
+    int sockfd;
+    struct sockaddr_in6 server_addr;
+    struct sockaddr_storage client_addr;
+    socklen_t addr_len = sizeof(client_addr);
+    char buffer[DATAGRAM_SIZE];
 
-    // Create a UDP socket
-    if ((s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-        die("socket");
+    // Create socket
+    if ((sockfd = socket(AF_INET6, SOCK_DGRAM, 0)) == -1) {
+        perror("socket creation failed");
+        exit(EXIT_FAILURE);
     }
 
-    // Zero out the structure
-    memset((char *) &si_me, 0, sizeof(si_me));
-
-    si_me.sin_family = AF_INET;
-    si_me.sin_port = htons(8888);
-    si_me.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    // Bind socket to port
-    if( bind(s , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
-        die("bind");
+    // Set socket option to allow both IPv4 and IPv6
+    int opt = 0; // 0 enables dual-stack mode
+    if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&opt, sizeof(opt)) == -1) {
+        perror("setsockopt failed");
+        exit(EXIT_FAILURE);
     }
 
-    // Keep listening for data
-    while(1) {
-        printf("Waiting for data...");
-        fflush(stdout);
+    // Initialize server address
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin6_family = AF_INET6;
+    server_addr.sin6_addr = in6addr_any;
+    server_addr.sin6_port = htons(PORT);
 
-        // Try to receive some data, this is a blocking call
-        if ((recv_len = recvfrom(s, buf, 512, 0, (struct sockaddr *) &si_other, &slen)) == -1) {
-            die("recvfrom()");
+    // Bind socket to both IPv4 and IPv6 addresses
+    if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Server loop
+    while (1) {
+        // Receive data
+        ssize_t recv_len = recvfrom(sockfd, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &addr_len);
+        if (recv_len == -1) {
+            perror("recvfrom failed");
+            continue;
         }
 
-        // Print details of the client/peer and the data received
-        printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-        printf("Data: %s\n" , buf);
+        // Deserialize received data
+        Datagram dg;
+        deserialize_datagram(buffer, &dg);
 
-        // Now reply the client with the same data
-        if (sendto(s, buf, recv_len, 0, (struct sockaddr*) &si_other, slen) == -1) {
-            die("sendto()");
+        // Verify signature and nonce
+        if (!verify_signature(buffer, &dg) || !verify_nonce(dg.nonce)) continue;
+
+        // Call appropriate command handler
+        CommandHandler handler = command_handlers[dg.command];
+        if (handler) {
+            handler(&dg, sockfd, *(struct sockaddr_in *)&client_addr);
         }
     }
 
-    close(s);
+    close(sockfd);
     return 0;
 }
