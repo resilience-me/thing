@@ -29,13 +29,13 @@ Domain name can of course be fetched via reverse DNS lookup, but it seems simple
 
 The nonce is either between user (client) and server, or per account relationship in server-to-server. Alternatively on server-to-server it could be per-server, but one design goal here is that servers do not need to know about one another, beyond what each account defines in their own relationships. The nonce has to be higher than previous nonce, it does not need to be in order. Since UDP can be sent out of order, servers can maintain a cache of previous highest nonce for a few minutes, and for that duration also accept those. This cache is a simple linked list with linear search, that is cleared every time it is searched (same design as the routing cache. )
 
-    typedef struct NodeCacheEntry {
+    typedef struct NonceCacheEntry {
         time_t timestamp;
         int nonce;
-        struct NodeCacheEntry *next;
-    } NodeCacheEntry;
+        struct NonceCacheEntry *next;
+    } NonceCacheEntry;
 
-    NodeCacheEntry *nonceCacheHead = NULL;
+    NonceCacheEntry *nonceCacheHead = NULL;
 
 ### Database
 
