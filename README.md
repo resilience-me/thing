@@ -25,7 +25,6 @@ The system can probably run over UDP, and be based on broadcast, and if the fram
 The connection type and command is used to dispatch the command handler for a command:
 
     typedef void (*CommandHandler)(const Datagram*, int sockfd, struct sockaddr_in client_addr);
-    CommandHandler command_handlers[256] = { {NULL} };
     CommandHandler command_handlers[256] = {
         [0] = client_handle_set_trustline,
         [1] = client_handle_get_trustline,
