@@ -79,7 +79,7 @@ The nonce is either between user (client) and server, or per account relationshi
 
 We serialize and deserialize the datagram to ensure the format is well defined (and use <arpa/inet.h> to ensure correct endianess for the nonce. )
 
-    uint8_t buffer[389];
+    uint8_t buffer[DATAGRAM_SIZE];
 
     void serialize_datagram(const Datagram* dg, uint8_t* buffer) {
         size_t offset = 0;
