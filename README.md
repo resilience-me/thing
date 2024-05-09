@@ -94,6 +94,6 @@ The routing is centered around caches that keep track of paths an account is inv
 
 ### Misc
 
-It is possible to add a buffer for UDP datagrams. The buffer can also do signature and nonce validation, thus be secure against spam attacks.
+It is possible to add a buffer for UDP datagrams. The buffer can also do signature and nonce validation, thus be secure against spam attacks. Although the built-in UDP buffer (at OS level) may be sufficient, and extra buffering unnecessary.
 
 The system will be single-threaded. Instead of multiple cores, can just run multiple CPU as in multiple servers, and limit a server to what can run on one core. Multiple threads is trivial to add, one solution could be to run the equivalent of "multiple servers", each "server" in its own thread, and use an account-to-thread mapping to find which thread to route datagrams to. And then do the UDP buffer and thread-routing in the main thread. And those who prefer to run multiple computers instead, can build a "virtual endpoint" that routes to servers in a cluster of server, all under the same host address, and works analogously. Or, just run smaller scale servers with fewer accounts...
