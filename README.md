@@ -109,7 +109,7 @@ We serialize and deserialize the datagram to ensure the format is well defined (
         memcpy(dg->signature, buffer + offset, 32); offset += 32;
     }
 
-And for verifying the signature:
+And for verifying the signature, using "sha2.c":
 
     int verify_signature(const unsigned char *serialized_dg, const Datagram* dg) {
         size_t data_size = DATAGRAM_SIZE - SIGNATURE_SIZE;
