@@ -55,7 +55,7 @@ And to see the command handler dispatcher in the context of the while loop that 
         deserialize_datagram(buffer, &dg);
 
         // Verify signature and nonce
-        if(!verify_signature(buffer, dg.signature) || !verify_nonce(dg.nonce)) continue;
+        if(!verify_signature(buffer, &dg) || !verify_nonce(dg.nonce)) continue;
 
         // Call appropriate command handler
         CommandHandler handler = command_handlers[dg.command];
@@ -111,10 +111,13 @@ We serialize and deserialize the datagram to ensure the format is well defined (
 
 And for verifying the signature:
 
-    int verify_signature(const unsigned char *serialized_dg, const unsigned char *signature) {
+    int verify_signature(const unsigned char *serialized_dg, const Datagram* dg) {
         size_t data_size = DATAGRAM_SIZE - SIGNATURE_SIZE;
         unsigned char data_with_key[data_size + SECRET_KEY_SIZE];
-    
+
+        unsigned char secret_key[SECRET_KEY_SIZE];
+        load_secret_key(dg, secret_key);
+
         // Concatenate serialized data (excluding signature) and secret key
         memcpy(data_with_key, serialized_dg, data_size);
         memcpy(data_with_key + data_size, secret_key, SECRET_KEY_SIZE);
@@ -124,7 +127,7 @@ And for verifying the signature:
         sha256(data_with_key, sizeof(data_with_key), computed_hash);
     
         // Compare computed hash with provided signature
-        return memcmp(computed_hash, signature, sizeof(computed_hash)) == 0;
+        return memcmp(computed_hash, dg->signature, sizeof(computed_hash)) == 0;
     }
 
 ### Database
