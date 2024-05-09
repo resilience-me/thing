@@ -91,3 +91,9 @@ The routing is centered around caches that keep track of paths an account is inv
     } AccountNode;
 
     AccountNode *accountCache = NULL;
+
+### Misc
+
+It will be single-threaded. Instead of multiple cores, can just run multiple CPU as in multiple servers, and limit a server to what can run on one core.
+
+It is possible to add a buffer for UDP datagrams. The buffer can also do signature and nonce validation, thus be secure against spam attacks.
