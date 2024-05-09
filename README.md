@@ -67,15 +67,7 @@ In most client-to-server interactions as well as server-to-server interactions, 
 
 The server address can of course be read from the IP header and if it was a domain it can be fetched via reverse DNS lookup, but it seems simpler to just pass it with the datagram, since it is part of the user idenfifier information (and it makes it more explicit what address is used, should be consistent since its used for the account identifier. )
 
-The nonce is either between user (client) and server, or per account relationship in server-to-server. Alternatively on server-to-server it could be per-server, but one design goal here is that servers do not need to know about one another, beyond what each account defines in their own relationships. The nonce has to be higher than previous nonce, it does not need to be in order. Since UDP can be sent out of order, servers can maintain a cache of previous highest nonce for a few minutes, and for that duration also accept those. This cache is a simple linked list with linear search, that is cleared every time it is searched (same design as the routing cache. )
-
-    typedef struct NonceCacheEntry {
-        time_t timestamp;
-        int nonce;
-        struct NonceCacheEntry *next;
-    } NonceCacheEntry;
-
-    NonceCacheEntry *nonceCacheHead = NULL;
+For datagrams that can be replayed (payment routing for example can only be replayed for the initial query, after that it depends on the routing cache), a nonce is used. The nonce is either between user (client) and server, or per account relationship in server-to-server (where both an incoming and outgoing nonce is stored, as for example the initial path finding query can be replayed and path finding is bidirectional. ) The nonce has to be higher than previous nonce, it does not need to be in order.
 
 We serialize and deserialize the datagram to ensure the format is well defined (and use <arpa/inet.h> to ensure correct endianess for the nonce. )
 
