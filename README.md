@@ -40,7 +40,7 @@ To get the connection type, use a simple bitshift:
         return (dg->command >> 7) & 1;
     }
 
-And to see the command handler dispatcher in the context of the while loop that accepts UDP datagrams (note that signature verification and nonce check should be added before the command handler dispatching):
+And to see the command handler dispatcher in the context of the while loop that accepts UDP datagrams:
 
     while (1) {
         // Receive data
@@ -53,7 +53,10 @@ And to see the command handler dispatcher in the context of the while loop that 
         // Deserialize received data
         Datagram dg;
         deserialize_datagram(buffer, &dg);
-        
+
+        // Verify signature and nonce
+        if(verify_signature(&dg) && verify_nonce(&dg)) continue;
+
         // Call appropriate command handler
         CommandHandler handler = command_handlers[dg.command];
         if (handler) {
