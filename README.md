@@ -55,7 +55,7 @@ And to see the command handler dispatcher in the context of the while loop that 
         deserialize_datagram(buffer, &dg);
 
         // Verify signature and nonce
-        if(verify_signature(&dg) && verify_nonce(&dg)) continue;
+        if(!verify_signature(&dg) && !verify_nonce(&dg)) continue;
 
         // Call appropriate command handler
         CommandHandler handler = command_handlers[dg.command];
