@@ -130,6 +130,8 @@ And for verifying the signature:
         return memcmp(computed_hash, dg->signature, sizeof(computed_hash)) == 0;
     }
 
+The function load_secret_key takes the datagram instance as a paramter since it needs user x and user y and connection type. The path to "secretkey.txt" differs in client and serve connection types. In client, its in `datadir/client/accounts/username`, and in server it is in `datadir/server/accounts/username/peers/username/`. )
+
 ### Database
 
 A datadirectory for both client and server  (tentatively at ~/.ripple, and ~/.ripple/client for client and ~/.ripple/server for server). In server, stores a folder "accounts", that stores each account on the server in a folder with the account's name. Here there is a file "secretkey.txt" with the symmetric authorization key, and also a file "nonce.txt" with the account nonce. In each account folder, there is a folder "peers", that stores account relationships. Peers are stored under both their username and their domain, first in a folder named with the domain such as "server.xyz" (or could also be an IPD address), and then in a folder under their username. In the peer folders, there is also a file "secretkey.txt", and also a file "nonce.txt", as well as a the files "incoming_trustlines.txt" and "outgoing_trustlines.txt".
