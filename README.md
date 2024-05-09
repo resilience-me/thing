@@ -50,12 +50,15 @@ And to see the command handler dispatcher in the context of the while loop that 
             exit(EXIT_FAILURE);
         }
 
+        // Verify signature
+        if(!verify_signature(buffer)) continue;
+
         // Deserialize received data
         Datagram dg;
         deserialize_datagram(buffer, &dg);
 
-        // Verify signature and nonce
-        if(!verify_signature(&dg) && !verify_nonce(&dg)) continue;
+        // Verify nonce
+        if(!verify_nonce(dg.nonce)) continue;
 
         // Call appropriate command handler
         CommandHandler handler = command_handlers[dg.command];
@@ -65,7 +68,6 @@ And to see the command handler dispatcher in the context of the while loop that 
             printf("No handler for command: %u\n", dg.command);
         }
     }
-
 
 In most client-to-server interactions as well as server-to-server interactions, two users are involved. One of the users is on the server that receives the datagram, and thus organized under "localhost", whereas the other needs a domain name as part of their identifier. These are "user X" and "user Y" in the datagram, where "user Y" also has a domain name identifier. When a user interacts with a server via a client, user X will be their account, and user Y will be the account they may want to interact with (such as setting the trustline for. ) And vice versa, when a server interacts with another server (on behalf of a user account), "user Y" will be their account and they also provide a domain name as part of the identifier, and user X will be the account they want to interact with.
 
@@ -108,6 +110,23 @@ We serialize and deserialize the datagram to ensure the format is well defined (
         memcpy(&net_nonce, buffer + offset, sizeof(net_nonce));
         dg->nonce = ntohl(net_nonce); // Convert from network byte order to host order
         memcpy(dg->signature, buffer + offset, 32); offset += 32;
+    }
+
+And for verifying the signature:
+
+    int verify_signature(const unsigned char *serialized_dg, const unsigned char *signature) {
+        unsigned char data_with_key[DG_DATA_SIZE + SECRET_KEY_SIZE];
+    
+        // Concatenate serialized data (excluding signature) and secret key
+        memcpy(data_with_key, serialized_dg, DG_DATA_SIZE);
+        memcpy(data_with_key + DG_DATA_SIZE, secret_key, SECRET_KEY_SIZE);
+    
+        // Compute SHA-256 hash of concatenated data
+        unsigned char computed_hash[32];
+        sha256(data_with_key, sizeof(data_with_key), computed_hash);
+    
+        // Compare computed hash with provided signature
+        return memcmp(computed_hash, signature, sizeof(computed_hash)) == 0;
     }
 
 ### Database
