@@ -29,6 +29,14 @@ Domain name can of course be fetched via reverse DNS lookup, but it seems simple
 
 The nonce is either between user (client) and server, or per account relationship in server-to-server. Alternatively on server-to-server it could be per-server, but one design goal here is that servers do not need to know about one another, beyond what each account defines in their own relationships. The nonce has to be higher than previous nonce, it does not need to be in order. Since UDP can be sent out of order, servers can maintain a cache of previous highest nonce for a few minutes, and for that duration also accept those. This cache is a simple linked list with linear search, that is cleared every time it is searched (same design as the routing cache. )
 
+    typedef struct NodeCacheEntry {
+        time_t timestamp;
+        int nonce;
+        struct NodeCacheEntry *next;
+    } NodeCacheEntry;
+
+    NodeCacheEntry *nonceCacheHead = NULL;
+
 ### Database
 
 A datadirectory for both client and server  (tentatively at ~/.ripple, and ~/.ripple/client for client and ~/.ripple/server for server). In server, stores a folder "accounts", that stores each account on the server in a folder with the account's name. Here there is a file "secretkey.txt" with the symmetric authorization key, and also a file "nonce.txt" with the account nonce. In each account folder, there is a folder "peers", that stores account relationships. Peers are stored under both their username and their domain, first in a folder named with the domain such as "server.xyz" (or could also be an IPD address), and then in a folder under their username. In the peer folders, there is also a file "secretkey.txt", and also a file "nonce.txt", as well as a the files "incoming_trustlines.txt" and "outgoing_trustlines.txt".
@@ -64,30 +72,22 @@ The path-finding optimizes for never going too deep. It is bidirectional, reduci
 
 Ability to select for paths other than the "first found" can be added later.
 
-Thus the path-finding is not actually aware of the sender or receiver account address. This is not for privacy reasons, it is just because it is redundant to provide accounts with that information in this routing system.
-
 The routing is centered around caches that keep track of paths an account is involved in searching for. Accounts track when they’re currently involved in a request, and they track the depth they are at for the request. Technically, linked lists are used, and linear search. During linear search (to either find a path identifier within an account’s caches, or an account within the overall routing cache) old queries are also cleared, and accounts with no active queries are cleared.
 
     #define CACHE_RETENTION_SECONDS 300
 
-    typedef struct CacheEntry {
-        time_t timestamp;
-        int depth;
-        struct CacheEntry *next;
-    } CacheEntry;
-
     typedef struct PathCacheEntry {
         int identifier;
-        CacheEntry *incomingHead;
-        CacheEntry *outgoingHead;
+        uint8_t pathType; // 0 for incoming, 1 for outgoing, 2 for path found
+        int depth;
         char *nextHop;
         struct PathCacheEntry *next;
     } PathCacheEntry;
 
     typedef struct AccountNode {
         char *accountId;
-        PathCacheEntry *cacheHead;
+        PathCacheEntry *head;
         struct AccountNode *next;
     } AccountNode;
 
-    AccountNode *head = NULL;
+    AccountNode *accountCache = NULL;
