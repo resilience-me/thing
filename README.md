@@ -24,7 +24,7 @@ The system can probably run over UDP, and be based on broadcast, and if the fram
 
 The connection type and command is used to dispatch the command handler for a command:
 
-    typedef void (*CommandHandler)(const Datagram*, int sockfd, struct sockaddr_in client_addr);
+    typedef void (*CommandHandler)(const Datagram*, int sockfd, const struct sockaddr_storage*);
     CommandHandler command_handlers[256] = {
         [0] = client_handle_set_trustline,
         [1] = client_handle_get_trustline,
@@ -46,8 +46,7 @@ And to see the command handler dispatcher in the context of the while loop that 
         // Receive data
         ssize_t recv_len = recvfrom(sockfd, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &addr_len);
         if (recv_len == -1) {
-            perror("recvfrom failed");
-            exit(EXIT_FAILURE);
+            continue;
         }
 
         // Deserialize received data
@@ -55,12 +54,12 @@ And to see the command handler dispatcher in the context of the while loop that 
         deserialize_datagram(buffer, &dg);
 
         // Verify signature and nonce
-        if(!verify_signature(buffer, &dg) || !verify_nonce(dg.nonce)) continue;
+        if (!verify_signature(buffer, &dg) || !verify_nonce(dg.nonce)) continue;
 
         // Call appropriate command handler
         CommandHandler handler = command_handlers[dg.command];
         if (handler) {
-            handler(&dg, sockfd, client_addr);
+            handler(&dg, sockfd, *(struct sockaddr_in *)&client_addr);
         }
     }
 
