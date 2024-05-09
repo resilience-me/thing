@@ -61,8 +61,6 @@ And to see the command handler dispatcher in the context of the while loop that 
         CommandHandler handler = command_handlers[dg.command];
         if (handler) {
             handler(&dg, sockfd, client_addr);
-        } else {
-            printf("No handler for command: %u\n", dg.command);
         }
     }
 
