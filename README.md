@@ -130,7 +130,7 @@ And for verifying the signature:
         return memcmp(computed_hash, dg->signature, sizeof(computed_hash)) == 0;
     }
 
-The function load_secret_key takes the datagram instance as a parameter since it needs user x and user y and connection type. The path to "secretkey.txt" differs in client and serve connection types. In client, its in `datadir/client/accounts/username`, and in server it is in `datadir/server/accounts/username/peers/domain/username/`.
+The function load_secret_key takes the datagram instance as a parameter since it needs user x and user y and connection type. The path to "secretkey.txt" differs in client and server connection types. In client, its in `datadir/client/accounts/username`, and in server it is in `datadir/server/accounts/username/peers/domain/username/`.
 
 ### Database
 
