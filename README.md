@@ -50,15 +50,12 @@ And to see the command handler dispatcher in the context of the while loop that 
             exit(EXIT_FAILURE);
         }
 
-        // Verify signature
-        if(!verify_signature(buffer)) continue;
-
         // Deserialize received data
         Datagram dg;
         deserialize_datagram(buffer, &dg);
 
-        // Verify nonce
-        if(!verify_nonce(dg.nonce)) continue;
+        // Verify signature and nonce
+        if(!verify_signature(buffer, dg.signature) || !verify_nonce(dg.nonce)) continue;
 
         // Call appropriate command handler
         CommandHandler handler = command_handlers[dg.command];
