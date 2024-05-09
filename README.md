@@ -16,7 +16,7 @@ The system can probably run over UDP, and be based on broadcast, and if the fram
         uint8_t command;           // Command code with most significant bit specifying connection type (client/server)
         char x_username[32];       // Username for user X, context-dependent.
         char y_username[32];       // Username for user Y, context-dependent.
-        char y_domain[32];         // Domain of user Y, context-dependent.
+        char y_server_address[32]; // Server address of user Y, context-dependent.
         char arguments[256];       // Data necessary for executing the command.
         uint32_t nonce;            // 4-byte nonce field for replay protection, context-dependent.
         char signature[32];        // SHA-256 hash for verifying data integrity and authenticity.
@@ -66,9 +66,9 @@ And to see the command handler dispatcher in the context of the while loop that 
         }
     }
 
-In most client-to-server interactions as well as server-to-server interactions, two users are involved. One of the users is on the server that receives the datagram, and thus organized under "localhost", whereas the other needs a domain name as part of their identifier. These are "user X" and "user Y" in the datagram, where "user Y" also has a domain name identifier. When a user interacts with a server via a client, user X will be their account, and user Y will be the account they may want to interact with (such as setting the trustline for. ) And vice versa, when a server interacts with another server (on behalf of a user account), "user Y" will be their account and they also provide a domain name as part of the identifier, and user X will be the account they want to interact with.
+In most client-to-server interactions as well as server-to-server interactions, two users are involved. One of the users is on the server that receives the datagram, and thus organized under "localhost", whereas the other needs a server address as part of their identifier. These are "user X" and "user Y" in the datagram, where "user Y" also has a server address identifier. When a user interacts with a server via a client, user X will be their account, and user Y will be the account they may want to interact with (such as setting the trustline for. ) And vice versa, when a server interacts with another server (on behalf of a user account), "user Y" will be their account and they also provide a server address name as part of the identifier, and user X will be the account they want to interact with.
 
-Domain name can of course be fetched via reverse DNS lookup, but it seems simpler to just pass it with the datagram, since it is part of the user idenfifier information.
+The server address can of course be read from the IP header and if it was a domain it can be fetched via reverse DNS lookup, but it seems simpler to just pass it with the datagram, since it is part of the user idenfifier information (and it makes it more explicit what address is used, should be consistent since its used for the account identifier. )
 
 The nonce is either between user (client) and server, or per account relationship in server-to-server. Alternatively on server-to-server it could be per-server, but one design goal here is that servers do not need to know about one another, beyond what each account defines in their own relationships. The nonce has to be higher than previous nonce, it does not need to be in order. Since UDP can be sent out of order, servers can maintain a cache of previous highest nonce for a few minutes, and for that duration also accept those. This cache is a simple linked list with linear search, that is cleared every time it is searched (same design as the routing cache. )
 
@@ -89,7 +89,7 @@ We serialize and deserialize the datagram to ensure the format is well defined (
         buffer[offset++] = dg->command;
         memcpy(buffer + offset, dg->x_username, 32); offset += 32;
         memcpy(buffer + offset, dg->y_username, 32); offset += 32;
-        memcpy(buffer + offset, dg->y_domain, 32); offset += 32;
+        memcpy(buffer + offset, dg->y_server_address, 32); offset += 32;
         memcpy(buffer + offset, dg->arguments, 256); offset += 256;
         uint32_t net_nonce = htonl(dg->nonce); // Convert to network byte order
         memcpy(buffer + offset, &net_nonce, sizeof(net_nonce)); offset += sizeof(net_nonce);
@@ -101,7 +101,7 @@ We serialize and deserialize the datagram to ensure the format is well defined (
         dg->command = buffer[offset++];
         memcpy(dg->x_username, buffer + offset, 32); offset += 32;
         memcpy(dg->y_username, buffer + offset, 32); offset += 32;
-        memcpy(dg->y_domain, buffer + offset, 32); offset += 32;
+        memcpy(dg->y_server_address, buffer + offset, 32); offset += 32;
         memcpy(dg->arguments, buffer + offset, 256); offset += 256;
         uint32_t net_nonce;
         memcpy(&net_nonce, buffer + offset, sizeof(net_nonce));
@@ -130,11 +130,11 @@ And for verifying the signature:
         return memcmp(computed_hash, dg->signature, sizeof(computed_hash)) == 0;
     }
 
-The function load_secret_key takes the datagram instance as a parameter since it needs user x and user y and connection type. The path to "secretkey.txt" differs in client and server connection types. In client, its in `datadir/client/accounts/username`, and in server it is in `datadir/server/accounts/username/peers/domain/username/`.
+The function load_secret_key takes the datagram instance as a parameter since it needs user x and user y and connection type. The path to "secretkey.txt" differs in client and server connection types. In client, its in `datadir/client/accounts/username`, and in server it is in `datadir/server/accounts/username/peers/server_address/username/`.
 
 ### Database
 
-A datadirectory for both client and server  (tentatively at ~/.ripple, and ~/.ripple/client for client and ~/.ripple/server for server). In server, stores a folder "accounts", that stores each account on the server in a folder with the account's name. Here there is a file "secretkey.txt" with the symmetric authorization key, and also a file "nonce.txt" with the account nonce. In each account folder, there is a folder "peers", that stores account relationships. Peers are stored under both their username and their domain, first in a folder named with the domain such as "server.xyz" (or could also be an IPD address), and then in a folder under their username. In the peer folders, there is also a file "secretkey.txt", and also a file "nonce.txt", as well as a the files "incoming_trustlines.txt" and "outgoing_trustlines.txt".
+A datadirectory for both client and server  (tentatively at ~/.ripple, and ~/.ripple/client for client and ~/.ripple/server for server). In server, stores a folder "accounts", that stores each account on the server in a folder with the account's name. Here there is a file "secretkey.txt" with the symmetric authorization key, and also a file "nonce.txt" with the account nonce. In each account folder, there is a folder "peers", that stores account relationships. Peers are stored under both their username and their server address, first in a folder named with the server address such as "server.xyz" (or could also be an IP address), and then in a folder under their username. In the peer folders, there is also a file "secretkey.txt", and also a file "nonce.txt", as well as a the files "incoming_trustlines.txt" and "outgoing_trustlines.txt".
 
 ### Commands
 
