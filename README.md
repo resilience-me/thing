@@ -43,7 +43,34 @@ The nonce is either between user (client) and server, or per account relationshi
 
     NonceCacheEntry *nonceCacheHead = NULL;
 
+We serialize and deserialize the datagram to ensure the format is well defined (and use <arpa/inet.h> to ensure correct endianess for the nonce. )
 
+    uint8_t buffer[389];
+
+    void serialize_datagram(const Datagram* dg, uint8_t* buffer) {
+        size_t offset = 0;
+        buffer[offset++] = dg->command;
+        memcpy(buffer + offset, dg->x_username, 32); offset += 32;
+        memcpy(buffer + offset, dg->y_username, 32); offset += 32;
+        memcpy(buffer + offset, dg->y_domain, 32); offset += 32;
+        memcpy(buffer + offset, dg->arguments, 256); offset += 256;
+        uint32_t net_nonce = htonl(dg->nonce); // Convert to network byte order
+        memcpy(buffer + offset, &net_nonce, sizeof(net_nonce)); offset += sizeof(net_nonce);
+        memcpy(buffer + offset, dg->signature, 32); offset += 32;
+    }
+    
+    void deserialize_datagram(const uint8_t* buffer, Datagram* dg) {
+        size_t offset = 0;
+        dg->command = buffer[offset++];
+        memcpy(dg->x_username, buffer + offset, 32); offset += 32;
+        memcpy(dg->y_username, buffer + offset, 32); offset += 32;
+        memcpy(dg->y_domain, buffer + offset, 32); offset += 32;
+        memcpy(dg->arguments, buffer + offset, 256); offset += 256;
+        uint32_t net_nonce;
+        memcpy(&net_nonce, buffer + offset, sizeof(net_nonce));
+        dg->nonce = ntohl(net_nonce); // Convert from network byte order to host order
+        memcpy(dg->signature, buffer + offset, 32); offset += 32;
+    }
 
 ### Database
 
