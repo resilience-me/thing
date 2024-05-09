@@ -51,22 +51,24 @@ A datadirectory for both client and server  (tentatively at ~/.ripple, and ~/.ri
 
 ### Commands
 
+The opcodes will be divided between client and server opcodes. 0-127 will be client opcodes and 128-255 will be server opcodes. Note that commmands also use user x and user y as parameters (every command handler receives a pointer to the Datagram instance. )
+
 Client commands:
 
-    1. SET_TRUSTLINE
+    0. SET_TRUSTLINE
     Value: 0x01
     Description: Sets or updates a trustline to a person.
     Arguments:
     size (64 byte)
     
-    2. GET_TRUSTLINE
+    1. GET_TRUSTLINE
     Value: 0x02
     Description: Retrieves size of trustline to a person.
     Arguments Encoding:
 
 Server commands:
     
-    1. SET_TRUSTLINE
+    128. SET_TRUSTLINE
     Value: 0x01
     Description: Synchronize trustline update between two accounts
     Arguments Encoding:
