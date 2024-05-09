@@ -26,6 +26,12 @@ The connection type and command is used to dispatch the command handler for a co
 
     typedef void (*CommandHandler)(const Datagram*, int sockfd, struct sockaddr_in client_addr);
     CommandHandler command_handlers[256] = { {NULL} };
+    CommandHandler command_handlers[256] = {
+        [0] = client_handle_set_trustline,
+        [1] = client_handle_get_trustline,
+        [128] = server_handle_set_trustline
+    };
+
 
 The command handlers are dispatched as `command_handlers[dg->command]`. Command codes 0 to 127 are for client commands and 128 to 255 are for server commands (thus the most significant bit specifies connection type there, and this bit is also used when verifying the signature since user x and user y parameters have to be used differently depending on client or server interaction context. ) The command handlers manage potential response to client (or server).
 
