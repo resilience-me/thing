@@ -44,7 +44,6 @@ int main() {
         // Receive data
         ssize_t recv_len = recvfrom(sockfd, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &addr_len);
         if (recv_len == -1) {
-            perror("recvfrom failed");
             continue;
         }
 
