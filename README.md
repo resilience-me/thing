@@ -40,6 +40,30 @@ To get the connection type, use a simple bitshift:
         return (dg->command >> 7) & 1;
     }
 
+And to see the command handler dispatcher in the context of the while loop that accepts UDP datagrams (note that signature verification and nonce check should be added before the command handler dispatching):
+
+    while (1) {
+        // Receive data
+        ssize_t recv_len = recvfrom(sockfd, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &addr_len);
+        if (recv_len == -1) {
+            perror("recvfrom failed");
+            exit(EXIT_FAILURE);
+        }
+
+        // Deserialize received data
+        Datagram dg;
+        deserialize_datagram(buffer, &dg);
+        
+        // Call appropriate command handler
+        CommandHandler handler = command_handlers[dg.command];
+        if (handler) {
+            handler(&dg, sockfd, client_addr);
+        } else {
+            printf("No handler for command: %u\n", dg.command);
+        }
+    }
+
+
 In most client-to-server interactions as well as server-to-server interactions, two users are involved. One of the users is on the server that receives the datagram, and thus organized under "localhost", whereas the other needs a domain name as part of their identifier. These are "user X" and "user Y" in the datagram, where "user Y" also has a domain name identifier. When a user interacts with a server via a client, user X will be their account, and user Y will be the account they may want to interact with (such as setting the trustline for. ) And vice versa, when a server interacts with another server (on behalf of a user account), "user Y" will be their account and they also provide a domain name as part of the identifier, and user X will be the account they want to interact with.
 
 Domain name can of course be fetched via reverse DNS lookup, but it seems simpler to just pass it with the datagram, since it is part of the user idenfifier information.
