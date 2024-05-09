@@ -27,7 +27,7 @@ In most client-to-server interactions as well as server-to-server interactions, 
 
 Domain name can of course be fetched via reverse DNS lookup, but it seems simpler to just pass it with the datagram, since it is part of the user idenfifier information.
 
-The nonce is either between user (client) and server, or per account relationship in server-to-server. Alternatively on server-to-server it could be per-server, but one design goal here is that servers do not need to know about one another, beyond what each account defines in their own relationships. The nonce has to be higher than previous nonce, it does not need to be in order. Since UDP can be sent out of order, servers can maintain a cache of previous highest nonce for a few minutes, and for that duration also accept those.
+The nonce is either between user (client) and server, or per account relationship in server-to-server. Alternatively on server-to-server it could be per-server, but one design goal here is that servers do not need to know about one another, beyond what each account defines in their own relationships. The nonce has to be higher than previous nonce, it does not need to be in order. Since UDP can be sent out of order, servers can maintain a cache of previous highest nonce for a few minutes, and for that duration also accept those. This cache is a simple linked list with linear search, that is cleared every time it is searched (same design as the routing cache. )
 
 ### Database
 
