@@ -13,6 +13,17 @@ People also use symmetric authentication with their server, and this is set up b
 The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A tentative format for a datagram in the system:
 
     typedef struct {
+        uint8_t connectionType:1; // 0 for client-server, 1 for server-server interactions.
+        uint8_t command:7;        // Numeric code for the command to be executed.
+        char x_username[32];       // Username for user X, context-dependent.
+        char y_username[32];       // Username for user Y, context-dependent.
+        char y_domain[32];         // Domain of user Y, context-dependent.
+        char arguments[256];       // Data necessary for executing the command.
+        uint32_t nonce;            // 4-byte nonce field for replay protection, context-dependent.
+        char signature[32];        // SHA-256 hash for verifying data integrity and authenticity.
+    } Datagram;
+
+    typedef struct {
         uint8_t connectionType;    // 0 for client-server, 1 for server-server interactions.
         char x_username[32];       // Username for user X, context-dependent.
         char y_username[32];       // Username for user Y, context-dependent.
