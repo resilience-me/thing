@@ -144,7 +144,7 @@ Client commands:
     
     2. PAYMENT
     Value: 0x02
-    Description: Retrieves size of trustline to a person.
+    Description: Request a payment path to user Y and make a payment if path found.
     Arguments Encoding:
     amount (64 byte)
 
