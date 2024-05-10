@@ -132,13 +132,13 @@ The opcodes will be divided between client and server opcodes. 0-127 will be cli
 Client commands:
 
     0. SET_TRUSTLINE
-    Value: 0x01
+    Value: 0x00
     Description: Sets or updates a trustline to a person.
     Arguments:
     size (64 byte)
     
     1. GET_TRUSTLINE
-    Value: 0x02
+    Value: 0x01
     Description: Retrieves size of trustline to a person.
     Arguments Encoding:
     
@@ -150,8 +150,8 @@ Client commands:
 
 Server commands:
     
-    128. SET_TRUSTLINE
-    Value: 0x01
+    128. SYNC_TRUSTLINE
+    Value: 0x80
     Description: Synchronize trustline update between two accounts
     Arguments Encoding:
     size (64 byte)
