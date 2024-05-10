@@ -141,6 +141,12 @@ Client commands:
     Value: 0x02
     Description: Retrieves size of trustline to a person.
     Arguments Encoding:
+    
+    2. PAYMENT
+    Value: 0x02
+    Description: Retrieves size of trustline to a person.
+    Arguments Encoding:
+    amount (64 byte)
 
 Server commands:
     
@@ -177,6 +183,12 @@ The routing is centered around caches that keep track of paths an account is inv
     } AccountNode;
 
     AccountNode *accountCache = NULL;
+
+### Payment
+
+A user sends a payment request, which automatically performs the path finding and completes the payment, if possible. The server stores a receipt if payment was successful, an empty file named with the payment identifier, and the user can poll the receipt with GET_RECEIPT and the payment identifier as an argument to see if it exists as in if the payment succeeded (this allows the UDP connectionless approach. ) The user can clear old receipts with a command CLEAR_RECEIPTS. Receipts accumulate unless cleared.
+
+Payments via more than one pathway (if "bandwidth" of one pathway is not enough) have to be done manually for now. The sender and recipient have to agree to cancel the payment (essentially make backwards payment) if they do not manage to do enough payments.
 
 ### Misc
 
