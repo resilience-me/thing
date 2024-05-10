@@ -1,4 +1,4 @@
-_edit, while idea to fit everything in single ethernet frame is good as it should easily do so, it will probably be good with retransmission until successfull transmission. so will probably use TCP instead, and threads for each ongoing connection_
+_edit, while idea to fit everything in single ethernet frame is good as it should easily do so, it will probably be good with retransmission until successfull transmission. so will probably use TCP instead, and threads for each ongoing connection. will also probably use encryption, but still account to account and not server to server as that avoids certificate authorities._
 
 # Ryan Fugger's Ripple in P2P way
 
