@@ -10,9 +10,7 @@ This implementation will then use no encryption of the messages. It will use no 
 
 People also use symmetric authentication with their server, and this is set up by exchanging a shared secret key with the server admin. The key is stored (on the server) in `accounts/your_account/secretkey.txt`, and in the client, in `client_datadir/secretkey.txt`. Besides that, all messages in plaintext. No persistent connection to server needed, craft a message (a command with argments, and your username as parameter), generate hash as signature, and submit the message and the signature to the server. Asymmetric key could be used too, but the benefit of asymmetric cryptography is in public contexts, and in person-to-person (including person-to-server where its still a personal exchange between two entities) they're not required.
 
-The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A form of retransmission will be possible, but only from user clients (freeing servers from having to manage retransmission. )
-
-A tentative format for a datagram in the system:
+The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A tentative format for a datagram in the system:
 
     typedef struct {
         uint8_t command;           // Command code with most significant bit specifying connection type (client/server)
@@ -150,9 +148,9 @@ Client commands:
     Arguments Encoding:
     amount (64 byte)
 
-    2. CLEAR_PAYMENT_CACHE
+    3. REFUND
     Value: 0x03
-    Description: Cancel all ongoing payment attempts from the account.
+    Description: Allow one-time trust line for refund, if original payment credit lines have had time to cleared before being able to refund full amount. Used in multi-path payments.
     Arguments Encoding:
     amount (64 byte)
     
@@ -196,7 +194,7 @@ The routing is centered around caches that keep track of paths an account is inv
 
 A user sends a payment request, which automatically performs the path finding and completes the payment, if possible. The server stores a receipt if payment was successful, an empty file named with the payment identifier, and the user can poll the receipt with GET_RECEIPT and the payment identifier as an argument to see if it exists as in if the payment succeeded (this allows the UDP connectionless approach. ) The user can clear old receipts with a command CLEAR_RECEIPTS. Receipts accumulate unless cleared.
 
-Payments via more than one pathway (if "bandwidth" of one pathway is not enough) have to be done manually for now. The sender and recipient have to agree to cancel the payment (essentially make backwards payment) if they do not manage to do enough payments. If the paths have already cleared such that that there is not enough trustlines to make the full refund payment, the sender can manually set a trustline to the recipient for a temporary refund path for the remaining refund, and then set the trustline to zero again after receiving the remaining refund.
+Payments via more than one pathway (if "bandwidth" of one pathway is not enough) have to be done manually for now. The sender and recipient have to agree to cancel the payment (essentially make backwards payment) if they do not manage to do enough payments. If the paths have already cleared such that that there is not enough trustlines to make the full refund payment, the sender can manually set a trustline to the recipient for a temporary refund path for the remaining refund, and then set the trustline to zero again after receiving the remaining refund. The REFUND command can be used for that.
 
 ### Misc
 
