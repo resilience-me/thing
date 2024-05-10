@@ -1,5 +1,3 @@
-_edit, while idea to fit everything in single ethernet frame is good as it should easily do so, it will probably be good with retransmission until successfull transmission. so will probably use TCP instead, and threads for each ongoing connection. will also probably use encryption, but still account to account and not server to server as that avoids certificate authorities. it's also possible to use a "transaction chain" for events between accounts, that has to be synchronized and everything always in the same order, and for syncing that it could be good to have TCP and be able to easily transfer data larger than one ethernet frame, and also good to have encryption regardless._
-
 # Ryan Fugger's Ripple in P2P way
 
 Since Ripple, uniquely, can rely only on authentication between the two people making the exchange, this implementation uses authentication only between people, and not between servers.
@@ -12,7 +10,9 @@ This implementation will then use no encryption of the messages. It will use no 
 
 People also use symmetric authentication with their server, and this is set up by exchanging a shared secret key with the server admin. The key is stored (on the server) in `accounts/your_account/secretkey.txt`, and in the client, in `client_datadir/secretkey.txt`. Besides that, all messages in plaintext. No persistent connection to server needed, craft a message (a command with argments, and your username as parameter), generate hash as signature, and submit the message and the signature to the server. Asymmetric key could be used too, but the benefit of asymmetric cryptography is in public contexts, and in person-to-person (including person-to-server where its still a personal exchange between two entities) they're not required.
 
-The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A tentative format for a datagram in the system:
+The system can probably run over UDP, and be based on broadcast, and if the frame was not delivered, the ability to poll for if the command was processed. All commands may fit within a single frame, making it very simple. A form of retransmission will be possible, but only from user clients (freeing servers from having to manage retransmission. )
+
+A tentative format for a datagram in the system:
 
     typedef struct {
         uint8_t command;           // Command code with most significant bit specifying connection type (client/server)
@@ -150,6 +150,12 @@ Client commands:
     Arguments Encoding:
     amount (64 byte)
 
+    2. CLEAR_PAYMENT_CACHE
+    Value: 0x03
+    Description: Cancel all ongoing payment attempts from the account.
+    Arguments Encoding:
+    amount (64 byte)
+    
 Server commands:
     
     128. SYNC_TRUSTLINE
