@@ -1,3 +1,5 @@
+_edit, while idea to fit everything in single ethernet frame is good as it should easily do so, it will probably be good with retransmission until successfull transmission. so will probably use TCP instead, and threads for each ongoing connection_
+
 # Ryan Fugger's Ripple in P2P way
 
 Since Ripple, uniquely, can rely only on authentication between the two people making the exchange, this implementation uses authentication only between people, and not between servers.
