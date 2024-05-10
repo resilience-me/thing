@@ -14,6 +14,17 @@ void saveTransactionChain(const char *filename, TransactionNode *head) {
     fclose(file);
 }
 
+void appendTransaction(const char *filename, Transaction *transaction) {
+    FILE *file = fopen(filename, "ab");  // Open in append mode
+    if (!file) {
+        perror("Failed to open file for appending");
+        return;
+    }
+
+    fwrite(transaction, sizeof(Transaction), 1, file);
+    fclose(file);
+}
+
 TransactionNode *loadTransactionChain(const char *filename) {
     FILE *file = fopen(filename, "rb");
     if (!file) {
