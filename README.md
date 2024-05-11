@@ -148,14 +148,33 @@ Client commands:
     Value: 0x02
     Description: Request a payment path to user Y and make a payment if path found.
     Arguments Encoding:
+    identifier (32 byte)
     amount (64 byte)
 
-    3. REFUND
+    3. UPDATE_PAYMENT
     Value: 0x03
+    Description: Retransmit commit or finalize commands if payment got stuck.
+    Arguments Encoding:
+    identifier (32 byte)
+
+    4. REFUND
+    Value: 0x04
     Description: Used in failed multi-path payments.
     Arguments Encoding:
+    identifier (32 byte)
     amount (64 byte)
-    
+
+    5. GET_RECEIPT
+    Value: 0x05
+    Description: Get payment receipt.
+    Arguments Encoding:
+    identifier (32 byte)
+
+    6. CLEAR_RECEIPTS
+    Value: 0x06
+    Description: Delete all receipts.
+    Arguments Encoding:
+
 Server commands:
     
     128. SYNC_TRUSTLINE
