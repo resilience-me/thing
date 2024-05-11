@@ -182,8 +182,8 @@ Server commands:
     Description: Search path.
     Arguments Encoding:
     identifier (32 byte)
-    size (64 byte)
     depth (1 byte)
+    size (64 byte)
 
     130. COMMIT_PAYMENT
     Value: 0x82
