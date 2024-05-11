@@ -158,14 +158,19 @@ Client commands:
     Arguments Encoding:
     identifier (32 byte)
 
-    4. GET_RECEIPT
+    4. RECEIVE_PAYMENT
     Value: 0x04
+    Description: 
+    Arguments Encoding:
+    
+    5. GET_RECEIPT
+    Value: 0x05
     Description: Get payment receipt.
     Arguments Encoding:
     identifier (32 byte)
 
-    5. CLEAR_RECEIPTS
-    Value: 0x05
+    6. CLEAR_RECEIPTS
+    Value: 0x06
     Description: Delete all receipts.
     Arguments Encoding:
 
