@@ -150,7 +150,7 @@ Client commands:
 
     3. REFUND
     Value: 0x03
-    Description: Allow one-time trust line for refund, if original payment credit lines have had time to cleared before being able to refund full amount. Used in multi-path payments.
+    Description: Used in failed multi-path payments.
     Arguments Encoding:
     amount (64 byte)
     
