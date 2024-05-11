@@ -177,6 +177,24 @@ Server commands:
     Arguments Encoding:
     size (64 byte)
 
+    129. 
+    Value: 0x81
+    Description:
+    Arguments Encoding:
+    size (64 byte)
+
+    130. COMMIT_PAYMENT
+    Value: 0x82
+    Description: Commit a payment down a path.
+    Arguments Encoding:
+    size (64 byte)
+
+    131. FINALIZE_PAYMENT
+    Value: 0x83
+    Description: 
+    Arguments Encoding:
+    size (64 byte)
+
 ### Routing
 
 The routing is very simple. It is practically “stateless”, no routing tables are stored, all routing is generated for each payment request. The benefit is that paths change constantly in Ripple (as trust lines fill up or credit is cleared), so a “routing table” would not reflect the true state anyway.
