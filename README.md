@@ -177,23 +177,25 @@ Server commands:
     Arguments Encoding:
     size (64 byte)
 
-    129. 
+    129. FIND_PATH
     Value: 0x81
-    Description:
+    Description: Search path.
     Arguments Encoding:
+    identifier (32 byte)
     size (64 byte)
+    depth (1 byte)
 
     130. COMMIT_PAYMENT
     Value: 0x82
     Description: Commit a payment down a path.
     Arguments Encoding:
-    size (64 byte)
+    identifier (32 byte)
 
     131. FINALIZE_PAYMENT
     Value: 0x83
-    Description: 
+    Description: Finalize a payment down a path.
     Arguments Encoding:
-    size (64 byte)
+    identifier (32 byte)
 
 ### Routing
 
