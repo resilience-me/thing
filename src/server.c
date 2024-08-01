@@ -14,11 +14,13 @@ typedef struct {
 
 typedef void (*CommandHandler)(const Datagram*, int, struct sockaddr_in*);
 
+CommandHandler command_handlers[256];
+
 int main() {
     int sockfd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t addr_len = sizeof(client_addr);
-    Datagram datagram;
+    Datagram dg;
 
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) {
@@ -34,9 +36,14 @@ int main() {
     }
 
     while (1) {
-        int recv_len = recvfrom(sockfd, &datagram, sizeof(datagram), 0, (struct sockaddr *)&client_addr, &addr_len);
+        int recv_len = recvfrom(sockfd, &dg, sizeof(dg), 0, (struct sockaddr *)&client_addr, &addr_len);
         if (recv_len < 0) {
             continue;
+        }
+
+        CommandHandler handler = command_handlers[dg.command];
+        if (handler) {
+            handler(&dg, sockfd, &client_addr);
         }
     }
 }
