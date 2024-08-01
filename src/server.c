@@ -32,8 +32,8 @@ int main() {
     }
 
     while (1) {
-        int n = recvfrom(sockfd, &datagram, sizeof(datagram), 0, (struct sockaddr *)&client_addr, &addr_len);
-        if (n < 0) {
+        int recv_len = recvfrom(sockfd, &datagram, sizeof(datagram), 0, (struct sockaddr *)&client_addr, &addr_len);
+        if (recv_len < 0) {
             continue;
         }
     }
