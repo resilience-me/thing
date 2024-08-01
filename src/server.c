@@ -1,66 +1,41 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <arpa/inet.h>
 
 #define PORT 2012
-#define DATAGRAM_SIZE 389
+
+typedef struct {
+    char command;
+    char x_username[32];
+    char y_username[32];
+    char y_server_address[32];
+    char arguments[256];
+    char counter[4];
+    char signature[32];
+} Datagram;
 
 int main() {
     int sockfd;
-    struct sockaddr_in6 server_addr;
-    struct sockaddr_storage client_addr;
+    struct sockaddr_in server_addr, client_addr;
     socklen_t addr_len = sizeof(client_addr);
-    char buffer[DATAGRAM_SIZE];
+    Datagram datagram;
 
-    // Create socket
-    if ((sockfd = socket(AF_INET6, SOCK_DGRAM, 0)) == -1) {
-        perror("socket creation failed");
-        exit(EXIT_FAILURE);
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        return 1;
     }
 
-    // Set socket option to allow both IPv4 and IPv6
-    int opt = 0; // 0 enables dual-stack mode
-    if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&opt, sizeof(opt)) == -1) {
-        perror("setsockopt failed");
-        exit(EXIT_FAILURE);
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
+
+    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        return 1;
     }
 
-    // Initialize server address
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin6_family = AF_INET6;
-    server_addr.sin6_addr = in6addr_any;
-    server_addr.sin6_port = htons(PORT);
-
-    // Bind socket to both IPv4 and IPv6 addresses
-    if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
-    }
-
-    // Server loop
     while (1) {
-        // Receive data
-        ssize_t recv_len = recvfrom(sockfd, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &addr_len);
-        if (recv_len == -1) {
+        int n = recvfrom(sockfd, &datagram, sizeof(datagram), 0, (struct sockaddr *)&client_addr, &addr_len);
+        if (n < 0) {
             continue;
         }
-
-        // Deserialize received data
-        Datagram dg;
-        deserialize_datagram(buffer, &dg);
-
-        // Verify signature and nonce
-        if (!verify_signature(buffer, &dg) || !verify_nonce(dg.nonce)) continue;
-
-        // Call appropriate command handler
-        CommandHandler handler = command_handlers[dg.command];
-        if (handler) {
-            handler(&dg, sockfd, *(struct sockaddr_in *)&client_addr);
-        }
     }
 
-    close(sockfd);
     return 0;
 }
