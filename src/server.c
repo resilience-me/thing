@@ -12,7 +12,7 @@ typedef struct {
     char signature[32];
 } Datagram;
 
-typedef void (*CommandHandler)(Datagram*, int sockfd);
+typedef void (*CommandHandler)(const Datagram*, int, struct sockaddr_in*);
 
 int main() {
     int sockfd;
