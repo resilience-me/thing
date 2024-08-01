@@ -23,7 +23,7 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
     memcpy(data_with_key, dg, sizeof(Datagram) - sizeof(dg->signature));
     memcpy(data_with_key + sizeof(Datagram) - sizeof(dg->signature), secret_key, 32);
 
-    unsigned char hash[32];  
+    char hash[32];  
     sha256(data_with_key, sizeof(data_with_key), hash);
 
     if (memcmp(hash, dg->signature, sizeof(dg->signature)) != 0) {
