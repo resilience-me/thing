@@ -18,7 +18,8 @@ int main() {
     socklen_t addr_len = sizeof(client_addr);
     Datagram datagram;
 
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) {
         return 1;
     }
 
