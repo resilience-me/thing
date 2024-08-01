@@ -12,6 +12,8 @@ typedef struct {
     char signature[32];
 } Datagram;
 
+typedef void (*CommandHandler)(Datagram*, int sockfd);
+
 int main() {
     int sockfd;
     struct sockaddr_in server_addr, client_addr;
