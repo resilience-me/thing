@@ -41,7 +41,7 @@ int main() {
             continue;
         }
 
-        CommandHandler handler = command_handlers[dg.command];
+        CommandHandler handler = command_handlers[(unsigned char)dg.command];
         if (handler) {
             handler(&dg, sockfd, &client_addr);
         }
