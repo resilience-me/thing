@@ -9,6 +9,27 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
         return;
     }
 
+    char secret_key_path[192];
+    snprintf(secret_key_path, sizeof(secret_key_path), "%s/secretkey.txt", peer);
+
+    char secret_key[32];
+    FILE *key_file = fopen(secret_key_path, "r");
+    if (key_file) {
+        fread(secret_key, sizeof(char), 32, key_file);
+        fclose(key_file);
+    }
+
+    char data_with_key[sizeof(Datagram)];
+    memcpy(data_with_key, dg, sizeof(Datagram) - sizeof(dg->signature));
+    memcpy(data_with_key + sizeof(Datagram) - sizeof(dg->signature), secret_key, 32);
+
+    unsigned char hash[32];  
+    sha256(data_with_key, sizeof(data_with_key), hash);
+
+    if (memcmp(hash, dg->signature, sizeof(dg->signature)) != 0) {
+        return;
+    }
+
     char counter_out_path[192];
     snprintf(counter_out_path, sizeof(counter_out_path), "%s/counter_out.txt", peer);
 
@@ -36,14 +57,15 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
     
     FILE *trustline_file = fopen(trustline_out_path, "w");
     if (trustline_file) {
-        fwrite(&trustline, sizeof(int), 1, trustline_file);
+        fwrite(&trustline, sizeof(int), 1, trustline_file);  
         fclose(trustline_file);
     }
 
-    counter++;  
+    counter++;
     FILE *counter_file_write = fopen(counter_out_path, "w");
     if (counter_file_write) {
-        fwrite(&counter, sizeof(int), 1, counter_file_write);
+        int network_counter = htonl(counter);
+        fwrite(&network_counter, sizeof(int), 1, counter_file_write);
         fclose(counter_file_write);
     }
 }
