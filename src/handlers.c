@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include "sha256.h"
+
 void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_addr) {
     char datadir[32];
     snprintf(datadir, sizeof(datadir), "%s/.ripple", getenv("HOME"));
