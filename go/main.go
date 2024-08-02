@@ -3,7 +3,6 @@ package main
 import (
     "fmt"
     "net"
-    "os"
 )
 
 type Datagram struct {
@@ -18,18 +17,11 @@ type Datagram struct {
 
 type CommandHandler func(Datagram, *net.UDPAddr)
 
+// Direct initialization of commandHandlers
 var commandHandlers = [256]CommandHandler{
     handleSetTrustline, // Command 0
     handleGetTrustline, // Command 1
-    // other handlers explicitly set to nil by default
-}
-
-func handleSetTrustline(dg Datagram, addr *net.UDPAddr) {
-    fmt.Println("Handling Set Trustline")
-}
-
-func handleGetTrustline(dg Datagram, addr *net.UDPAddr) {
-    fmt.Println("Handling Get Trustline")
+    // All other handlers are implicitly set to nil
 }
 
 func main() {
@@ -65,4 +57,12 @@ func main() {
             fmt.Printf("No handler for command: %d\n", dg.Command)
         }
     }
+}
+
+func handleSetTrustline(dg Datagram, addr *net.UDPAddr) {
+    fmt.Println("Handling Set Trustline")
+}
+
+func handleGetTrustline(dg Datagram, addr *net.UDPAddr) {
+    fmt.Println("Handling Get Trustline")
 }
