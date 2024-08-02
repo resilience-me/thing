@@ -61,7 +61,3 @@ func setTrustline(dg Datagram, addr *net.UDPAddr) {
 
     fmt.Println("Trustline updated successfully for", peerUsername, "to", trustlineAmount)
 }
-
-func main() {
-    // Main function setup for UDP server would be here
-}
