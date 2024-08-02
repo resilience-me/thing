@@ -73,7 +73,7 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
     
     FILE *trustline_file = fopen(trustline_out_path, "w");
     if (trustline_file) {
-        fwrite(&trustline, sizeof(int), 1, trustline_file);  
+        fprintf(trustline_file, "%d\n", trustline);
         fclose(trustline_file);
     }
 
