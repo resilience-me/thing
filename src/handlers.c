@@ -27,6 +27,18 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
         fclose(key_file);
     }
 
+    char secret_key_string[65];
+    FILE *key_file = fopen(secret_key_path, "r");
+    if (key_file) {
+        fgets(secret_key_string, sizeof(secret_key_string), key_file);
+        fclose(key_file);
+    }
+    
+    char secret_key[32];
+    for (int i = 0; i < 32; i++) {
+        sscanf(secret_key_string + (i * 2), "%2hhx", &secret_key[i]);
+    }
+
     char data_with_key[sizeof(Datagram)];
     memcpy(data_with_key, dg, sizeof(Datagram) - sizeof(dg->signature));
     memcpy(data_with_key + sizeof(Datagram) - sizeof(dg->signature), secret_key, 32);
