@@ -3,18 +3,6 @@
 
 #define PORT 2012
 
-typedef struct {
-    char command;
-    char x_username[32];
-    char y_username[32];
-    char y_server_address[32];
-    char arguments[256];
-    char counter[4];
-    char signature[32];
-} Datagram;
-
-typedef void (*CommandHandler)(const Datagram*, int, struct sockaddr_in*);
-
 CommandHandler command_handlers[256]  = {
     [0] = set_trustline
 };
