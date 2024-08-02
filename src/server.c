@@ -18,6 +18,7 @@ typedef void (*CommandHandler)(const Datagram*, int, struct sockaddr_in*);
 CommandHandler command_handlers[256]  = {
     [0] = set_trustline
 };
+
 int main() {
     int sockfd;
     struct sockaddr_in server_addr, client_addr;
