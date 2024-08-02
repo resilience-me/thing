@@ -74,9 +74,9 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
 
     counter++;
     snprintf(counter_str, sizeof(counter_str), "%d", counter);
-    FILE *counter_file = fopen(counter_out_path, "w");
-    if (counter_file) {
-        fputs(counter_str, counter_file);
-        fclose(counter_file);
+    FILE *counter_file_write = fopen(counter_out_path, "w");
+    if (counter_file_write) {
+        fputs(counter_str, counter_file_write);
+        fclose(counter_file_write);
     }
 }
