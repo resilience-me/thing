@@ -48,14 +48,18 @@ func main() {
 
     for {
         var dg Datagram
-        _, remoteAddr, err := conn.ReadFromUDP(dg[:])
+        n, remoteAddr, err := conn.ReadFromUDP(dg[:])
         if err != nil {
             fmt.Fprintf(os.Stderr, "Error reading from UDP: %v\n", err)
             continue
         }
-
-        handler := commandHandlers[dg.Command]
-        if handler != nil {
+        if n != len(dg) {
+            fmt.Printf("Received incorrect datagram size from %s. Expected %d bytes, got %d bytes.\n", remoteAddr, len(dg), n)
+            continue
+        }
+        
+        // Fetch the appropriate handler based on the command byte.
+        if handler := commandHandlers[dg.Command]; handler != nil {
             handler(dg, remoteAddr)
         } else {
             fmt.Printf("No handler for command: %d\n", dg.Command)
