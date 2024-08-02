@@ -35,16 +35,17 @@ func handleGetTrustline(dg Datagram, addr *net.UDPAddr) {
 func main() {
     addr := net.UDPAddr{
         Port: 2012,
-        IP:   net.ParseIP("::"),
+        IP:   net.ParseIP("::"), // Listen on all IPv6 and mapped IPv4 addresses.
     }
+
     conn, err := net.ListenUDP("udp", &addr)
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error listening: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error listening on UDP port %d: %v\n", addr.Port, err)
         return
     }
     defer conn.Close()
 
-    fmt.Println("Server listening on all interfaces for IPv4 and IPv6.")
+    fmt.Printf("Server is listening on all network interfaces for both IPv4 and IPv6 at port %d\n", addr.Port)
 
     for {
         var dg Datagram
@@ -58,7 +59,6 @@ func main() {
             continue
         }
         
-        // Fetch the appropriate handler based on the command byte.
         if handler := commandHandlers[dg.Command]; handler != nil {
             handler(dg, remoteAddr)
         } else {
