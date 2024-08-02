@@ -6,7 +6,6 @@ import (
     "os"
 )
 
-// Datagram structure to define the packet structure
 type Datagram struct {
     Command        byte
     XUsername      [32]byte
@@ -17,51 +16,49 @@ type Datagram struct {
     Signature      [32]byte
 }
 
-// Define the type for command handlers
 type CommandHandler func(Datagram, *net.UDPAddr)
 
-// Array of command handlers, assuming commands 0 and 1 are implemented
-var commandHandlers = []CommandHandler{
+var commandHandlers = [256]CommandHandler{
     handleSetTrustline, // Command 0
     handleGetTrustline, // Command 1
-    // More handlers can be added here sequentially
+    // other handlers explicitly set to nil by default
+}
+
+func handleSetTrustline(dg Datagram, addr *net.UDPAddr) {
+    fmt.Println("Handling Set Trustline")
+}
+
+func handleGetTrustline(dg Datagram, addr *net.UDPAddr) {
+    fmt.Println("Handling Get Trustline")
 }
 
 func main() {
-    // Listening on both IPv4 and IPv6 addresses
     addr := net.UDPAddr{
         Port: 2012,
-        IP:   net.ParseIP("::"), // This handles both IPv6 and IPv4
+        IP:   net.ParseIP("::"),
     }
-
-    // Setup the UDP server
     conn, err := net.ListenUDP("udp", &addr)
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error listening on UDP port %d: %v\n", addr.Port, err)
+        fmt.Fprintf(os.Stderr, "Error listening: %v\n", err)
         return
     }
     defer conn.Close()
 
-    fmt.Printf("Server is listening on all network interfaces for both IPv4 and IPv6 at port %d\n", addr.Port)
+    fmt.Println("Server listening on all interfaces for IPv4 and IPv6.")
 
-    // Infinite loop to handle incoming datagrams
     for {
         var dg Datagram
-        n, remoteAddr, err := conn.ReadFromUDP(dg[:])
+        _, remoteAddr, err := conn.ReadFromUDP(dg[:])
         if err != nil {
             fmt.Fprintf(os.Stderr, "Error reading from UDP: %v\n", err)
             continue
         }
-        if n < len(dg) {
-            fmt.Println("Received incomplete datagram")
-            continue
-        }
 
-        // Dispatch the command using an array index
-        if int(dg.Command) < len(commandHandlers) {
-            commandHandlers[dg.Command](dg, remoteAddr)
+        handler := commandHandlers[dg.Command]
+        if handler != nil {
+            handler(dg, remoteAddr)
         } else {
-            fmt.Printf("Unknown command: %d\n", dg.Command)
+            fmt.Printf("No handler for command: %d\n", dg.Command)
         }
     }
 }
