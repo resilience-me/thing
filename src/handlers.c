@@ -42,12 +42,15 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
     snprintf(counter_out_path, sizeof(counter_out_path), "%s/counter_out.txt", peer);
 
     int prev_counter;
+    char counter_str[12];
+    
     FILE *counter_file = fopen(counter_out_path, "r");
     if (counter_file) {
-        fread(&prev_counter, sizeof(int), 1, counter_file);
+        fgets(counter_str, sizeof(counter_str), counter_file);
+        prev_counter = atoi(counter_str);
         fclose(counter_file);
     }
-
+    
     int counter;
     memcpy(&counter, dg->counter, sizeof(counter));
     counter = ntohl(counter);
@@ -70,10 +73,10 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
     }
 
     counter++;
-    FILE *counter_file_write = fopen(counter_out_path, "w");
-    if (counter_file_write) {
-        int network_counter = htonl(counter);
-        fwrite(&network_counter, sizeof(int), 1, counter_file_write);
-        fclose(counter_file_write);
+    snprintf(counter_str, sizeof(counter_str), "%d", counter);
+    FILE *counter_file = fopen(counter_out_path, "w");
+    if (counter_file) {
+        fputs(counter_str, counter_file);
+        fclose(counter_file);
     }
 }
