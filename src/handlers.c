@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
-#include "handlers.c"
+#include "handlers.h"
 #include "mac/sha2.h"
 
 void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_addr) {
