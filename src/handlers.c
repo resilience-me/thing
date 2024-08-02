@@ -20,13 +20,6 @@ void set_trustline(const Datagram *dg, int sockfd, struct sockaddr_in *client_ad
     char secret_key_path[192];
     snprintf(secret_key_path, sizeof(secret_key_path), "%s/secretkey.txt", peer);
 
-    char secret_key[32];
-    FILE *key_file = fopen(secret_key_path, "r");
-    if (key_file) {
-        fread(secret_key, sizeof(char), 32, key_file);
-        fclose(key_file);
-    }
-
     char secret_key_string[65];
     FILE *key_file = fopen(secret_key_path, "r");
     if (key_file) {
