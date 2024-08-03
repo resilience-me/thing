@@ -78,4 +78,25 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
     }
     
     fmt.Println("Trustline, counter and timestamp updated successfully.")
+
+    // Prepare the response datagram
+    responseDg := main.Datagram{
+        Command:       main.SetSyncCounter,
+        XUsername:     dg.YUsername,        // Reverse the usernames for response
+        YUsername:     dg.XUsername,
+        YServerAddress: main.GetServerAddress(), // Use the server's address
+        Counter:       dg.Counter,           // Copy the existing counter directly
+    }
+
+    // Sign the response datagram
+    if err := main.SignDatagram(&responseDg, peerDir); err != nil {
+        fmt.Printf("Error signing response datagram: %v\n", err)
+        return
+    }
+
+    // Send the response datagram back to the peer
+    _, err = conn.WriteToUDP(responseDg[:], addr)
+    if err != nil {
+        fmt.Printf("Error sending response datagram: %v\n", err)
+    }
 }
