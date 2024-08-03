@@ -6,7 +6,6 @@ import (
     "net"
     "os"
     "path/filepath"
-    "yourapp/data" // Adjust the import path based on your actual module setup
 )
 
 func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
