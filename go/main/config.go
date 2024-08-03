@@ -6,13 +6,29 @@ import (
     "path/filepath"
 )
 
-// loadServerAddress reads the server address from server_address.txt
-func loadServerAddress() (string, error) {
+var (
+    serverAddress []byte // Store the server address as a byte array
+)
+
+func GetServerAddress() []byte {
+    return serverAddress
+}
+
+// loadServerAddress reads the server address from the configuration file.
+func loadServerAddress() error {
     addressPath := filepath.Join(datadir, "server_address.txt")
     address, err := os.ReadFile(addressPath)
     if err != nil {
-        return "", fmt.Errorf("error reading server address file: %w", err)
+        return return fmt.Errorf("error loading server address: %w", err)
     }
+    serverAddress = address // Store as byte array
+    return nil
+}
 
-    return string(address), nil
+// InitConfig initializes the configuration
+func InitConfig() error {
+    if err := loadServerAddress(); err != nil {
+        return err
+    }
+    return nil
 }
