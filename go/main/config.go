@@ -8,6 +8,7 @@ import (
 
 var serverAddress []byte // Store the server address as a byte array
 
+// GetServerAddress returns the server address as a byte slice
 func GetServerAddress() []byte {
     return serverAddress
 }
@@ -17,7 +18,7 @@ func loadServerAddress() error {
     addressPath := filepath.Join(datadir, "server_address.txt")
     address, err := os.ReadFile(addressPath)
     if err != nil {
-        return return fmt.Errorf("error loading server address: %w", err)
+        return fmt.Errorf("error loading server address: %w", err)
     }
     serverAddress = address
     return nil
