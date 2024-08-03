@@ -45,7 +45,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
         return
     }
 
-    prevCounter, err := strconv.ParseUint(str, 10, 32) // Parse as uint64 first
+    prevCounter, err := strconv.ParseUint(string(prevCounterStr), 10, 32) // Parse as uint64 first
     if err != nil {
         fmt.Printf("Error parsing string: %v\n", err)
         return
