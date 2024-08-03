@@ -20,7 +20,6 @@ type CommandHandler func(Datagram, *net.UDPAddr)
 
 // Direct initialization of commandHandlers
 var commandHandlers = [256]CommandHandler{
-    handleSetTrustline, // Command 0
-    handleGetTrustline, // Command 1
+    setTrustline, // Command 0
     // All other handlers are implicitly set to nil
 }
