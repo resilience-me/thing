@@ -27,7 +27,7 @@ func generateSignature(dg Datagram, dir string) ([]byte, error) {
 }
 
 // signDatagram signs the given datagram by generating a signature.
-func signDatagram(dg *Datagram, dir string) error {
+func SignDatagram(dg *Datagram, dir string) error {
     signature, err := generateSignature(*dg, dir)
     if err != nil {
         return err
@@ -40,7 +40,7 @@ func signDatagram(dg *Datagram, dir string) error {
 }
 
 // verifySignature checks if the signature of the datagram is valid.
-func verifySignature(dg Datagram, dir string) error {
+func VerifySignature(dg Datagram, dir string) error {
     // Generate the expected signature based on the datagram
     expectedSignature, err := generateSignature(dg, dir)
     if err != nil {
