@@ -23,8 +23,9 @@ func setTrustline(dg Datagram, addr *net.UDPAddr) {
     }
 
     // Construct the trustline and counter file paths
-    counterOutPath := filepath.Join(peerDir, "counter_out.txt")
-    trustlineOutPath := filepath.Join(peerDir, "trustline_out.txt")
+    trustlineDir := filepath.Join(peerDir, "trustline")
+    counterOutPath := filepath.Join(trustlineDir, "counter_out.txt")
+    trustlineOutPath := filepath.Join(trustlineDir, "trustline_out.txt")
 
     // Load the previous counter value
     prevCounterStr, err := os.ReadFile(counterOutPath)
