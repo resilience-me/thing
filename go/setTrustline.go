@@ -6,15 +6,14 @@ import (
     "net"
     "os"
     "path/filepath"
+    "yourapp/data" // Adjust the import path based on your actual module setup
 )
 
 func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
     trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
-    peerDir := data.GetPeerDir(dg)
-
-    // Ensure the peer directory exists
-    if _, err := os.Stat(peerDir); os.IsNotExist(err) {
-        fmt.Printf("Peer directory does not exist: %s\n", peerDir)
+    peerDir, err := data.GetPeerDir(dg)
+    if err != nil {
+        fmt.Printf("Error getting peer directory: %v\n", err)
         return
     }
 
