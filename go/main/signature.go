@@ -8,8 +8,8 @@ import (
     "path/filepath"
 )
 
-func verifySignature(dg Datagram, peerDir string) error {
-    secretKey, err := loadSecretKey(peerDir)
+func verifySignature(dg Datagram, dir string) error {
+    secretKey, err := loadSecretKey(dir)
     if err != nil {
         return fmt.Errorf("error loading secret key: %w", err)
     }
@@ -24,7 +24,7 @@ func verifySignature(dg Datagram, peerDir string) error {
     return nil
 }
 
-func loadSecretKey(peerDir string) ([]byte, error) {
-    secretKeyPath := filepath.Join(peerDir, "secretkey.txt")
+func loadSecretKey(dir string) ([]byte, error) {
+    secretKeyPath := filepath.Join(dir, "secretkey.txt")
     return os.ReadFile(secretKeyPath)
 }
