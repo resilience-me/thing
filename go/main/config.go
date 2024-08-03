@@ -6,9 +6,7 @@ import (
     "path/filepath"
 )
 
-var (
-    serverAddress []byte // Store the server address as a byte array
-)
+var serverAddress []byte // Store the server address as a byte array
 
 func GetServerAddress() []byte {
     return serverAddress
@@ -21,12 +19,12 @@ func loadServerAddress() error {
     if err != nil {
         return return fmt.Errorf("error loading server address: %w", err)
     }
-    serverAddress = address // Store as byte array
+    serverAddress = address
     return nil
 }
 
 // InitConfig initializes the configuration
-func InitConfig() error {
+func initConfig() error {
     if err := loadServerAddress(); err != nil {
         return err
     }
