@@ -32,8 +32,7 @@ func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
     trustlineOutPath := filepath.Join(peerDir, "trustline_out.txt")
 
     // Load the previous counter value
-    prevCounterStr, err := os.ReadFile(counterOutPath);
-    
+    prevCounterStr, err := os.ReadFile(counterOutPath)
     if err != nil && !os.IsNotExist(err) {
         fmt.Printf("Error reading counter file: %v\n", err)
         return
@@ -42,7 +41,7 @@ func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
     if len(prevCounterStr) > 0 {
         prevCounter = int(binary.BigEndian.Uint32(prevCounterStr))
     }
-    
+
     // Check the counter
     incomingCounter := binary.BigEndian.Uint32(dg.Counter[:])
     if int(incomingCounter) <= prevCounter {
