@@ -8,10 +8,10 @@ import (
     "path/filepath"
 )
 
-func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
+func setTrustline(dg Datagram, addr *net.UDPAddr) {
     trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
 
-    peerDir, err := data.GetPeerDir(dg)
+    peerDir, err := GetPeerDir(dg)
     if err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err)
         return
