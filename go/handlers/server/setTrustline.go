@@ -81,7 +81,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
 
     // Prepare the response datagram
     responseDg := main.Datagram{
-        Command:       main.SetSyncCounter,
+        Command:       main.Server_SetSyncCounter,
         XUsername:     dg.YUsername,        // Reverse the usernames for response
         YUsername:     dg.XUsername,
         YServerAddress: main.GetServerAddress(), // Use the server's address
