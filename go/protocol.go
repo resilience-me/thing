@@ -2,6 +2,7 @@ package main
 
 import (
     "net"
+    "resilience/handlers"
 )
 
 // Datagram holds the structure of the incoming data
@@ -20,6 +21,6 @@ type CommandHandler func(Datagram, *net.UDPAddr)
 
 // Direct initialization of commandHandlers
 var commandHandlers = [256]CommandHandler{
-    setTrustline, // Command 0
+    handlers.setTrustline, // Command 0
     // All other handlers are implicitly set to nil
 }
