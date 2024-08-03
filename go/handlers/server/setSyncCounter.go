@@ -10,7 +10,7 @@ import (
     "resilience/main"
 )
 
-func SetTrustlineResponse(dg main.Datagram, addr *net.UDPAddr) {
+func SetSyncCounter(dg main.Datagram, addr *net.UDPAddr) {
     // Get the account directory
     accountDir, err := main.GetAccountDir(dg)
     if err != nil {
