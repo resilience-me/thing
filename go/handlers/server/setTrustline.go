@@ -64,16 +64,17 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
         return
     }
 
-    // Write the new counter value as a string
-    counterStr := fmt.Sprintf("%d", counter)
-    if err := os.WriteFile(counterInPath, []byte(counterStr), 0644); err != nil {
+    // Write the new counter value to the file directly
+    if err := os.WriteFile(counterInPath, []byte(fmt.Sprintf("%d", counter)), 0644); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err)
         return
     }
-
-    // Write the timestamp once at the end if everything is successful
-    timestamp := time.Now().Format(time.RFC3339)
-    os.WriteFile(timestampPath, []byte(timestamp), 0644)
+    
+    // Write the Unix timestamp directly to the file at the end if everything is successful
+    if err := os.WriteFile(timestampPath, []byte(fmt.Sprintf("%d", time.Now().Unix())), 0644); err != nil {
+        fmt.Printf("Error writing timestamp to file: %v\n", err)
+        return
+    }
     
     fmt.Println("Trustline, counter and timestamp updated successfully.")
 }
