@@ -44,14 +44,16 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
         fmt.Printf("Error reading counter file: %v\n", err)
         return
     }
-    prevCounter := 0
-    if len(prevCounterStr) > 0 {
-        prevCounter = int(binary.BigEndian.Uint32(prevCounterStr))
+
+    prevCounter, err := strconv.ParseUint(str, 10, 32) // Parse as uint64 first
+    if err != nil {
+        fmt.Printf("Error parsing string: %v\n", err)
+        return
     }
 
     // Check the counter
     counter := binary.BigEndian.Uint32(dg.Counter[:])
-    if int(counter) <= prevCounter {
+    if counter <= uint32(prevCounter) {
         fmt.Println("Received counter is not greater than previous counter. Potential replay attack.")
         return
     }
