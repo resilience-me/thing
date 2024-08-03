@@ -39,11 +39,3 @@ func main() {
         }
     }
 }
-
-func handleSetTrustline(dg Datagram, addr *net.UDPAddr) {
-    fmt.Println("Handling Set Trustline")
-}
-
-func handleGetTrustline(dg Datagram, addr *net.UDPAddr) {
-    fmt.Println("Handling Get Trustline")
-}
