@@ -6,7 +6,7 @@ import (
 )
 
 // Initialize datadir only once
-var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
+var datadir = filepath.Join(os.Getenv("HOME"), "resilience")
 
 // GetAccountDir constructs the account directory path from the datagram
 func GetAccountDir(dg Datagram) (string, error) {
