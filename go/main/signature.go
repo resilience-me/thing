@@ -42,13 +42,13 @@ func SignDatagram(dg *Datagram, dir string) error {
 // verifySignature checks if the signature of the datagram is valid.
 func VerifySignature(dg Datagram, dir string) error {
     // Generate the expected signature based on the datagram
-    expectedSignature, err := generateSignature(dg, dir)
+    generatedHash, err := generateSignature(dg, dir)
     if err != nil {
         return err
     }
 
     // Compare the generated hash with the provided signature
-    if !bytes.Equal(expectedSignature, dg.Signature[:]) {
+    if !bytes.Equal(generatedHash, dg.Signature[:]) {
         return fmt.Errorf("signature does not match")
     }
 
