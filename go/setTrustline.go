@@ -39,8 +39,8 @@ func setTrustline(dg Datagram, addr *net.UDPAddr) {
     }
 
     // Check the counter
-    incomingCounter := binary.BigEndian.Uint32(dg.Counter[:])
-    if int(incomingCounter) <= prevCounter {
+    counter := binary.BigEndian.Uint32(dg.Counter[:])
+    if int(counter) <= prevCounter {
         fmt.Println("Received counter is not greater than previous counter. Potential replay attack.")
         return
     }
@@ -51,11 +51,9 @@ func setTrustline(dg Datagram, addr *net.UDPAddr) {
         return
     }
 
-    // Increment and write the new counter value
-    newCounter := incomingCounter + 1
-    counterData := make([]byte, 4)
-    binary.BigEndian.PutUint32(counterData, newCounter)
-    if err := os.WriteFile(counterOutPath, counterData, 0644); err != nil {
+    // Write the new counter value as a string
+    counterStr := fmt.Sprintf("%d", counter)
+    if err := os.WriteFile(counterOutPath, []byte(counterStr), 0644); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err)
         return
     }
