@@ -2,7 +2,7 @@ package main
 
 import (
     "net"
-    "resilience/handlers"
+    "resilience/handlers/client"
 )
 
 // Datagram holds the structure of the incoming data
@@ -21,6 +21,6 @@ type CommandHandler func(Datagram, *net.UDPAddr)
 
 // CommandHandlers holds the command handlers
 var commandHandlers = [256]CommandHandler{
-    handlers.SetTrustline, // Command 0
+    client.SetTrustline, // Command 0
     // All other handlers are implicitly set to nil
 }
