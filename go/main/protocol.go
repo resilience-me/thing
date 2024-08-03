@@ -3,6 +3,7 @@ package main
 import (
     "net"
     "resilience/handlers/client"
+    "resilience/handlers/server"
 )
 
 // Datagram holds the structure of the incoming data
