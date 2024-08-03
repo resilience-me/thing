@@ -17,15 +17,10 @@ func setTrustline(dg Datagram, addr *net.UDPAddr) {
         return
     }
 
-    // Load the secret key
-    secretKeyPath := filepath.Join(peerDir, "secretkey.txt")
-    secretKey, err := os.ReadFile(secretKeyPath)
-    if err != nil {
-        fmt.Printf("Error reading secret key: %v\n", err)
+    if err := verifySignature(dg, peerDir); err != nil {
+        fmt.Printf("Signature verification failed: %v\n", err)
         return
     }
-
-    // Signature verification would go here (omitted for brevity)
 
     // Construct the trustline and counter file paths
     counterOutPath := filepath.Join(peerDir, "counter_out.txt")
