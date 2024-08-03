@@ -5,6 +5,13 @@ import (
     "net"
 )
 
+// Direct initialization of commandHandlers
+var commandHandlers = [256]CommandHandler{
+    handleSetTrustline, // Command 0
+    handleGetTrustline, // Command 1
+    // All other handlers are implicitly set to nil
+}
+
 func main() {
     addr := net.UDPAddr{
         Port: 2012,
