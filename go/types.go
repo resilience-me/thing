@@ -1,3 +1,5 @@
+package main
+
 import "net"
 
 // Datagram holds the structure of the incoming data
