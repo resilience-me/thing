@@ -21,6 +21,6 @@ type CommandHandler func(Datagram, *net.UDPAddr)
 
 // CommandHandlers holds the command handlers
 var commandHandlers = [256]CommandHandler{
-    handlers.setTrustline, // Command 0
+    handlers.SetTrustline, // Command 0
     // All other handlers are implicitly set to nil
 }
