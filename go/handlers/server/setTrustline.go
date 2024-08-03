@@ -35,7 +35,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
     // Get the trustline directory
     trustlineDir := filepath.Join(peerDir, "trustline")
 
-    // Construct the trustline and counter file paths
+    // Construct the trustline, counter and timestamp file paths
     counterInPath := filepath.Join(trustlineDir, "counter_in.txt")
     trustlineInPath := filepath.Join(trustlineDir, "trustline_in.txt")
     timestampPath := filepath.Join(trustlineDir, "sync_timestamp.txt")
@@ -75,5 +75,5 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
     timestamp := time.Now().Format(time.RFC3339)
     os.WriteFile(timestampPath, []byte(timestamp), 0644)
     
-    fmt.Println("Trustline and counter updated successfully.")
+    fmt.Println("Trustline, counter and timestamp updated successfully.")
 }
