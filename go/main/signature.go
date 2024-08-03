@@ -10,9 +10,11 @@ import (
 
 // generateSignature computes the SHA-256 signature for the given datagram.
 func generateSignature(dg Datagram, dir string) ([]byte, error) {
-    secretKey, err := loadSecretKey(dir)
+    // Load the secret key from the specified directory.
+    secretKeyPath := filepath.Join(dir, "secretkey.txt")
+    secretKey, err := os.ReadFile(secretKeyPath)
     if err != nil {
-        return nil, fmt.Errorf("error loading secret key: %w", err)
+        return nil, fmt.Errorf("error reading secret key: %w", err)
     }
 
     // Create a byte slice that contains the datagram without the signature
@@ -51,10 +53,4 @@ func verifySignature(dg Datagram, dir string) error {
     }
 
     return nil
-}
-
-
-func loadSecretKey(dir string) ([]byte, error) {
-    secretKeyPath := filepath.Join(dir, "secretkey.txt")
-    return os.ReadFile(secretKeyPath)
 }
