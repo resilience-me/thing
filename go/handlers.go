@@ -10,14 +10,6 @@ import (
     "strconv"
 )
 
-
-// Direct initialization of commandHandlers
-var commandHandlers = [256]CommandHandler{
-    handleSetTrustline, // Command 0
-    handleGetTrustline, // Command 1
-    // All other handlers are implicitly set to nil
-}
-
 func setTrustline(dg Datagram, addr *net.UDPAddr) {
     trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
     username := string(dg.XUsername[:]) // Assuming XUsername is null-terminated ASCII
