@@ -11,15 +11,17 @@ import (
 
 func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
     trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
-    
-    if peerDir, err := data.GetPeerDir(dg); err != nil {
+
+    peerDir, err := data.GetPeerDir(dg)
+    if err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err)
         return
     }
 
     // Load the secret key
     secretKeyPath := filepath.Join(peerDir, "secretkey.txt")
-    if secretKey, err := os.ReadFile(secretKeyPath); err != nil {
+    secretKey, err := os.ReadFile(secretKeyPath)
+    if err != nil {
         fmt.Printf("Error reading secret key: %v\n", err)
         return
     }
@@ -31,7 +33,9 @@ func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
     trustlineOutPath := filepath.Join(peerDir, "trustline_out.txt")
 
     // Load the previous counter value
-    if prevCounterStr, err := os.ReadFile(counterOutPath); err != nil && !os.IsNotExist(err) {
+    prevCounterStr, err := os.ReadFile(counterOutPath);
+    
+    if err != nil && !os.IsNotExist(err) {
         fmt.Printf("Error reading counter file: %v\n", err)
         return
     }
@@ -39,7 +43,7 @@ func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
     if len(prevCounterStr) > 0 {
         prevCounter = int(binary.BigEndian.Uint32(prevCounterStr))
     }
-
+    
     // Check the counter
     incomingCounter := binary.BigEndian.Uint32(dg.Counter[:])
     if int(incomingCounter) <= prevCounter {
@@ -48,7 +52,7 @@ func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
     }
 
     // Write the new trustline amount to the file
-    if err = os.WriteFile(trustlineOutPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
+    if err := os.WriteFile(trustlineOutPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
         fmt.Printf("Error writing trustline to file: %v\n", err)
         return
     }
@@ -57,7 +61,7 @@ func setTrustline(dg data.Datagram, addr *net.UDPAddr) {
     newCounter := incomingCounter + 1
     counterData := make([]byte, 4)
     binary.BigEndian.PutUint32(counterData, newCounter)
-    if err = os.WriteFile(counterOutPath, counterData, 0644); err != nil {
+    if err := os.WriteFile(counterOutPath, counterData, 0644); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err)
         return
     }
