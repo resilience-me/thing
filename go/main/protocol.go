@@ -18,7 +18,7 @@ type Datagram struct {
 }
 
 // CommandHandler defines the type for command handling functions
-type CommandHandler func(Datagram, *net.UDPAddr)
+type CommandHandler func(Datagram, *net.UDPAddr, *net.UDPConn)
 
 // CommandHandlers holds the command handlers
 var commandHandlers = [256]CommandHandler{
