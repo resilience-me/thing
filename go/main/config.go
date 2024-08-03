@@ -6,6 +6,8 @@ import (
     "path/filepath"
 )
 
+var LocalClientMode = false // Set to true to restrict client commands to localhost
+
 var serverAddress []byte // Store the server address as a byte array
 
 // GetServerAddress returns the server address as a byte slice
