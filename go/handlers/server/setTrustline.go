@@ -35,11 +35,11 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
     trustlineDir := filepath.Join(peerDir, "trustline")
 
     // Construct the trustline and counter file paths
-    counterOutPath := filepath.Join(trustlineDir, "counter_out.txt")
-    trustlineOutPath := filepath.Join(trustlineDir, "trustline_out.txt")
+    counterInPath := filepath.Join(trustlineDir, "counter_in.txt")
+    trustlineInPath := filepath.Join(trustlineDir, "trustline_in.txt")
 
     // Load the previous counter value
-    prevCounterStr, err := os.ReadFile(counterOutPath)
+    prevCounterStr, err := os.ReadFile(counterInPath)
     if err != nil && !os.IsNotExist(err) {
         fmt.Printf("Error reading counter file: %v\n", err)
         return
@@ -57,14 +57,14 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
     }
 
     // Write the new trustline amount to the file
-    if err := os.WriteFile(trustlineOutPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
+    if err := os.WriteFile(trustlineInPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
         fmt.Printf("Error writing trustline to file: %v\n", err)
         return
     }
 
     // Write the new counter value as a string
     counterStr := fmt.Sprintf("%d", counter)
-    if err := os.WriteFile(counterOutPath, []byte(counterStr), 0644); err != nil {
+    if err := os.WriteFile(counterInPath, []byte(counterStr), 0644); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err)
         return
     }
