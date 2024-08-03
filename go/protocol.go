@@ -19,7 +19,7 @@ type Datagram struct {
 // CommandHandler defines the type for command handling functions
 type CommandHandler func(Datagram, *net.UDPAddr)
 
-// Direct initialization of commandHandlers
+// CommandHandlers holds the command handlers
 var commandHandlers = [256]CommandHandler{
     handlers.setTrustline, // Command 0
     // All other handlers are implicitly set to nil
