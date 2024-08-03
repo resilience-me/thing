@@ -10,7 +10,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Failed to initialize configuration: %v\n", err)
         return
     }
-    
+
     addr := net.UDPAddr{
         Port: 2012,
         IP:   net.ParseIP("::"), // Listen on all IPv6 and mapped IPv4 addresses.
@@ -36,7 +36,19 @@ func main() {
             fmt.Printf("Received incorrect datagram size from %s. Expected %d bytes, got %d bytes.\n", remoteAddr, len(dg), n)
             continue
         }
-        
+
+        // Determine if the received command is a client command (where the most significant bit is 0)
+        isClientCommand := dg.Command < 128
+
+        // Check if the source IP address is not a loopback address (i.e., not localhost)
+        isNotLoopback := !remoteAddr.IP.IsLoopback()
+
+        // If LocalClientMode is enabled, reject any client commands coming from non-localhost addresses
+        if LocalClientMode && isClientCommand && isNotLoopback {
+            fmt.Printf("Received client command from non-localhost address: %s. Command rejected.\n", remoteAddr.IP)
+            continue
+        }
+
         if handler := commandHandlers[dg.Command]; handler != nil {
             handler(dg, remoteAddr)
         } else {
