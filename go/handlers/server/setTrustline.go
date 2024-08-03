@@ -27,7 +27,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
         return
     }
 
-    if err := main.verifySignature(dg, peerDir); err != nil {
+    if err := main.VerifySignature(dg, peerDir); err != nil {
         fmt.Printf("Signature verification failed: %v\n", err)
         return
     }
@@ -70,13 +70,13 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
         fmt.Printf("Error writing counter to file: %v\n", err)
         return
     }
-    
+
     // Write the Unix timestamp directly to the file at the end if everything is successful
     if err := os.WriteFile(timestampPath, []byte(fmt.Sprintf("%d", time.Now().Unix())), 0644); err != nil {
         fmt.Printf("Error writing timestamp to file: %v\n", err)
         return
     }
-    
+
     fmt.Println("Trustline, counter and timestamp updated successfully.")
 
     // Prepare the response datagram
