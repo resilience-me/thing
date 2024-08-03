@@ -6,6 +6,11 @@ import (
 )
 
 func main() {
+    if err := initConfig(); err != nil {
+        fmt.Fprintf(os.Stderr, "Failed to initialize configuration: %v\n", err)
+        return
+    }
+    
     addr := net.UDPAddr{
         Port: 2012,
         IP:   net.ParseIP("::"), // Listen on all IPv6 and mapped IPv4 addresses.
