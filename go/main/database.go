@@ -9,13 +9,24 @@ import (
 // Initialize datadir only once
 var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
 
-// GetPeerDir constructs the peer directory path from the datagram and checks if it exists.
-func GetPeerDir(dg Datagram) (string, error) {
+func GetAccountDir(dg Datagram) (string, error) {
     username := string(dg.XUsername[:])
+    accountDir := filepath.Join(datadir, "accounts", username)
+
+    // Ensure the account directory exists
+    if _, err := os.Stat(accountDir); err != nil {
+        return "", err
+    }
+
+    return accountDir, nil
+}
+
+// GetPeerDir constructs the peer directory path from the datagram and checks if it exists.
+func GetPeerDir(dg Datagram, accountDir string) (string, error) {
     peerUsername := string(dg.YUsername[:])
     peerAddress := string(dg.YServerAddress[:])
 
-    peerDir := filepath.Join(datadir, "accounts", username, "peers", peerAddress, peerUsername)
+    peerDir := filepath.Join(accountDir, "peers", peerAddress, peerUsername)
 
     // Ensure the peer directory exists
     if _, err := os.Stat(peerDir); err != nil {
