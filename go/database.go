@@ -18,8 +18,8 @@ func GetPeerDir(dg Datagram) (string, error) {
     peerDir := filepath.Join(datadir, "accounts", username, "peers", peerAddress, peerUsername)
 
     // Ensure the peer directory exists
-    if _, err := os.Stat(peerDir); os.IsNotExist(err) {
-        return "", fmt.Errorf("peer directory does not exist: %s", peerDir)
+    if _, err := os.Stat(peerDir); err != nil {
+        return "", err
     }
 
     return peerDir, nil
