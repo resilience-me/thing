@@ -22,8 +22,10 @@ func setTrustline(dg Datagram, addr *net.UDPAddr) {
         return
     }
 
-    // Construct the trustline and counter file paths
+    // Get the trustline directory
     trustlineDir := filepath.Join(peerDir, "trustline")
+
+    // Construct the trustline and counter file paths
     counterOutPath := filepath.Join(trustlineDir, "counter_out.txt")
     trustlineOutPath := filepath.Join(trustlineDir, "trustline_out.txt")
 
