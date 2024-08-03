@@ -10,16 +10,23 @@ import (
     "resilience/main"
 )
 
+// SetTrustline handles setting or updating a trustline from the client's perspective
 func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
     trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
 
-    peerDir, err := main.GetPeerDir(dg)
+    accountDir, err := main.GetAccountDir(dg)
+    if err != nil {
+        fmt.Printf("Error getting account directory: %v\n", err)
+        return
+    }
+
+    peerDir, err := main.GetPeerDir(dg, accountDir)
     if err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err)
         return
     }
 
-    if err := main.VerifySignature(dg, peerDir); err != nil {
+    if err := main.verifySignature(dg, accountDir); err != nil {
         fmt.Printf("Signature verification failed: %v\n", err)
         return
     }
