@@ -7,19 +7,19 @@ import (
     "os"
     "path/filepath"
 
-    "resilience"
+    "resilience/main"
 )
 
-func SetTrustline(dg resilience.Datagram, addr *net.UDPAddr) {
+func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
     trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
 
-    peerDir, err := resilience.GetPeerDir(dg)
+    peerDir, err := main.GetPeerDir(dg)
     if err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err)
         return
     }
 
-    if err := resilience.VerifySignature(dg, peerDir); err != nil {
+    if err := main.VerifySignature(dg, peerDir); err != nil {
         fmt.Printf("Signature verification failed: %v\n", err)
         return
     }
