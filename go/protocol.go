@@ -1,6 +1,8 @@
 package main
 
-import "net"
+import (
+    "net"
+)
 
 // Datagram holds the structure of the incoming data
 type Datagram struct {
@@ -15,3 +17,10 @@ type Datagram struct {
 
 // CommandHandler defines the type for command handling functions
 type CommandHandler func(Datagram, *net.UDPAddr)
+
+// Direct initialization of commandHandlers
+var commandHandlers = [256]CommandHandler{
+    handleSetTrustline, // Command 0
+    handleGetTrustline, // Command 1
+    // All other handlers are implicitly set to nil
+}
