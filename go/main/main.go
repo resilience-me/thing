@@ -37,14 +37,8 @@ func main() {
             continue
         }
 
-        // Determine if the received command is a client command (where the most significant bit is 0)
-        isClientCommand := dg.Command < 128
-
-        // Check if the source IP address is not a loopback address (i.e., not localhost)
-        isNotLoopback := !remoteAddr.IP.IsLoopback()
-
         // If LocalClientMode is enabled, reject any client commands coming from non-localhost addresses
-        if LocalClientMode && isClientCommand && isNotLoopback {
+        if LocalClientMode && dg.Command < 128 && !remoteAddr.IP.IsLoopback() {
             fmt.Printf("Received client command from non-localhost address: %s. Command rejected.\n", remoteAddr.IP)
             continue
         }
