@@ -12,7 +12,7 @@ import (
 )
 
 // SetTrustline handles setting or updating a trustline from the server's perspective
-func SetTrustline(dg main.Datagram, addr *net.UDPAddr) {
+func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
     trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
 
     accountDir, err := main.GetAccountDir(dg)
