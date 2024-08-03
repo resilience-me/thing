@@ -28,3 +28,10 @@ var commandHandlers = [256]CommandHandler{
     130: server.GetTrustline,    // Server Command
     // Other indices are nil by default
 }
+
+const (
+    Client_SetTrustline   = 0
+    Server_SetTrustline   = 128
+    Server_SetSyncCounter = 129
+    Server_GetTrustline   = 130
+)
