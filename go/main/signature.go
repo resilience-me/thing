@@ -9,7 +9,7 @@ import (
 )
 
 // generateSignature computes the SHA-256 signature for the given data.
-func generateSignature(data []byte, dir string) ([]byte, error) {
+func GenerateSignature(data []byte, dir string) ([]byte, error) {
     // Load the secret key from the specified directory.
     secretKeyPath := filepath.Join(dir, "secretkey.txt")
     secretKey, err := os.ReadFile(secretKeyPath)
