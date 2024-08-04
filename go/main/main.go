@@ -37,14 +37,8 @@ func main() {
             continue
         }
 
-        // If LocalClientMode is enabled, reject any client commands coming from non-localhost addresses
-        if LocalClientMode && dg.Command < 128 && !remoteAddr.IP.IsLoopback() {
-            fmt.Printf("Received client command from non-localhost address: %s. Command rejected.\n", remoteAddr.IP)
-            continue
-        }
-
         if handler := commandHandlers[dg.Command]; handler != nil {
-            handler(dg, remoteAddr)
+            handler(dg, remoteAddr, conn)
         } else {
             fmt.Printf("No handler for command: %d\n", dg.Command)
         }
