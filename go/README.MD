@@ -1,6 +1,6 @@
 # Ripple + Resilience, in a very simple true peer-to-peer implementation
 
-Uses UDP, single-threaded server, a standardized datagram format for both client and server (and a datagram for server-to-client responses). Any data stored in alphanumeric format in text files. Accounts are identified by a username, and, the address of their host server (IP address or domain name). "Database" managed with simple directories, `datadir/resilience/accounts/username/peers/server_address/username`. No encryption, only authentication. The reason to skip encryption is because it is not indispensable for the system. And the threat of eavesdropping is quite low (see "On skipping encryption" below. ) Counters (nonces) to prevent replay attacks. Retransmission and verification that payment succeeded and such can be added manually via client, this repository is the server only. Client can be "extended" with plug-in asymmeteric client to allow simple login via something like a website with password.
+Uses UDP, single-threaded server, a standardized datagram format for both client and server (and a datagram for server-to-client responses). Any data stored in alphanumeric format in text files. Accounts are identified by a username, and, the address of their host server (IP address or domain name). "Database" managed with simple directories, `datadir/resilience/accounts/username/peers/server_address/username`. No encryption, only authentication. The reason to skip encryption is because it is not indispensable for the system. And the threat of eavesdropping is quite low (see ["On skipping encryption"](https://github.com/resilience-me/thing/blob/main/go/README.MD#on-skipping-encryption) below. ) Counters (nonces) to prevent replay attacks. Retransmission and verification that payment succeeded and such can be added manually via client, this repository is the server only. Client can be "extended" with plug-in asymmeteric client to allow simple login via something like a website with password.
 
     type Datagram struct {
         Command        byte
@@ -22,6 +22,6 @@ Client return values use a standardized datagram too. It includes a random "nonc
         Signature    [32]byte
     }
 
-# On skipping encryption
+### On skipping encryption
 
 Account messages are not that sensitive information. Many people would be OK with having a conversation in public about their trustline to a friend, and eavesdropping on their internet routers and communication lines is comparable to eavesdropping in public places like cafés, a town square or a park.
