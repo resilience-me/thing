@@ -14,10 +14,10 @@ Uses UDP, single-threaded server, a standardized datagram format for both client
 
 The command is one byte, allowing 256 commands. The first 128 commands are client commands, the last 128 are server commands. In datagram, user X and user Y mean opposite things when using client commands and server commands. In client commands, the Y user is the user you want to interact with, and the X user is yourself. In server commands, the Y user is the user whose account sent the command, and the X user is the target user that the account wants to interact with. The counter is managed with different counters for different commands. The signature relies on a symmetric secret key, in client command shared by the server and the client, and in server commands shared by two users with a direct connection in the system (they will be user X and user Y in a given datagram. ) It is a simple sha256 of the datagram together with the secret key. And, the 256 byte long arguments field, can hold arbitrary data for operands to the command. The datagram is 389 bytes and fits well within a UDP packet.
 
-Client return values use a standardized datagram too. It includes a random "nonce" (so client can decide to listen to specific response), and then an a byte array Result with a return value or some arbitrary return data. The response datagram also includes a signature.
+Client return values use a standardized datagram too. It includes a random "nonce" (so client can decide to listen to specific response), and then an a byte array Result with a return value or some arbitrary return data. The nonce is the signature of the datagram sent by the client. The response datagram also includes a signature.
 
     type ResponseDatagram {
-        Nonce        [4]byte
+        Nonce        [32]byte
         Result       [256]byte
         Signature    [32]byte
     }
