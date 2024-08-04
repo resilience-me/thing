@@ -28,10 +28,9 @@ func GenerateSignature(data []byte, dir string) ([]byte, error) {
 
 // VerifySignature checks if the signature of the datagram is valid.
 func VerifySignature(dg Datagram, dir string) error {
-    data := make([]byte, len(dg)-32) // Adjust size based on the actual struct size
-    copy(data, dg[:len(dg)-32])      // Exclude the signature part
 
-    generatedHash, err := generateSignature(data, dir)
+    // Generate the expected signature based on the entire datagram
+    generatedHash, err := GenerateSignature(dg[:], dir)
     if err != nil {
         return err
     }
