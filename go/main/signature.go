@@ -17,6 +17,11 @@ func GenerateSignature(data []byte, dir string) ([]byte, error) {
         return nil, fmt.Errorf("error reading secret key: %w", err)
     }
 
+    // Check if data is at least 32 bytes long
+    if len(data) < 32 {
+        return nil, fmt.Errorf("data must be at least 32 bytes long")
+    }
+    
     // Create a byte slice that contains the data without the signature
     dataWithKey := append(data[:len(data)-32], secretKey...)
 
