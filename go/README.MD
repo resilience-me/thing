@@ -24,4 +24,4 @@ Client return values use a standardized datagram too. It includes a random "nonc
 
 ### On skipping encryption
 
-Account messages are not that sensitive information. Many people would be OK with having a conversation in public about their trustline to a friend, and eavesdropping on their internet routers and communication lines is comparable to eavesdropping in public places like cafés, a town square or a park.
+Account messages are not that sensitive information. Many people would be OK with having a conversation in public about their trustline to a friend, and eavesdropping on their internet routers and communication lines is comparable to eavesdropping in public places like cafés, a town square or a park. A "message authentication code" such as a hash function is also theoretically more secure than encryption (it is not reversible so theoretically more secure. ) It is easy to add encryption, either via asymmetric encryption, or, something like a one-time pad (the latter gives perfect secrecy, a property that Ripple is uniquely able to have. )
