@@ -6,6 +6,7 @@ import (
     "net"
     "os"
     "path/filepath"
+    "strconv"
     "time"
 
     "resilience/main"
@@ -65,13 +66,13 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
         return
     }
 
-    // Write the new counter value to the file directly
+    // Write the new counter value to the file
     if err := os.WriteFile(counterInPath, []byte(fmt.Sprintf("%d", counter)), 0644); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err)
         return
     }
 
-    // Write the Unix timestamp directly to the file at the end if everything is successful
+    // Write the Unix timestamp to the file
     if err := os.WriteFile(timestampPath, []byte(fmt.Sprintf("%d", time.Now().Unix())), 0644); err != nil {
         fmt.Printf("Error writing timestamp to file: %v\n", err)
         return
@@ -88,9 +89,10 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
         Counter:       dg.Counter,           // Copy the existing counter directly
     }
 
-    signature, err := generateSignature(responseDg[:], peerDir)
+    signature, err := main.GenerateSignature(responseDg[:], peerDir)
     if err != nil {
-        return err
+        fmt.Printf("Error generating signature: %v\n", err)
+        return
     }
 
     // Copy the generated signature into the response datagram's signature field
