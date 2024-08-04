@@ -18,7 +18,7 @@ type Datagram struct {
 }
 
 type ResponseDatagram {
-    Nonce        [4]byte
+    Nonce        [32]byte
     Result       [256]byte
     Signature    [32]byte
 }
