@@ -17,6 +17,12 @@ type Datagram struct {
     Signature      [32]byte
 }
 
+type ResponseDatagram {
+    Nonce        [4]byte
+    Result       [256]byte
+    Signature    [32]byte
+}
+
 // CommandHandler defines the type for command handling functions
 type CommandHandler func(Datagram, *net.UDPAddr, *net.UDPConn)
 
