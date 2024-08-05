@@ -58,7 +58,10 @@ func SignDatagram(dg *Datagram) error {
 }
 
 // SignResponseDatagram signs the given ResponseDatagram by generating a signature.
-func SignResponseDatagram(rd *ResponseDatagram, accountDir string) error {
+func SignResponseDatagram(rd *ResponseDatagram, username string) error {
+    // Construct the account directory path from the username
+    accountDir := filepath.Join(datadir, "accounts", username)
+
     // Load the secret key
     secretKey, err := loadSecretKey(accountDir)
     if err != nil {
