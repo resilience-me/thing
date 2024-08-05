@@ -35,7 +35,10 @@ func generateSignature(data []byte, secretKey []byte) ([]byte, error) {
 }
 
 // SignDatagram signs the given Datagram by generating a signature.
-func SignDatagram(dg *Datagram, peerDir string) error {
+func SignDatagram(dg *Datagram) error {
+    // Get the peer directory based on the datagram
+    peerDir := GetPeerDir(dg)
+
     // Load the secret key
     secretKey, err := loadSecretKey(peerDir)
     if err != nil {
