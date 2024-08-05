@@ -11,7 +11,7 @@ import (
 // loadSecretKey loads the secret key from the specified directory.
 func loadSecretKey(dir string) ([]byte, error) {
     secretKeyPath := filepath.Join(dir, "secretkey.txt")
-    secretKey err := os.ReadFile(secretKeyPath)
+    secretKey, err := os.ReadFile(secretKeyPath)
     if err != nil {
         return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
     }
