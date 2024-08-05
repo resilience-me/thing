@@ -1,6 +1,6 @@
 # Ripple + Resilience, in a very simple true peer-to-peer implementation
 
-Uses UDP, single-threaded server, a standardized datagram format for both client and server (and a datagram for server-to-client responses). Any data stored in alphanumeric format in text files. Accounts are identified by a username, and, the address of their host server (IP address or domain name). "Database" managed with simple directories, `datadir/resilience/accounts/username/peers/server_address/username`. No encryption, only authentication. Counters (nonces) to prevent replay attacks. Retransmission and verification that payment succeeded and such can be added manually via client, this repository is the server only. Client can be "extended" with plug-in asymmeteric client to allow simple login via something like a website with password.
+Uses UDP, single-threaded server, a standardized datagram format for both client and server (and a datagram for server-to-client responses). Any data stored in alphanumeric format in text files. Accounts are identified by a username, and, the address of their host server (IP address or domain name). "Database" managed with simple directories, `datadir/resilience/accounts/username/peers/server_address/username`. No encryption, only authentication. Counters (nonces) to prevent replay attacks. Retransmission and verification that payment succeeded and such can be added manually via client, this repository is the server only.
 
     type Datagram struct {
         Command        byte
