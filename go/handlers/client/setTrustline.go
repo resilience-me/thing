@@ -16,8 +16,10 @@ import (
 func SetTrustline(ctx main.HandlerContext) {
     trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
+    username := string(ctx.Datagram.XUsername[:])
+
     // Check if the account exists using the username from the datagram
-    if err := main.CheckAccountExists(string(ctx.Datagram.XUsername[:])); err != nil {
+    if err := main.CheckAccountExists(username); err != nil {
         fmt.Printf("Error getting account directory: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to get account directory.") // Send simpler error message
         return
