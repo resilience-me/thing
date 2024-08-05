@@ -24,6 +24,13 @@ func GetPeerDir(dg *Datagram) string {
     return filepath.Join(datadir, "accounts", username, "peers", peerAddress, peerUsername)
 }
 
+// GetTrustlineDir constructs the trustline directory path from the datagram and returns it.
+func GetTrustlineDir(dg *Datagram) string {
+    peerDir := GetPeerDir(dg)
+    trustlineDir := filepath.Join(peerDir, "trustline")
+    return trustlineDir
+}
+
 // CheckAccountExists checks if the account directory exists
 func CheckAccountExists(dg *Datagram) error {
     accountDir := GetAccountDir(dg)
