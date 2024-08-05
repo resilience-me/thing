@@ -12,23 +12,27 @@ import (
     "resilience/main"
 )
 
-// SetTrustline handles setting or updating a trustline from the server's perspective
+// SetTrustline handles setting or updating a trustline from another server's perspective
 func SetTrustline(ctx main.HandlerContext) {
     trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
-    accountDir, err := main.GetAccountDir(ctx.Datagram)
-    if err != nil {
+    // Check if the account exists using the username from the datagram
+    if err := main.CheckAccountExists(ctx.Datagram); err != nil {
         fmt.Printf("Error getting account directory: %v\n", err)
         return
     }
 
-    peerDir, err := main.GetPeerDir(ctx.Datagram, accountDir)
-    if err != nil {
+    // Get the peer directory
+    peerDir := main.GetPeerDir(ctx.Datagram)
+
+    // Check if the peer exists
+    if err := main.CheckPeerExists(peerDir); err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err)
         return
     }
 
-    if err := main.VerifySignature(ctx.Datagram, peerDir); err != nil {
+    // Verify the incoming request's signature
+    if err := main.VerifyServerSignature(ctx.Datagram); err != nil {
         fmt.Printf("Signature verification failed: %v\n", err)
         return
     }
@@ -36,7 +40,7 @@ func SetTrustline(ctx main.HandlerContext) {
     // Get the trustline directory
     trustlineDir := filepath.Join(peerDir, "trustline")
 
-    // Construct the trustline, counter and timestamp file paths
+    // Construct the trustline, counter, and timestamp file paths
     counterInPath := filepath.Join(trustlineDir, "counter_in.txt")
     trustlineInPath := filepath.Join(trustlineDir, "trustline_in.txt")
     timestampPath := filepath.Join(trustlineDir, "sync_timestamp.txt")
@@ -81,7 +85,7 @@ func SetTrustline(ctx main.HandlerContext) {
 
     fmt.Println("Trustline, counter, and timestamp updated successfully.")
 
-    // Prepare the datagram
+    // Prepare the datagram to send back to the peer
     dg := main.Datagram{
         Command:       main.Server_SetSyncCounter,
         XUsername:     ctx.Datagram.YUsername,       // Reverse the usernames for response
@@ -90,7 +94,8 @@ func SetTrustline(ctx main.HandlerContext) {
         Counter:       ctx.Datagram.Counter,           // Copy the existing counter directly
     }
 
-    if err := main.SignDatagram(&dg, peerDir); err != nil {
+    // Sign the datagram
+    if err := main.SignDatagram(&dg); err != nil {
         fmt.Printf("Failed to sign datagram: %v\n", err)
         return
     }
