@@ -89,7 +89,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
         Counter:       dg.Counter,           // Copy the existing counter directly
     }
 
-    if err := signDatagram(&responseDg, peerDir); err != nil {
+    if err := main.SignDatagram(&responseDg, peerDir); err != nil {
         fmt.Printf("Failed to sign datagram: %v\n", err)
         return
     }
