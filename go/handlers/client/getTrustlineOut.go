@@ -4,31 +4,29 @@ import (
     "net"
     "os"
     "path/filepath"
+
     "resilience/main"
+    "resilience/handlers"
 )
 
 // Handles fetching the outbound trustline information
 func GetTrustlineOut(ctx main.HandlerContext) {
-    peerDir, err := main.GetPeerDir(ctx.Datagram, ctx.Datagram)
+    peerDir, err := main.GetPeerDir(ctx.Datagram)
     if err != nil {
-        // Send error response to the client
-        _ = main.SendErrorResponse(ctx, "Error getting peer directory for outbound trustline.")
-        return
+        _ = handlers.SendErrorResponse(ctx, "Error getting peer directory for outbound trustline.")
+        return // Optionally handle or log the error
     }
 
     trustlineOutPath := filepath.Join(peerDir, "trustline", "trustline_out.txt")
     trustlineAmount, err := os.ReadFile(trustlineOutPath)
     if err != nil {
-        // Send error response to the client
-        _ = main.SendErrorResponse(ctx, "Error reading outbound trustline file.")
-        return
+        _ = handlers.SendErrorResponse(ctx, "Error reading outbound trustline file.")
+        return // Optionally handle or log the error
     }
 
-    // Send success response with trustline amount
-    _, err = ctx.Conn.WriteToUDP(trustlineAmount, ctx.Addr)
+    _, err = conn.WriteToUDP(trustlineAmount, addr)
     if err != nil {
-        // Send error response to the client
-        _ = main.SendErrorResponse(ctx, "Error sending outbound trustline amount.")
-        return
+        _ = handlers.SendErrorResponse(ctx, "Error sending outbound trustline amount.")
+        return // Optionally handle or log the error
     }
 }
