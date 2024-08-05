@@ -3,11 +3,8 @@ package server
 import (
 	"encoding/binary"
 	"fmt"
-	"os"
-	"path/filepath"
 	"resilience/main"
 	"resilience/handlers"
-	"strconv"
 )
 
 // GetTrustline handles the request to get the current trustline amount from another server
@@ -18,34 +15,17 @@ func GetTrustline(ctx main.HandlerContext) {
 		return
 	}
 
-	// Get the trustline directory
-	trustlineDir := main.GetTrustlineDir(ctx.Datagram)
-	trustlinePath := filepath.Join(trustlineDir, "trustline_out.txt")
-	counterOutPath := filepath.Join(trustlineDir, "counter_out.txt")
-
-	// Read the current trustline amount
-	trustlineAmountBytes, err := os.ReadFile(trustlinePath)
+	// Retrieve the current trustline amount
+	trustline, err := main.GetTrustlineOut(ctx.Datagram)
 	if err != nil {
-		fmt.Printf("Error reading trustline amount: %v\n", err)
+		fmt.Printf("Error getting trustline: %v\n", err)
 		return
 	}
 
-	trustlineAmount, err := strconv.ParseUint(string(trustlineAmountBytes), 10, 32)
+	// Retrieve the current counter value
+	counter, err := main.GetCounterOut(ctx.Datagram)
 	if err != nil {
-		fmt.Printf("Error parsing trustline amount: %v\n", err)
-		return
-	}
-
-	// Read the current counter value (alphanumeric)
-	counterStr, err := os.ReadFile(counterOutPath)
-	if err != nil {
-		fmt.Printf("Error reading counter: %v\n", err)
-		return
-	}
-
-	counter, err := strconv.ParseUint(string(counterStr), 10, 32)
-	if err != nil {
-		fmt.Printf("Error parsing counter: %v\n", err)
+		fmt.Printf("Error getting counter: %v\n", err)
 		return
 	}
 
@@ -58,9 +38,9 @@ func GetTrustline(ctx main.HandlerContext) {
 	}
 
 	// Set the trustline amount in the arguments section of the Datagram
-	binary.BigEndian.PutUint32(dg.Arguments[:4], uint32(trustlineAmount))
+	binary.BigEndian.PutUint32(dg.Arguments[:4], trustline)
 	// Set the current counter in the Datagram
-	binary.BigEndian.PutUint32(dg.Counter[:], uint32(counter))
+	binary.BigEndian.PutUint32(dg.Counter[:], counter)
 
 	// Use the handlers.SignAndSendDatagram to sign and send the datagram
 	if err := handlers.SignAndSendDatagram(ctx, &dg); err != nil {
