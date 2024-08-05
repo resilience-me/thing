@@ -32,7 +32,7 @@ func generateSignature(data []byte, dir string) ([]byte, error) {
 }
 
 // signDatagram signs the given Datagram by generating a signature.
-func signDatagram(dg *Datagram, dir string) error {
+func SignDatagram(dg *Datagram, dir string) error {
     // Call generateSignature directly with the Datagram's byte representation
     signature, err := generateSignature((*dg)[:], dir)
     if err != nil {
@@ -46,7 +46,7 @@ func signDatagram(dg *Datagram, dir string) error {
 }
 
 // signResponseDatagram signs the given ResponseDatagram by generating a signature.
-func signResponseDatagram(rd *ResponseDatagram, dir string) error {
+func SignResponseDatagram(rd *ResponseDatagram, dir string) error {
     // Call generateSignature directly with the ResponseDatagram's byte representation
     signature, err := generateSignature((*rd)[:], dir)
     if err != nil {
