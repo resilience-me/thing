@@ -6,16 +6,12 @@ import (
 )
 
 // SignAndSendResponseDatagram signs and sends the response datagram.
-func SignAndSendResponseDatagram(responseDg *ResponseDatagram, addr *net.UDPAddr, conn *net.UDPConn, dir string) error {
-    // Generate signature for ResponseDatagram
-    signature, err := GenerateSignature((*responseDg)[:], dir)
-    if err != nil {
-        return fmt.Errorf("failed to generate signature for ResponseDatagram: %w", err)
+func SignAndSendResponseDatagram(responseDg *ResponseDatagram, addr *net.UDPAddr, conn *net.UDPConn, accountDir string) error {
+    // Generate signature for response datagram
+    if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
+        fmt.Printf("Failed to sign response datagram: %v\n", err)
+        return
     }
-
-    // Copy the generated signature into the response datagram's signature field
-    copy(responseDg.Signature[:], signature)
-
     // Send the signed response datagram
     _, err = conn.WriteToUDP(responseDg[:], addr)
     if err != nil {
@@ -26,15 +22,12 @@ func SignAndSendResponseDatagram(responseDg *ResponseDatagram, addr *net.UDPAddr
 }
 
 // SignAndSendDatagram signs and sends the datagram
-func SignAndSendDatagram(dg *Datagram, addr *net.UDPAddr, conn *net.UDPConn, dir string) error {
+func SignAndSendDatagram(dg *Datagram, addr *net.UDPAddr, conn *net.UDPConn, peerDir string) error {
     // Generate signature for Datagram
-    signature, err := GenerateSignature((*dg)[:], dir)
-    if err != nil {
-        return fmt.Errorf("failed to generate signature for Datagram: %w", err)
+    if err := main.SignDatagram(&dg, peerDir); err != nil {
+        fmt.Printf("Failed to sign response datagram: %v\n", err)
+        return
     }
-
-    // Copy the generated signature into the datagram's signature field
-    copy(dg.Signature[:], signature)
 
     // Send the signed datagram
     _, err := conn.WriteToUDP(dg[:], addr)
