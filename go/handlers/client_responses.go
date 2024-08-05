@@ -31,18 +31,22 @@ func SendErrorResponse(ctx main.HandlerContext, errorMessage string) error {
     return nil
 }
 
-func SendSuccessResponse(ctx main.HandlerContext, result []byte) error {
+// SendSuccessResponse prepares and sends a success response datagram.
+func SendSuccessResponse(ctx main.HandlerContext, resultData []byte) error {
     var responseDg main.ResponseDatagram
-    copy(responseDg.Nonce[:], ctx.Datagram.Signature[:])
+    // Use the original signature as the nonce, dereferencing ctx.Datagram
+    copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) 
     responseDg.Result[0] = 0 // Set success code
-    copy(responseDg.Result[1:], result)
+    copy(responseDg.Result[1:], resultData) // Copy the result data
 
-    accountDir := main.GetAccountDir(ctx.Datagram)
-    if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
+    // Use GetAccountDir to construct the account directory path
+    username := string(ctx.Datagram.XUsername[:])
+    if err := main.SignResponseDatagram(&responseDg, username); err != nil {
         fmt.Printf("Failed to sign response datagram: %v\n", err)
         return err
     }
 
+    // Send the signed response datagram
     _, err := ctx.Conn.WriteToUDP(responseDg[:], ctx.Addr)
     if err != nil {
         return fmt.Errorf("error sending response datagram: %w", err)
