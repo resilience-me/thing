@@ -50,7 +50,6 @@ func SignDatagram(dg *Datagram) error {
     return nil
 }
 
-
 // SignResponseDatagram signs the given ResponseDatagram by generating a signature.
 func SignResponseDatagram(rd *ResponseDatagram, username string) error {
     // Construct the account directory path from the username
