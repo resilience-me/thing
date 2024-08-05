@@ -12,7 +12,7 @@
 //     "resilience/handlers"
 // )
 
-// // fetchTrustline handles fetching the trustline information for both inbound and outbound.
+// // getTrustline handles fetching the trustline information for both inbound and outbound.
 // func getTrustline(ctx main.HandlerContext, filename string) {
 //     // Validate the client request
 //     if err := handlers.ValidateClientRequest(ctx); err != nil {
