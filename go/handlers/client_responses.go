@@ -13,11 +13,9 @@ func SendErrorResponse(ctx main.HandlerContext, errorMessage string) error {
     responseDg.Result[0] = 1 // Set error code
     copy(responseDg.Result[1:], []byte(errorMessage)) // Copy the error message
 
-    // Use GetAccountDir to construct the account directory path
-    accountDir := main.GetAccountDir(ctx.Datagram)
-    
     // Generate signature for response datagram
-    if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
+    username := string(ctx.Datagram.XUsername[:])
+    if err := main.SignResponseDatagram(&responseDg, username); err != nil {
         fmt.Printf("Failed to sign response datagram: %v\n", err)
         return err
     }
@@ -39,7 +37,7 @@ func SendSuccessResponse(ctx main.HandlerContext, resultData []byte) error {
     responseDg.Result[0] = 0 // Set success code
     copy(responseDg.Result[1:], resultData) // Copy the result data
 
-    // Use GetAccountDir to construct the account directory path
+    // Generate signature for response datagram
     username := string(ctx.Datagram.XUsername[:])
     if err := main.SignResponseDatagram(&responseDg, username); err != nil {
         fmt.Printf("Failed to sign response datagram: %v\n", err)
