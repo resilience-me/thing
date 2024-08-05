@@ -40,23 +40,13 @@ func GetTrustlineIn(ctx main.HandlerContext) {
         return
     }
 
-    // Prepare response datagram
-    var responseDg main.ResponseDatagram
-    responseDg.Result[0] = 0 // Set success code
-    copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) // Use the original signature as the nonce
+    // Prepare success response
+    responseData := make([]byte, 4) // Allocate 4 bytes for the trustline amount
+    binary.BigEndian.PutUint32(responseData, uint32(trustlineAmount)) // Convert the trustline amount to bytes
 
-    // Store the trustline amount as bytes in the response
-    binary.BigEndian.PutUint32(responseDg.Result[1:], uint32(trustlineAmount)) // Convert back to bytes
-    if err := main.SignResponseDatagram(&responseDg, string(ctx.Datagram.XUsername[:])) ; err != nil {
-        fmt.Printf("Failed to sign response datagram: %v\n", err) // Log the error
-        _ = handlers.SendErrorResponse(ctx, "Failed to sign response datagram.")
-        return
-    }
-
-    // Send the response back to the client
-    _, err = ctx.Conn.WriteToUDP(responseDg[:], ctx.Addr)
-    if err != nil {
-        fmt.Printf("Error sending inbound trustline amount: %v\n", err) // Log the error
+    // Send the success response back to the client
+    if err := handlers.SendSuccessResponse(ctx, responseData); err != nil {
+        fmt.Printf("Error sending success response: %v\n", err) // Log the error
         return
     }
 
