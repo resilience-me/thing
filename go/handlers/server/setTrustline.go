@@ -79,15 +79,10 @@ func SetTrustline(ctx main.HandlerContext) {
         Counter:       ctx.Datagram.Counter,           // Copy the existing counter directly
     }
 
-    // Sign the datagram
-    if err := main.SignDatagram(&dg); err != nil {
-        fmt.Printf("Failed to sign datagram: %v\n", err)
-        return
+    // Replace explicit signing and sending with the centralized function call
+    if err := handlers.SignAndSendDatagram(ctx, &dg); err != nil {
+        fmt.Printf("Failed to sign and send datagram: %v\n", err)
     }
-
-    // Send the datagram back to the peer
-    _, err = ctx.Conn.WriteToUDP(dg[:], ctx.Addr)
-    if err != nil {
-        fmt.Printf("Error sending datagram: %v\n", err)
-    }
+    // Add a success message indicating all operations were successful
+    fmt.Println("Trustline update and datagram sending completed successfully.")
 }
