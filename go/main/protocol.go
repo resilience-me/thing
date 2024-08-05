@@ -23,8 +23,15 @@ type ResponseDatagram {
     Signature    [32]byte
 }
 
+// HandlerContext holds the common parameters for handler functions
+type HandlerContext struct {
+    Datagram main.Datagram
+    Addr     *net.UDPAddr
+    Conn     *net.UDPConn
+}
+
 // CommandHandler defines the type for command handling functions
-type CommandHandler func(Datagram, *net.UDPAddr, *net.UDPConn)
+type CommandHandler func(HandlerContext)
 
 // CommandHandlers holds the command handlers
 var commandHandlers = [256]CommandHandler{
