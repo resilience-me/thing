@@ -9,7 +9,7 @@ import (
 )
 
 // generateSignature computes the SHA-256 signature for the given data.
-func generateSignature(data []byte, dir string) ([]byte, error) {
+func GenerateSignature(data []byte, dir string) ([]byte, error) {
     // Load the secret key from the specified directory.
     secretKeyPath := filepath.Join(dir, "secretkey.txt")
     secretKey, err := os.ReadFile(secretKeyPath)
@@ -31,38 +31,10 @@ func generateSignature(data []byte, dir string) ([]byte, error) {
     return generatedHash[:], nil
 }
 
-// signDatagram signs the given Datagram by generating a signature.
-func SignDatagram(dg *Datagram, dir string) error {
-    // Call generateSignature directly with the Datagram's byte representation
-    signature, err := generateSignature((*dg)[:], dir)
-    if err != nil {
-        return fmt.Errorf("failed to generate signature for Datagram: %w", err)
-    }
-
-    // Copy the generated signature into the datagram's signature field
-    copy(dg.Signature[:], signature)
-
-    return nil
-}
-
-// signResponseDatagram signs the given ResponseDatagram by generating a signature.
-func SignResponseDatagram(rd *ResponseDatagram, dir string) error {
-    // Call generateSignature directly with the ResponseDatagram's byte representation
-    signature, err := generateSignature((*rd)[:], dir)
-    if err != nil {
-        return fmt.Errorf("failed to generate signature for ResponseDatagram: %w", err)
-    }
-
-    // Copy the generated signature into the response datagram's signature field
-    copy(rd.Signature[:], signature)
-
-    return nil
-}
-
 // VerifySignature checks if the signature of the datagram is valid.
 func VerifySignature(dg Datagram, dir string) error {
     // Generate the expected signature based on the entire datagram
-    generatedHash, err := generateSignature(dg[:], dir)
+    generatedHash, err := GenerateSignature(dg[:], dir)
     if err != nil {
         return fmt.Errorf("failed to generate signature for verification: %w", err)
     }
