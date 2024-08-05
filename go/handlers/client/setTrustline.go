@@ -16,14 +16,15 @@ import (
 func SetTrustline(ctx main.HandlerContext) {
     trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
-    accountDir := main.GetAccountDir(ctx.Datagram)
-    peerDir := main.GetPeerDir(ctx.Datagram)
+    username := string(ctx.Datagram.XUsername[:])
 
-    if err := main.CheckAccountExists(accountDir); err != nil {
+    if err := main.CheckAccountExists(username); err != nil {
         fmt.Printf("Error getting account directory: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to get account directory.") // Send simpler error message
         return
     }
+
+    peerDir := main.GetPeerDir(ctx.Datagram)
 
     if err := main.CheckPeerExists(peerDir); err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err) // Log detailed error
@@ -92,7 +93,7 @@ func SetTrustline(ctx main.HandlerContext) {
     copy(responseDg.Result[1:], []byte("Trustline updated successfully.")) // More informative success message
 
     // Sign the response datagram using the username
-    if err := main.SignResponseDatagram(&responseDg, string(ctx.Datagram.XUsername[:])) ; err != nil {
+    if err := main.SignResponseDatagram(&responseDg, username) ; err != nil {
         fmt.Printf("Failed to sign response datagram: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to sign response datagram.") // Send simpler error message
         return
