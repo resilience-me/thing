@@ -6,36 +6,37 @@ import (
     "os"
     "path/filepath"
     "encoding/binary"
-    "strconv"
     "resilience/main"
 )
 
-func SetSyncCounter(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
-    // Get the account directory
-    accountDir, err := main.GetAccountDir(dg)
-    if err != nil {
-        fmt.Printf("Error getting account directory: %v\n", err)
+// SetSyncCounter handles updating the sync counter from a received context
+func SetSyncCounter(ctx main.HandlerContext) {
+    // Check if the account exists
+    if err := main.CheckAccountExists(ctx.Datagram); err != nil {
+        fmt.Printf("Error checking account existence: %v\n", err)
         return
     }
 
-    // Get the peer directory
-    peerDir, err := main.GetPeerDir(dg, accountDir)
-    if err != nil {
-        fmt.Printf("Error getting peer directory: %v\n", err)
+    // Check if the peer exists
+    if err := main.CheckPeerExists(ctx.Datagram); err != nil {
+        fmt.Printf("Error checking peer existence: %v\n", err)
         return
     }
 
-    // Verify the signature using peerDir
-    if err := main.VerifySignature(dg, peerDir); err != nil {
+    // Verify the signature
+    if err := main.VerifyServerSignature(ctx.Datagram); err != nil {
         fmt.Printf("Signature verification failed: %v\n", err)
         return
     }
 
-    // Define the path for sync_counter.txt in peerDir
+    // Get the peer directory using the datagram
+    peerDir := main.GetPeerDir(ctx.Datagram)
+
+    // Define the path for sync_counter.txt in the peer directory
     syncCounterPath := filepath.Join(peerDir, "trustline", "sync_counter.txt")
 
     // Get the current sync counter from the datagram
-    syncCounter := binary.BigEndian.Uint32(dg.Counter[:])
+    syncCounter := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
 
     // Write the sync counter to sync_counter.txt
     if err := os.WriteFile(syncCounterPath, []byte(fmt.Sprintf("%d", syncCounter)), 0644); err != nil {
