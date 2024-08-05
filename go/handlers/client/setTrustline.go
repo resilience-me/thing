@@ -1,34 +1,24 @@
-package handlers
-
-import (
-    "encoding/binary"
-    "fmt"
-    "net"
-    "os"
-    "path/filepath"
-    "strconv"
-
-    "resilience/main"
-)
-
 // SetTrustline handles setting or updating a trustline from the client's perspective
-func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
-    trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
+func SetTrustline(ctx main.HandlerContext) {
+    trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
-    accountDir, err := main.GetAccountDir(dg)
+    accountDir, err := main.GetAccountDir(ctx.Datagram)
     if err != nil {
-        fmt.Printf("Error getting account directory: %v\n", err)
+        fmt.Printf("Error getting account directory: %v\n", err) // Log detailed error
+        sendErrorResponse(ctx, "Failed to get account directory.") // Send simpler error message
         return
     }
 
-    peerDir, err := main.GetPeerDir(dg, accountDir)
+    peerDir, err := main.GetPeerDir(ctx.Datagram, accountDir)
     if err != nil {
-        fmt.Printf("Error getting peer directory: %v\n", err)
+        fmt.Printf("Error getting peer directory: %v\n", err) // Log detailed error
+        sendErrorResponse(ctx, "Failed to get peer directory.") // Send simpler error message
         return
     }
 
-    if err := main.verifySignature(dg, accountDir); err != nil {
-        fmt.Printf("Signature verification failed: %v\n", err)
+    if err := main.VerifySignature(ctx.Datagram, accountDir); err != nil {
+        fmt.Printf("Signature verification failed: %v\n", err) // Log detailed error
+        sendErrorResponse(ctx, "Signature verification failed.") // Send simpler error message
         return
     }
 
@@ -42,33 +32,38 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
     // Load the previous counter value
     prevCounterStr, err := os.ReadFile(counterOutPath)
     if err != nil && !os.IsNotExist(err) {
-        fmt.Printf("Error reading counter file: %v\n", err)
+        fmt.Printf("Error reading counter file: %v\n", err) // Log detailed error
+        sendErrorResponse(ctx, "Failed to read counter file.") // Send simpler error message
         return
     }
 
     prevCounter, err := strconv.ParseUint(string(prevCounterStr), 10, 32) // Parse as uint64 first
     if err != nil {
-        fmt.Printf("Error parsing string: %v\n", err)
+        fmt.Printf("Error parsing previous counter string: %v\n", err) // Log detailed error
+        sendErrorResponse(ctx, "Failed to parse previous counter.") // Send simpler error message
         return
     }
 
     // Check the counter
-    counter := binary.BigEndian.Uint32(dg.Counter[:])
+    counter := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
     if counter <= uint32(prevCounter) {
         fmt.Println("Received counter is not greater than previous counter. Potential replay attack.")
+        sendErrorResponse(ctx, "Received counter is not valid.") // Send simpler error message
         return
     }
 
     // Write the new trustline amount to the file
     if err := os.WriteFile(trustlineOutPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
-        fmt.Printf("Error writing trustline to file: %v\n", err)
+        fmt.Printf("Error writing trustline to file: %v\n", err) // Log detailed error
+        sendErrorResponse(ctx, "Failed to write trustline.") // Send simpler error message
         return
     }
 
     // Write the new counter value as a string
     counterStr := fmt.Sprintf("%d", counter)
     if err := os.WriteFile(counterOutPath, []byte(counterStr), 0644); err != nil {
-        fmt.Printf("Error writing counter to file: %v\n", err)
+        fmt.Printf("Error writing counter to file: %v\n", err) // Log detailed error
+        sendErrorResponse(ctx, "Failed to write counter.") // Send simpler error message
         return
     }
 
@@ -76,17 +71,20 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
 
     // Prepare response datagram
     var responseDg main.ResponseDatagram
-    copy(responseDg.Nonce[:], dg.Signature[:]) // Use the original signature as the nonce
+    copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) // Use the original signature as the nonce
     copy(responseDg.Result[:], []byte("Success")) // Arbitrary success message
 
     if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
-        fmt.Printf("Failed to sign response datagram: %v\n", err)
+        fmt.Printf("Failed to sign response datagram: %v\n", err) // Log detailed error
+        sendErrorResponse(ctx, "Failed to sign response datagram.") // Send simpler error message
         return
     }
 
     // Send the response back to the client
-    _, err = conn.WriteToUDP(responseDg[:], addr)
+    _, err = ctx.Conn.WriteToUDP(responseDg[:], ctx.Addr)
     if err != nil {
-        fmt.Printf("Error sending response to client: %v\n", err)
+        fmt.Printf("Error sending response to client: %v\n", err) // Log detailed error
+        return
     }
+    fmt.Println("Sent success response to client.")
 }
