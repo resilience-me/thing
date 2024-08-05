@@ -25,7 +25,8 @@ func GetPeerDir(dg *Datagram) string {
 }
 
 // CheckAccountExists checks if the account directory exists
-func CheckAccountExists(accountDir string) error {
+func CheckAccountExists(username string) error {
+    accountDir := filepath.Join(datadir, "accounts", username)
     // Ensure the account directory exists
     if err := os.Stat(accountDir); err != nil {
         return err
