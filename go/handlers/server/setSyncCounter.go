@@ -6,7 +6,9 @@ import (
     "os"
     "path/filepath"
     "encoding/binary"
+
     "resilience/main"
+    "resilience/handlers"
 )
 
 // SetSyncCounter handles updating the sync counter from a received context
