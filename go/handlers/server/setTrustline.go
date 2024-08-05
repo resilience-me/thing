@@ -13,22 +13,22 @@ import (
 )
 
 // SetTrustline handles setting or updating a trustline from the server's perspective
-func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
-    trustlineAmount := binary.BigEndian.Uint32(dg.Arguments[:4])
+func SetTrustline(ctx main.HandlerContext) {
+    trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
-    accountDir, err := main.GetAccountDir(dg)
+    accountDir, err := main.GetAccountDir(ctx.Datagram)
     if err != nil {
         fmt.Printf("Error getting account directory: %v\n", err)
         return
     }
 
-    peerDir, err := main.GetPeerDir(dg, accountDir)
+    peerDir, err := main.GetPeerDir(ctx.Datagram, accountDir)
     if err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err)
         return
     }
 
-    if err := main.VerifySignature(dg, peerDir); err != nil {
+    if err := main.VerifySignature(ctx.Datagram, peerDir); err != nil {
         fmt.Printf("Signature verification failed: %v\n", err)
         return
     }
@@ -47,6 +47,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
         fmt.Printf("Error reading counter file: %v\n", err)
         return
     }
+
     prevCounter, err := strconv.ParseUint(string(prevCounterStr), 10, 32) // Parse as uint64 first
     if err != nil {
         fmt.Printf("Error parsing string: %v\n", err)
@@ -54,7 +55,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
     }
 
     // Check the counter
-    counter := binary.BigEndian.Uint32(dg.Counter[:])
+    counter := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
     if counter <= uint32(prevCounter) {
         fmt.Println("Received counter is not greater than previous counter. Potential replay attack.")
         return
@@ -78,15 +79,15 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
         return
     }
 
-    fmt.Println("Trustline, counter and timestamp updated successfully.")
+    fmt.Println("Trustline, counter, and timestamp updated successfully.")
 
     // Prepare the response datagram
     responseDg := main.Datagram{
         Command:       main.Server_SetSyncCounter,
-        XUsername:     dg.YUsername,        // Reverse the usernames for response
-        YUsername:     dg.XUsername,
-        YServerAddress: main.GetServerAddress(), // Use the server's address
-        Counter:       dg.Counter,           // Copy the existing counter directly
+        XUsername:     ctx.Datagram.YUsername,       // Reverse the usernames for response
+        YUsername:     ctx.Datagram.XUsername,
+        YServerAddress: main.GetServerAddress(),      // Use the server's address
+        Counter:       ctx.Datagram.Counter,           // Copy the existing counter directly
     }
 
     if err := main.SignDatagram(&responseDg, peerDir); err != nil {
@@ -95,7 +96,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
     }
 
     // Send the response datagram back to the peer
-    _, err = conn.WriteToUDP(responseDg[:], addr)
+    _, err = ctx.Conn.WriteToUDP(responseDg[:], ctx.Addr)
     if err != nil {
         fmt.Printf("Error sending datagram: %v\n", err)
     }
