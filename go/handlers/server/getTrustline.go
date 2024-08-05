@@ -21,6 +21,7 @@ func GetTrustline(ctx main.HandlerContext) {
 	// Get the trustline directory
 	trustlineDir := main.GetTrustlineDir(ctx.Datagram)
 	trustlinePath := filepath.Join(trustlineDir, "trustline_out.txt")
+	counterOutPath := filepath.Join(trustlineDir, "counter_out.txt")
 
 	// Read the current trustline amount
 	trustlineAmountBytes, err := os.ReadFile(trustlinePath)
@@ -35,6 +36,19 @@ func GetTrustline(ctx main.HandlerContext) {
 		return
 	}
 
+	// Read the current counter value (alphanumeric)
+	counterStr, err := os.ReadFile(counterOutPath)
+	if err != nil {
+		fmt.Printf("Error reading counter: %v\n", err)
+		return
+	}
+
+	counter, err := strconv.ParseUint(string(counterStr), 10, 32)
+	if err != nil {
+		fmt.Printf("Error parsing counter: %v\n", err)
+		return
+	}
+
 	// Prepare a new Datagram for SetTrustline command to be sent to the requesting server
 	dg := main.Datagram{
 		Command: main.Server_SetTrustline,
@@ -45,6 +59,8 @@ func GetTrustline(ctx main.HandlerContext) {
 
 	// Set the trustline amount in the arguments section of the Datagram
 	binary.BigEndian.PutUint32(dg.Arguments[:4], uint32(trustlineAmount))
+	// Set the current counter in the Datagram
+	binary.BigEndian.PutUint32(dg.Counter[:], uint32(counter))
 
 	// Use the handlers.SignAndSendDatagram to sign and send the datagram
 	if err := handlers.SignAndSendDatagram(ctx, &dg); err != nil {
@@ -52,5 +68,5 @@ func GetTrustline(ctx main.HandlerContext) {
 		return
 	}
 
-	fmt.Println("Server_SetTrustline command sent successfully.")
+	fmt.Println("SetTrustline command sent successfully with current counter.")
 }
