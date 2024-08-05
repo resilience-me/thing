@@ -81,7 +81,7 @@ func SignResponseDatagram(rd *ResponseDatagram, username string) error {
 }
 
 // VerifySignature checks if the signature of the datagram is valid.
-func VerifySignature(dg Datagram, dir string) error {
+func verifySignature(dg *Datagram, dir string) error {
     // Load the secret key
     secretKey, err := loadSecretKey(dir)
     if err != nil {
@@ -100,4 +100,16 @@ func VerifySignature(dg Datagram, dir string) error {
     }
 
     return nil
+}
+
+// VerifyClientSignature verifies the client's signature of the datagram.
+func VerifyClientSignature(dg *Datagram) error {
+    accountDir := GetAccountDir(dg)
+    return verifySignature(dg, accountDir)
+}
+
+// VerifyServerSignature verifies the server's signature of the datagram.
+func VerifyServerSignature(dg *Datagram) error {
+    peerDir := GetPeerDir(dg)
+    return verifySignature(dg, peerDir)
 }
