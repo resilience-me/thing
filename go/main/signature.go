@@ -19,12 +19,7 @@ func loadSecretKey(dir string) ([]byte, error) {
 }
 
 // generateSignature computes the SHA-256 signature for the given data and secret key.
-func generateSignature(data []byte, secretKey []byte) ([]byte, error) {
-    // Check if data is at least 32 bytes long
-    if len(data) < 32 {
-        return nil, fmt.Errorf("data must be at least 32 bytes long")
-    }
-    
+func generateSignature(data []byte, secretKey []byte) ([]byte, error) {    
     // Create a byte slice that contains the data without the signature
     dataWithKey := append(data[:len(data)-32], secretKey...)
 
