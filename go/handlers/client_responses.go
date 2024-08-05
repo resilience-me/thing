@@ -9,11 +9,12 @@ import (
 // sendErrorResponse prepares and sends an error response datagram.
 func sendErrorResponse(ctx main.HandlerContext, errorMessage string) error {
     var responseDg main.ResponseDatagram
-    copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) // Use the original signature as the nonce
-    responseDg.Result[0] = 1                                // Set error code
-    copy(responseDg.Result[1:], []byte(errorMessage))       // Copy the error message
+    // Use the original signature as the nonce, dereferencing ctx.Datagram
+    copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) 
+    responseDg.Result[0] = 1 // Set error code
+    copy(responseDg.Result[1:], []byte(errorMessage)) // Copy the error message
 
-    // Construct the account directory path directly
+    // Construct the account directory path directly, dereferencing ctx.Datagram
     accountDir := filepath.Join(main.Datadir, "accounts", string(ctx.Datagram.XUsername[:]))
     
     // Generate signature for response datagram
