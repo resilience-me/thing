@@ -48,7 +48,7 @@ func GetTrustlineOut(ctx main.HandlerContext) {
     // Send the response back to the client
     _, err = ctx.Conn.WriteToUDP(responseDg[:], ctx.Addr)
     if err != nil {
-        _ = handlers.SendErrorResponse(ctx, "Error sending outbound trustline amount.")
+        fmt.Printf("Error sending outbound trustline amount: %v\n", err) // Log the error
         return
     }
 }
