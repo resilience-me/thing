@@ -3,8 +3,10 @@ package main
 import (
     "fmt"
     "net"
+    "os"
 )
 
+// main function initializes the server and listens for incoming UDP datagrams.
 func main() {
     if err := initConfig(); err != nil {
         fmt.Fprintf(os.Stderr, "Failed to initialize configuration: %v\n", err)
@@ -37,8 +39,16 @@ func main() {
             continue
         }
 
+        // Create HandlerContext and pass the pointer to the Datagram
+        ctx := HandlerContext{
+            Datagram: &dg, // Pass by reference
+            Addr:     remoteAddr,
+            Conn:     conn,
+        }
+
+        // Call the appropriate handler
         if handler := commandHandlers[dg.Command]; handler != nil {
-            handler(dg, remoteAddr, conn)
+            handler(ctx) // Use HandlerContext
         } else {
             fmt.Printf("No handler for command: %d\n", dg.Command)
         }
