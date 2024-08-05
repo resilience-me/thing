@@ -88,23 +88,10 @@ func SetTrustline(ctx main.HandlerContext) {
 
     fmt.Println("Trustline and counter updated successfully.")
 
-    // Prepare response datagram
-    var responseDg main.ResponseDatagram
-    responseDg.Result[0] = 0 // Set success code
-    copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) // Use the original signature as the nonce
-    copy(responseDg.Result[1:], []byte("Trustline updated successfully.")) // More informative success message
-
-    // Sign the response datagram using the username
-    if err := main.SignResponseDatagram(&responseDg, username); err != nil {
-        fmt.Printf("Failed to sign response datagram: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(ctx, "Failed to sign response datagram.") // Send simpler error message
-        return
-    }
-
-    // Send the response back to the client
-    _, err = ctx.Conn.WriteToUDP(responseDg[:], ctx.Addr)
-    if err != nil {
-        fmt.Printf("Error sending response to client: %v\n", err) // Log detailed error
+    // Prepare success response
+    successMessage := []byte("Trustline updated successfully.")
+    if err := handlers.SendSuccessResponse(ctx, successMessage); err != nil {
+        fmt.Printf("Error sending success response: %v\n", err) // Log detailed error
         return
     }
     fmt.Println("Sent success response to client.")
