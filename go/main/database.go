@@ -9,21 +9,19 @@ import (
 var datadir = filepath.Join(os.Getenv("HOME"), "resilience")
 
 // GetAccountDir constructs the account directory path from the datagram
-func GetAccountDir(dg *Datagram) string { // Change to pointer
+func GetAccountDir(dg *Datagram) string {
     username := string(dg.XUsername[:])
-    accountDir := filepath.Join(datadir, "accounts", username)
 
-    return accountDir
+    return filepath.Join(datadir, "accounts", username)
 }
 
 // GetPeerDir constructs the peer directory path from the datagram and returns it
-func GetPeerDir(dg *Datagram, accountDir string) string { // Change to pointer
+func GetPeerDir(dg *Datagram) string {
+    username := string(dg.XUsername[:])    
     peerUsername := string(dg.YUsername[:])
     peerAddress := string(dg.YServerAddress[:])
 
-    peerDir := filepath.Join(accountDir, "peers", peerAddress, peerUsername)
-
-    return peerDir
+    return filepath.Join(datadir, "accounts", username, "peers", peerAddress, peerUsername)
 }
 
 // CheckAccountExists checks if the account directory exists
