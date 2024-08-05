@@ -5,6 +5,7 @@ import (
     "net"
     "os"
     "path/filepath"
+    "strconv"
 
     "resilience/main"
     "resilience/handlers"
@@ -19,9 +20,16 @@ func GetTrustlineOut(ctx main.HandlerContext) {
     }
 
     trustlineOutPath := filepath.Join(peerDir, "trustline", "trustline_out.txt")
-    trustlineAmount, err := os.ReadFile(trustlineOutPath)
+    trustlineAmountStr, err := os.ReadFile(trustlineOutPath)
     if err != nil {
         _ = handlers.SendErrorResponse(ctx, "Error reading outbound trustline file.")
+        return
+    }
+
+    // Convert the string to an integer
+    trustlineAmount, err := strconv.ParseUint(string(trustlineAmountStr), 10, 32)
+    if err != nil {
+        _ = handlers.SendErrorResponse(ctx, "Error converting trustline amount to integer.")
         return
     }
 
@@ -29,10 +37,10 @@ func GetTrustlineOut(ctx main.HandlerContext) {
     var responseDg main.ResponseDatagram
     responseDg.Result[0] = 0 // Set success code
     copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) // Use the original signature as the nonce
-    copy(responseDg.Result[1:], trustlineAmount) // Copy the trustline amount directly
 
+    // Store the trustline amount as bytes in the response
+    binary.BigEndian.PutUint32(responseDg.Result[1:], uint32(trustlineAmount)) // Convert back to bytes
     if err := main.SignResponseDatagram(&responseDg, peerDir); err != nil {
-        fmt.Printf("Failed to sign response datagram: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to sign response datagram.")
         return
     }
@@ -43,6 +51,4 @@ func GetTrustlineOut(ctx main.HandlerContext) {
         _ = handlers.SendErrorResponse(ctx, "Error sending outbound trustline amount.")
         return
     }
-    
-    fmt.Println("Sent outbound trustline amount to client.")
 }
