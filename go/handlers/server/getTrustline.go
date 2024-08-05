@@ -3,11 +3,11 @@ package server
 import (
 	"encoding/binary"
 	"fmt"
-	"net"
 	"os"
 	"path/filepath"
 	"resilience/main"
 	"resilience/handlers"
+	"strconv"
 )
 
 // GetTrustline handles the request to get the current trustline amount from another server
@@ -46,15 +46,11 @@ func GetTrustline(ctx main.HandlerContext) {
 	// Set the trustline amount in the arguments section of the Datagram
 	binary.BigEndian.PutUint32(dg.Arguments[:4], uint32(trustlineAmount))
 
-	// Sign the datagram to ensure integrity and authenticity
-	if err := main.SignDatagram(&dg); err != nil {
-		fmt.Printf("Failed to sign datagram: %v\n", err)
+	// Use the handlers.SignAndSendDatagram to sign and send the datagram
+	if err := handlers.SignAndSendDatagram(ctx, &dg); err != nil {
+		fmt.Printf("Failed to sign and send datagram: %v\n", err)
 		return
 	}
 
-	// Send the datagram
-	_, err = ctx.Conn.WriteToUDP(dg[:], ctx.Addr)
-	if err != nil {
-		fmt.Printf("Error sending SetTrustline command: %v\n", err)
-	}
+	fmt.Println("Server_SetTrustline command sent successfully.")
 }
