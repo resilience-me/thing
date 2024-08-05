@@ -36,7 +36,7 @@ func signDatagram(dg *Datagram, dir string) error {
     // Call generateSignature directly with the Datagram's byte representation
     signature, err := generateSignature((*dg)[:], dir)
     if err != nil {
-        return err
+        return fmt.Errorf("failed to generate signature for Datagram: %w", err)
     }
 
     // Copy the generated signature into the datagram's signature field
@@ -50,7 +50,7 @@ func signResponseDatagram(rd *ResponseDatagram, dir string) error {
     // Call generateSignature directly with the ResponseDatagram's byte representation
     signature, err := generateSignature((*rd)[:], dir)
     if err != nil {
-        return fmt.Printf("Error generating signature: %v\n", err)
+        return fmt.Errorf("failed to generate signature for ResponseDatagram: %w", err)
     }
 
     // Copy the generated signature into the response datagram's signature field
@@ -61,11 +61,10 @@ func signResponseDatagram(rd *ResponseDatagram, dir string) error {
 
 // VerifySignature checks if the signature of the datagram is valid.
 func VerifySignature(dg Datagram, dir string) error {
-
     // Generate the expected signature based on the entire datagram
     generatedHash, err := generateSignature(dg[:], dir)
     if err != nil {
-        return fmt.Printf("Error generating signature: %v\n", err)
+        return fmt.Errorf("failed to generate signature for verification: %w", err)
     }
 
     // Compare the generated hash with the provided signature
