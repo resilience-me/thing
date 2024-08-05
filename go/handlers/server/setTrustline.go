@@ -20,11 +20,8 @@ func SetTrustline(ctx main.HandlerContext) {
         return
     }
 
-    // Get the peer directory
-    peerDir := main.GetPeerDir(ctx.Datagram)
-
     // Get the trustline directory
-    trustlineDir := filepath.Join(peerDir, "trustline")
+    trustlineDir := main.GetTrustlineDir(ctx.Datagram)
 
     // Construct the trustline, counter, and timestamp file paths
     counterInPath := filepath.Join(trustlineDir, "counter_in.txt")
