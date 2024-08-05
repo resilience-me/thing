@@ -13,7 +13,16 @@ import (
 
 // Handles fetching the outbound trustline information
 func GetTrustlineOut(ctx main.HandlerContext) {
-    peerDir, err := main.GetPeerDir(ctx.Datagram)
+    // First, get the account directory
+    accountDir, err := main.GetAccountDir(ctx.Datagram) // No need for the & operator
+    if err != nil {
+        fmt.Printf("Error getting account directory: %v\n", err) // Log the error
+        _ = handlers.SendErrorResponse(ctx, "Error getting account directory.")
+        return
+    }
+
+    // Now, get the peer directory using the account directory
+    peerDir, err := main.GetPeerDir(ctx.Datagram, accountDir) // Pass accountDir
     if err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err) // Log the error
         _ = handlers.SendErrorResponse(ctx, "Error getting peer directory for outbound trustline.")
