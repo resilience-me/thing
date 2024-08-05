@@ -1,6 +1,7 @@
 package client
 
 import (
+    "encoding/binary"
     "fmt"
     "net"
     "os"
@@ -13,21 +14,15 @@ import (
 
 // Handles fetching the inbound trustline information
 func GetTrustlineIn(ctx main.HandlerContext) {
-    // First, get the account directory
-    accountDir, err := main.GetAccountDir(ctx.Datagram) // No need for the & operator
-    if err != nil {
-        fmt.Printf("Error getting account directory: %v\n", err) // Log the error
-        _ = handlers.SendErrorResponse(ctx, "Error getting account directory.")
+    // Validate the client request
+    if err := handlers.ValidateClientRequest(ctx); err != nil {
+        fmt.Printf("Validation failed: %v\n", err) // Log detailed error
+        // Error response has already been sent in ValidateClientRequest
         return
     }
 
-    // Now, get the peer directory using the account directory
-    peerDir, err := main.GetPeerDir(ctx.Datagram, accountDir) // Pass accountDir
-    if err != nil {
-        fmt.Printf("Error getting peer directory: %v\n", err) // Log the error
-        _ = handlers.SendErrorResponse(ctx, "Error getting peer directory for inbound trustline.")
-        return
-    }
+    // Get the peer directory for the trustline
+    peerDir := main.GetPeerDir(ctx.Datagram)
 
     trustlineInPath := filepath.Join(peerDir, "trustline", "trustline_in.txt")
     trustlineAmountStr, err := os.ReadFile(trustlineInPath)
@@ -52,7 +47,7 @@ func GetTrustlineIn(ctx main.HandlerContext) {
 
     // Store the trustline amount as bytes in the response
     binary.BigEndian.PutUint32(responseDg.Result[1:], uint32(trustlineAmount)) // Convert back to bytes
-    if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
+    if err := main.SignResponseDatagram(&responseDg, string(ctx.Datagram.XUsername[:])) ; err != nil {
         fmt.Printf("Failed to sign response datagram: %v\n", err) // Log the error
         _ = handlers.SendErrorResponse(ctx, "Failed to sign response datagram.")
         return
