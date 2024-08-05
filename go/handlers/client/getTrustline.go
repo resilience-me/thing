@@ -20,10 +20,10 @@ func getTrustline(ctx main.HandlerContext, filename string) {
         return // Error response has already been sent in ValidateClientRequest
     }
 
-    // Get the peer directory for the trustline
-    peerDir := main.GetPeerDir(ctx.Datagram)
+    // Get the trustline directory
+    trustlineDir := main.GetTrustlineDir(ctx.Datagram)
 
-    trustlinePath := filepath.Join(peerDir, "trustline", filename)
+    trustlinePath := filepath.Join(trustlineDir, filename)
     trustlineAmountStr, err := os.ReadFile(trustlinePath)
     if err != nil {
         fmt.Printf("Error reading trustline file (%s): %v\n", filename, err) // Log the error
