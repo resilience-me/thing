@@ -19,7 +19,7 @@ func sendErrorResponse(ctx main.HandlerContext, errorMessage string) error {
     
     // Generate signature for response datagram
     if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
-        fmt.Printf("Failed to sign response datagram: %v\n", err)
+        fmt.Errorf("Failed to sign response datagram: %v\n", err)
         return err
     }
 
