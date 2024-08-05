@@ -73,11 +73,11 @@ func SetTrustline(ctx main.HandlerContext) {
 
     // Prepare the datagram to send back to the peer
     dg := main.Datagram{
-        Command:       main.Server_SetSyncCounter,
-        XUsername:     ctx.Datagram.YUsername,       // Reverse the usernames for response
-        YUsername:     ctx.Datagram.XUsername,
+        Command:        main.Server_SetSyncCounter,
+        XUsername:      ctx.Datagram.YUsername,       // Reverse the usernames for response
+        YUsername:      ctx.Datagram.XUsername,
         YServerAddress: main.GetServerAddress(),      // Use the server's address
-        Counter:       ctx.Datagram.Counter,           // Copy the existing counter directly
+        Counter:        ctx.Datagram.Counter,           // Copy the existing counter directly
     }
 
     // Replace explicit signing and sending with the centralized function call
