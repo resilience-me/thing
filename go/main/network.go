@@ -1,3 +1,10 @@
+package main
+
+import (
+    "fmt"
+    "net"
+)
+
 // SignAndSendResponse signs and sends the response datagram.
 func SignAndSendResponseDatagram(rd *ResponseDatagram, addr *net.UDPAddr, conn *net.UDPConn, dir string) error {
     // Call generateSignature directly with the ResponseDatagram's byte representation
