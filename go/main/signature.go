@@ -19,14 +19,14 @@ func loadSecretKey(dir string) ([]byte, error) {
 }
 
 // generateSignature computes the SHA-256 signature for the given data and secret key.
-func generateSignature(data []byte, secretKey []byte) ([]byte, error) {    
+func generateSignature(data []byte, secretKey []byte) []byte {    
     // Create a byte slice that contains the data without the signature
     dataWithKey := append(data[:len(data)-32], secretKey...)
 
     // Generate the SHA-256 hash
     generatedHash := sha256.Sum256(dataWithKey)
 
-    return generatedHash[:], nil
+    return generatedHash[:]
 }
 
 // SignDatagram signs the given Datagram by generating a signature.
@@ -41,10 +41,7 @@ func SignDatagram(dg *Datagram) error {
     }
 
     // Call generateSignature directly with the Datagram's byte representation and the secret key
-    signature, err := generateSignature((*dg)[:], secretKey)
-    if err != nil {
-        return fmt.Errorf("failed to generate signature for Datagram: %w", err)
-    }
+    signature := generateSignature((*dg)[:], secretKey)
 
     // Copy the generated signature into the datagram's signature field
     copy(dg.Signature[:], signature)
@@ -64,10 +61,7 @@ func SignResponseDatagram(rd *ResponseDatagram, username string) error {
     }
 
     // Call generateSignature directly with the ResponseDatagram's byte representation and the secret key
-    signature, err := generateSignature((*rd)[:], secretKey)
-    if err != nil {
-        return fmt.Errorf("failed to generate signature for ResponseDatagram: %w", err)
-    }
+    signature := generateSignature((*rd)[:], secretKey)
 
     // Copy the generated signature into the response datagram's signature field
     copy(rd.Signature[:], signature)
@@ -84,10 +78,7 @@ func verifySignature(dg *Datagram, dir string) error {
     }
 
     // Generate the expected signature based on the entire datagram
-    generatedHash, err := generateSignature(dg[:], secretKey)
-    if err != nil {
-        return fmt.Errorf("failed to generate signature for verification: %w", err)
-    }
+    generatedHash := generateSignature(dg[:], secretKey)
 
     // Compare the generated hash with the provided signature
     if !bytes.Equal(generatedHash, dg.Signature[:]) {
