@@ -19,11 +19,11 @@ func SetSyncCounter(ctx main.HandlerContext) {
         return
     }
 
-    // Get the peer directory using the datagram
-    peerDir := main.GetPeerDir(ctx.Datagram)
+    // Get the trustline directory
+    trustlineDir := main.GetTrustlineDir(ctx.Datagram)
 
     // Define the path for sync_counter.txt in the peer directory
-    syncCounterPath := filepath.Join(peerDir, "trustline", "sync_counter.txt")
+    syncCounterPath := filepath.Join(trustlineDir, "sync_counter.txt")
 
     // Get the current sync counter from the datagram
     syncCounter := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
