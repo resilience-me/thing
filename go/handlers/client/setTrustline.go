@@ -6,6 +6,7 @@ import (
     "net"
     "os"
     "path/filepath"
+    "strconv"
 
     "resilience/main"
 )
@@ -72,4 +73,20 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
     }
 
     fmt.Println("Trustline and counter updated successfully.")
+
+    // Prepare response datagram
+    var responseDg main.ResponseDatagram
+    copy(responseDg.Nonce[:], dg.Signature[:]) // Use the original signature as the nonce
+    copy(responseDg.Result[:], []byte("Success")) // Arbitrary success message
+
+    if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
+        fmt.Printf("Failed to sign response datagram: %v\n", err)
+        return
+    }
+
+    // Send the response back to the client
+    _, err = conn.WriteToUDP(responseDg[:], addr)
+    if err != nil {
+        fmt.Printf("Error sending response to client: %v\n", err)
+    }
 }
