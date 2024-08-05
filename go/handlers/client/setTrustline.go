@@ -21,8 +21,7 @@ func SetTrustline(ctx main.HandlerContext) {
     }
 
     // Get the trustline directory
-    peerDir := main.GetPeerDir(ctx.Datagram)
-    trustlineDir := filepath.Join(peerDir, "trustline")
+    trustlineDir := main.GetTrustlineDir(ctx.Datagram)
 
     // Construct the trustline and counter file paths
     counterOutPath := filepath.Join(trustlineDir, "counter_out.txt")
