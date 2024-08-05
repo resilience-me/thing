@@ -15,6 +15,7 @@ import (
 func GetTrustlineOut(ctx main.HandlerContext) {
     peerDir, err := main.GetPeerDir(ctx.Datagram)
     if err != nil {
+        fmt.Printf("Error getting peer directory: %v\n", err) // Log the error
         _ = handlers.SendErrorResponse(ctx, "Error getting peer directory for outbound trustline.")
         return
     }
@@ -22,6 +23,7 @@ func GetTrustlineOut(ctx main.HandlerContext) {
     trustlineOutPath := filepath.Join(peerDir, "trustline", "trustline_out.txt")
     trustlineAmountStr, err := os.ReadFile(trustlineOutPath)
     if err != nil {
+        fmt.Printf("Error reading trustline file: %v\n", err) // Log the error
         _ = handlers.SendErrorResponse(ctx, "Error reading outbound trustline file.")
         return
     }
@@ -29,6 +31,7 @@ func GetTrustlineOut(ctx main.HandlerContext) {
     // Convert the string to an integer
     trustlineAmount, err := strconv.ParseUint(string(trustlineAmountStr), 10, 32)
     if err != nil {
+        fmt.Printf("Error converting trustline amount to integer: %v\n", err) // Log the error
         _ = handlers.SendErrorResponse(ctx, "Error converting trustline amount to integer.")
         return
     }
@@ -41,6 +44,7 @@ func GetTrustlineOut(ctx main.HandlerContext) {
     // Store the trustline amount as bytes in the response
     binary.BigEndian.PutUint32(responseDg.Result[1:], uint32(trustlineAmount)) // Convert back to bytes
     if err := main.SignResponseDatagram(&responseDg, peerDir); err != nil {
+        fmt.Printf("Failed to sign response datagram: %v\n", err) // Log the error
         _ = handlers.SendErrorResponse(ctx, "Failed to sign response datagram.")
         return
     }
@@ -51,4 +55,6 @@ func GetTrustlineOut(ctx main.HandlerContext) {
         fmt.Printf("Error sending outbound trustline amount: %v\n", err) // Log the error
         return
     }
+    
+    fmt.Println("Outbound trustline amount sent successfully.")
 }
