@@ -10,6 +10,7 @@ import (
     "time"
 
     "resilience/main"
+    "resilience/handlers"
 )
 
 // SetTrustline handles setting or updating a trustline from another server's perspective
@@ -82,6 +83,7 @@ func SetTrustline(ctx main.HandlerContext) {
     // Replace explicit signing and sending with the centralized function call
     if err := handlers.SignAndSendDatagram(ctx, &dg); err != nil {
         fmt.Printf("Failed to sign and send datagram: %v\n", err)
+        return
     }
     // Add a success message indicating all operations were successful
     fmt.Println("Trustline update and datagram sending completed successfully.")
