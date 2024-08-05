@@ -2,7 +2,6 @@ package handlers
 
 import (
     "fmt"
-    "path/filepath"
     "resilience/main"
 )
 
@@ -14,12 +13,12 @@ func sendErrorResponse(ctx main.HandlerContext, errorMessage string) error {
     responseDg.Result[0] = 1 // Set error code
     copy(responseDg.Result[1:], []byte(errorMessage)) // Copy the error message
 
-    // Construct the account directory path directly, dereferencing ctx.Datagram
-    accountDir := filepath.Join(main.Datadir, "accounts", string(ctx.Datagram.XUsername[:]))
+    // Use GetAccountDir to construct the account directory path
+    accountDir := main.GetAccountDir(ctx.Datagram)
     
     // Generate signature for response datagram
     if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
-        fmt.Errorf("Failed to sign response datagram: %v\n", err)
+        fmt.Printf("Failed to sign response datagram: %v\n", err)
         return err
     }
 
