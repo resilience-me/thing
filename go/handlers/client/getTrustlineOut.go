@@ -52,7 +52,7 @@ func GetTrustlineOut(ctx main.HandlerContext) {
 
     // Store the trustline amount as bytes in the response
     binary.BigEndian.PutUint32(responseDg.Result[1:], uint32(trustlineAmount)) // Convert back to bytes
-    if err := main.SignResponseDatagram(&responseDg, peerDir); err != nil {
+    if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
         fmt.Printf("Failed to sign response datagram: %v\n", err) // Log the error
         _ = handlers.SendErrorResponse(ctx, "Failed to sign response datagram.")
         return
