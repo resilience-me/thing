@@ -1,6 +1,7 @@
 package client
 
 import (
+    "encoding/binary"
     "fmt"
     "net"
     "os"
@@ -11,21 +12,30 @@ import (
     "resilience/handlers"
 )
 
-// Handles fetching the outbound trustline information
+// GetTrustlineOut handles fetching the outbound trustline information
 func GetTrustlineOut(ctx main.HandlerContext) {
-    // First, get the account directory
-    accountDir, err := main.GetAccountDir(ctx.Datagram) // No need for the & operator
-    if err != nil {
-        fmt.Printf("Error getting account directory: %v\n", err) // Log the error
-        _ = handlers.SendErrorResponse(ctx, "Error getting account directory.")
+    username := string(ctx.Datagram.XUsername[:])
+
+    // Check if the account exists using the username from the datagram
+    if err := main.CheckAccountExists(username); err != nil {
+        fmt.Printf("Error getting account directory: %v\n", err) // Log detailed error
+        _ = handlers.SendErrorResponse(ctx, "Failed to get account directory.") // Send simpler error message
         return
     }
 
-    // Now, get the peer directory using the account directory
-    peerDir, err := main.GetPeerDir(ctx.Datagram, accountDir) // Pass accountDir
-    if err != nil {
-        fmt.Printf("Error getting peer directory: %v\n", err) // Log the error
-        _ = handlers.SendErrorResponse(ctx, "Error getting peer directory for outbound trustline.")
+    peerDir := main.GetPeerDir(ctx.Datagram)
+
+    // Check if the peer directory exists
+    if err := main.CheckPeerExists(peerDir); err != nil {
+        fmt.Printf("Error getting peer directory: %v\n", err) // Log detailed error
+        _ = handlers.SendErrorResponse(ctx, "Failed to get peer directory.") // Send simpler error message
+        return
+    }
+
+    // Verify the client's signature
+    if err := main.VerifyClientSignature(ctx.Datagram); err != nil {
+        fmt.Printf("Signature verification failed: %v\n", err) // Log detailed error
+        _ = handlers.SendErrorResponse(ctx, "Signature verification failed.") // Send simpler error message
         return
     }
 
@@ -45,25 +55,15 @@ func GetTrustlineOut(ctx main.HandlerContext) {
         return
     }
 
-    // Prepare response datagram
-    var responseDg main.ResponseDatagram
-    responseDg.Result[0] = 0 // Set success code
-    copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) // Use the original signature as the nonce
+    // Prepare success response
+    responseData := make([]byte, 4) // Allocate 4 bytes for the trustline amount
+    binary.BigEndian.PutUint32(responseData, uint32(trustlineAmount)) // Convert the trustline amount to bytes
 
-    // Store the trustline amount as bytes in the response
-    binary.BigEndian.PutUint32(responseDg.Result[1:], uint32(trustlineAmount)) // Convert back to bytes
-    if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
-        fmt.Printf("Failed to sign response datagram: %v\n", err) // Log the error
-        _ = handlers.SendErrorResponse(ctx, "Failed to sign response datagram.")
+    // Send the success response back to the client
+    if err := handlers.SendSuccessResponse(ctx, responseData); err != nil {
+        fmt.Printf("Error sending success response: %v\n", err) // Log the error
         return
     }
 
-    // Send the response back to the client
-    _, err = ctx.Conn.WriteToUDP(responseDg[:], ctx.Addr)
-    if err != nil {
-        fmt.Printf("Error sending outbound trustline amount: %v\n", err) // Log the error
-        return
-    }
-    
     fmt.Println("Outbound trustline amount sent successfully.")
 }
