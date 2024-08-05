@@ -9,17 +9,28 @@ import (
 )
 
 // loadSecretKey loads the secret key from the specified directory.
-func loadSecretKey(dir string) ([32]byte, error) {
+func loadSecretKey(dir string) ([]byte, error) {
     secretKeyPath := filepath.Join(dir, "secretkey.txt")
-    secretKeyBytes, err := os.ReadFile(secretKeyPath)
+    secretKey err := os.ReadFile(secretKeyPath)
     if err != nil {
-        return [32]byte{}, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
+        return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
     }
-    // Convert secretKeyBytes to [32]byte
-    var secretKey [32]byte
-    copy(secretKey[:], secretKeyBytes) // Copy the contents to the fixed-size array
 
     return secretKey, nil
+}
+
+func generateDatagramSignature(dg *Datagram, secretKey []byte) [32]byte {
+    var dataWithKey []byte
+    dataWithKey = append(dataWithKey, dg.Command)
+    dataWithKey = append(dataWithKey, dg.XUsername[:]...)
+    dataWithKey = append(dataWithKey, dg.YUsername[:]...)
+    dataWithKey = append(dataWithKey, dg.YServerAddress[:]...)
+    dataWithKey = append(dataWithKey, dg.Arguments[:]...)
+    dataWithKey = append(dataWithKey, dg.Counter[:]...)
+    dataWithKey = append(dataWithKey, secretKey...)
+    
+    generatedHash := sha256.Sum256(dataWithKey)
+    return generatedHash
 }
 
 // SignDatagram signs the given Datagram by generating a signature.
@@ -33,14 +44,8 @@ func SignDatagram(dg *Datagram) error {
         return fmt.Errorf("failed to load secret key in SignDatagram: %w", err)
     }
 
-    // Write the secret key into the signature field
-    dg.Signature = secretKey
-
-    // Generate the signature using the current datagram (with the secret key in the signature field)
-    generatedHash := sha256.Sum256(*dg)
-
     // Replace the signature field with the generated hash
-    dg.Signature = generatedHash
+    dg.Signature = generateDatagramSignature(dg, secretKey)
 
     return nil
 }
@@ -75,10 +80,8 @@ func verifySignature(dg *Datagram, dir string) error {
     if err != nil {
         return fmt.Errorf("failed to load secret key for verification: %w", err)
     }
-    buf := *dg;
-    buf.Signature = secretKey
-    // Generate the expected signature based on the entire datagram
-    generatedHash := sha256.Sum256(buf)
+    // Generate the expected signature based on the datagram
+    generatedHash := generateDatagramSignature(dg, secretKey)
 
     // Compare the generated hash with the provided signature
     if !bytes.Equal(generatedHash, dg.Signature[:]) {
