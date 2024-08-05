@@ -14,28 +14,14 @@ import (
 
 // SetTrustline handles setting or updating a trustline from another server's perspective
 func SetTrustline(ctx main.HandlerContext) {
-    trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
-    // Check if the account exists using the username from the datagram
-    if err := main.CheckAccountExists(ctx.Datagram); err != nil {
-        fmt.Printf("Error getting account directory: %v\n", err)
+    if err := handlers.ValidateServerRequest(ctx); err != nil {
+        fmt.Printf("Validation failed: %v\n", err) // Log detailed error
         return
     }
 
     // Get the peer directory
     peerDir := main.GetPeerDir(ctx.Datagram)
-
-    // Check if the peer exists
-    if err := main.CheckPeerExists(peerDir); err != nil {
-        fmt.Printf("Error getting peer directory: %v\n", err)
-        return
-    }
-
-    // Verify the incoming request's signature
-    if err := main.VerifyServerSignature(ctx.Datagram); err != nil {
-        fmt.Printf("Signature verification failed: %v\n", err)
-        return
-    }
 
     // Get the trustline directory
     trustlineDir := filepath.Join(peerDir, "trustline")
@@ -64,6 +50,8 @@ func SetTrustline(ctx main.HandlerContext) {
         fmt.Println("Received counter is not greater than previous counter. Potential replay attack.")
         return
     }
+
+    trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
     // Write the new trustline amount to the file
     if err := os.WriteFile(trustlineInPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
