@@ -1,3 +1,11 @@
+package handlers
+
+import (
+    "fmt"
+    "resilience/main" // Correct import path based on the Go module name
+)
+
+// SignAndSendDatagram signs a Datagram and sends it via UDP.
 func SignAndSendDatagram(ctx main.HandlerContext, dg *main.Datagram) error {
     // Sign the datagram
     if err := main.SignDatagram(dg); err != nil {
