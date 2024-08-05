@@ -28,7 +28,7 @@ func main() {
     fmt.Printf("Server is listening on all network interfaces for both IPv4 and IPv6 at port %d\n", addr.Port)
 
     for {
-        var dg Datagram
+        var dg Datagram // Stack-allocated Datagram
         n, remoteAddr, err := conn.ReadFromUDP(dg[:])
         if err != nil {
             fmt.Fprintf(os.Stderr, "Error reading from UDP: %v\n", err)
