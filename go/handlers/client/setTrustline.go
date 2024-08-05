@@ -1,3 +1,16 @@
+package client
+
+import (
+    "encoding/binary"
+    "fmt"
+    "net"
+    "os"
+    "path/filepath"
+    "strconv"
+
+    "resilience/main"
+)
+
 // SetTrustline handles setting or updating a trustline from the client's perspective
 func SetTrustline(ctx main.HandlerContext) {
     trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
