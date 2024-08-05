@@ -9,24 +9,17 @@ import (
 )
 
 // loadSecretKey loads the secret key from the specified directory.
-func loadSecretKey(dir string) ([]byte, error) {
+func loadSecretKey(dir string) ([32]byte, error) {
     secretKeyPath := filepath.Join(dir, "secretkey.txt")
-    secretKey, err := os.ReadFile(secretKeyPath)
+    secretKeyBytes, err := os.ReadFile(secretKeyPath)
     if err != nil {
-        return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
+        return [32]byte{}, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
     }
+    // Convert secretKeyBytes to [32]byte
+    var secretKey [32]byte
+    copy(secretKey[:], secretKeyBytes) // Copy the contents to the fixed-size array
+
     return secretKey, nil
-}
-
-// generateSignature computes the SHA-256 signature for the given data and secret key.
-func generateSignature(data []byte, secretKey []byte) []byte {    
-    // Create a byte slice that contains the data without the signature
-    dataWithKey := append(data[:len(data)-32], secretKey...)
-
-    // Generate the SHA-256 hash
-    generatedHash := sha256.Sum256(dataWithKey)
-
-    return generatedHash[:]
 }
 
 // SignDatagram signs the given Datagram by generating a signature.
@@ -40,14 +33,18 @@ func SignDatagram(dg *Datagram) error {
         return fmt.Errorf("failed to load secret key in SignDatagram: %w", err)
     }
 
-    // Call generateSignature directly with the Datagram's byte representation and the secret key
-    signature := generateSignature((*dg)[:], secretKey)
+    // Write the secret key into the signature field
+    dg.Signature = secretKey
 
-    // Copy the generated signature into the datagram's signature field
-    copy(dg.Signature[:], signature)
+    // Generate the signature using the current datagram (with the secret key in the signature field)
+    generatedHash := sha256.Sum256(*dg)
+
+    // Replace the signature field with the generated hash
+    dg.Signature = generatedHash
 
     return nil
 }
+
 
 // SignResponseDatagram signs the given ResponseDatagram by generating a signature.
 func SignResponseDatagram(rd *ResponseDatagram, username string) error {
@@ -76,9 +73,10 @@ func verifySignature(dg *Datagram, dir string) error {
     if err != nil {
         return fmt.Errorf("failed to load secret key for verification: %w", err)
     }
-
+    buf := *dg;
+    buf.Signature = secretKey
     // Generate the expected signature based on the entire datagram
-    generatedHash := generateSignature(dg[:], secretKey)
+    generatedHash := sha256.Sum256(buf)
 
     // Compare the generated hash with the provided signature
     if !bytes.Equal(generatedHash, dg.Signature[:]) {
