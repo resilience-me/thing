@@ -11,21 +11,9 @@ import (
 
 // SetSyncCounter handles updating the sync counter from a received context
 func SetSyncCounter(ctx main.HandlerContext) {
-    // Check if the account exists
-    if err := main.CheckAccountExists(ctx.Datagram); err != nil {
-        fmt.Printf("Error checking account existence: %v\n", err)
-        return
-    }
 
-    // Check if the peer exists
-    if err := main.CheckPeerExists(ctx.Datagram); err != nil {
-        fmt.Printf("Error checking peer existence: %v\n", err)
-        return
-    }
-
-    // Verify the signature
-    if err := main.VerifyServerSignature(ctx.Datagram); err != nil {
-        fmt.Printf("Signature verification failed: %v\n", err)
+    if err := handlers.ValidateServerRequest(ctx); err != nil {
+        fmt.Printf("Validation failed: %v\n", err) // Log detailed error
         return
     }
 
