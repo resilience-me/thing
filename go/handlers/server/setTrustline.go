@@ -89,14 +89,10 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
         Counter:       dg.Counter,           // Copy the existing counter directly
     }
 
-    signature, err := main.GenerateSignature(responseDg[:], peerDir)
-    if err != nil {
+    if err := signDatagram(&responseDg, peerDir); err != nil {
         fmt.Printf("Error generating signature: %v\n", err)
         return
     }
-
-    // Copy the generated signature into the response datagram's signature field
-    copy(responseDg.Signature[:], signature)
 
     // Send the response datagram back to the peer
     _, err = conn.WriteToUDP(responseDg[:], addr)
