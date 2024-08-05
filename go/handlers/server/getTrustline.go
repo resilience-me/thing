@@ -20,7 +20,7 @@ func GetTrustline(ctx main.HandlerContext) {
 
     	// Get the trustline directory
     	trustlineDir := main.GetTrustlineDir(ctx.Datagram)
-	trustlinePath := filepath.Join(peerDir, "trustline", "trustline_out.txt")
+	trustlinePath := filepath.Join(trustlineDir, "trustline_out.txt")
 
 	// Read the current trustline amount
 	trustlineAmountBytes, err := os.ReadFile(trustlinePath)
