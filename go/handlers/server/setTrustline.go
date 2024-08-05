@@ -97,6 +97,6 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
     // Send the response datagram back to the peer
     _, err = conn.WriteToUDP(responseDg[:], addr)
     if err != nil {
-        fmt.Printf("Error sending response datagram: %v\n", err)
+        fmt.Printf("Error sending datagram: %v\n", err)
     }
 }
