@@ -62,10 +62,12 @@ func SignResponseDatagram(rd *ResponseDatagram, username string) error {
         return fmt.Errorf("failed to load secret key in SignResponseDatagram: %w", err)
     }
 
-    rd.Signature = secretKey
-
-    // Generate the signature using the current datagram (with the secret key in the signature field)
-    signature := sha256.Sum256(*rd)
+    var dataWithKey []byte
+    dataWithKey = append(dataWithKey, rd.Nonce[:]...)
+    dataWithKey = append(dataWithKey, rd.Result[:]...)
+    dataWithKey = append(dataWithKey, secretKey...)
+    
+    signature := sha256.Sum256(dataWithKey)
 
     // Copy the generated signature into the response datagram's signature field
     rd.Signature = signature
