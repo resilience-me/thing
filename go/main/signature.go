@@ -35,9 +35,9 @@ func generateSignature(data []byte, secretKey []byte) ([]byte, error) {
 }
 
 // SignDatagram signs the given Datagram by generating a signature.
-func SignDatagram(dg *Datagram, dir string) error {
+func SignDatagram(dg *Datagram, peerDir string) error {
     // Load the secret key
-    secretKey, err := loadSecretKey(dir)
+    secretKey, err := loadSecretKey(peerDir)
     if err != nil {
         return fmt.Errorf("failed to load secret key in SignDatagram: %w", err)
     }
@@ -55,9 +55,9 @@ func SignDatagram(dg *Datagram, dir string) error {
 }
 
 // SignResponseDatagram signs the given ResponseDatagram by generating a signature.
-func SignResponseDatagram(rd *ResponseDatagram, dir string) error {
+func SignResponseDatagram(rd *ResponseDatagram, accountDir string) error {
     // Load the secret key
-    secretKey, err := loadSecretKey(dir)
+    secretKey, err := loadSecretKey(accountDir)
     if err != nil {
         return fmt.Errorf("failed to load secret key in SignResponseDatagram: %w", err)
     }
