@@ -16,21 +16,23 @@ import (
 func SetTrustline(ctx main.HandlerContext) {
     trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
-    accountDir, err := main.GetAccountDir(ctx.Datagram)
-    if err != nil {
+    accountDir := main.GetAccountDir(ctx.Datagram)
+    peerDir := main.GetPeerDir(ctx.Datagram)
+
+    if err := main.CheckAccountExists(accountDir); err != nil {
         fmt.Printf("Error getting account directory: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to get account directory.") // Send simpler error message
         return
     }
 
-    peerDir, err := main.GetPeerDir(ctx.Datagram, accountDir)
-    if err != nil {
+    if err := main.CheckPeerExists(peerDir); err != nil {
         fmt.Printf("Error getting peer directory: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to get peer directory.") // Send simpler error message
         return
     }
 
-    if err := main.VerifySignature(ctx.Datagram, accountDir); err != nil {
+    // Verify the client's signature
+    if err := main.VerifyClientSignature(ctx.Datagram); err != nil {
         fmt.Printf("Signature verification failed: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Signature verification failed.") // Send simpler error message
         return
