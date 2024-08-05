@@ -25,7 +25,7 @@ type ResponseDatagram {
 
 // HandlerContext holds the common parameters for handler functions
 type HandlerContext struct {
-    Datagram main.Datagram
+    Datagram *main.Datagram // Pointer to Datagram
     Addr     *net.UDPAddr
     Conn     *net.UDPConn
 }
