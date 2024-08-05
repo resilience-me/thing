@@ -71,8 +71,9 @@ func SetTrustline(ctx main.HandlerContext) {
 
     // Prepare response datagram
     var responseDg main.ResponseDatagram
+    responseDg.Result[0] = 0 // Set success code
     copy(responseDg.Nonce[:], ctx.Datagram.Signature[:]) // Use the original signature as the nonce
-    copy(responseDg.Result[:], []byte("Success")) // Arbitrary success message
+    copy(responseDg.Result[1:], []byte("Trustline updated successfully.")) // More informative success message
 
     if err := main.SignResponseDatagram(&responseDg, accountDir); err != nil {
         fmt.Printf("Failed to sign response datagram: %v\n", err) // Log detailed error
