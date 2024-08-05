@@ -90,7 +90,7 @@ func SetTrustline(dg main.Datagram, addr *net.UDPAddr, conn *net.UDPConn) {
     }
 
     if err := signDatagram(&responseDg, peerDir); err != nil {
-        fmt.Printf("Error generating signature: %v\n", err)
+        fmt.Printf("Failed to sign datagram: %v\n", err)
         return
     }
 
