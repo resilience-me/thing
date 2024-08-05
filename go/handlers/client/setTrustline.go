@@ -14,34 +14,14 @@ import (
 
 // SetTrustline handles setting or updating a trustline from the client's perspective
 func SetTrustline(ctx main.HandlerContext) {
-    trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
-
-    username := string(ctx.Datagram.XUsername[:])
-
-    // Check if the account exists using the username from the datagram
-    if err := main.CheckAccountExists(username); err != nil {
-        fmt.Printf("Error getting account directory: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(ctx, "Failed to get account directory.") // Send simpler error message
-        return
-    }
-
-    peerDir := main.GetPeerDir(ctx.Datagram)
-
-    // Check if the peer directory exists
-    if err := main.CheckPeerExists(peerDir); err != nil {
-        fmt.Printf("Error getting peer directory: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(ctx, "Failed to get peer directory.") // Send simpler error message
-        return
-    }
-
-    // Verify the client's signature
-    if err := main.VerifyClientSignature(ctx.Datagram); err != nil {
-        fmt.Printf("Signature verification failed: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(ctx, "Signature verification failed.") // Send simpler error message
-        return
+    // Validate the client request (account and peer directory checks, and signature verification)
+    if err := handlers.ValidateClientRequest(ctx); err != nil {
+        fmt.Printf("Validation failed: %v\n", err) // Log detailed error
+        return // Error response has already been sent in ValidateClientRequest
     }
 
     // Get the trustline directory
+    peerDir := main.GetPeerDir(ctx.Datagram)
     trustlineDir := filepath.Join(peerDir, "trustline")
 
     // Construct the trustline and counter file paths
@@ -72,6 +52,8 @@ func SetTrustline(ctx main.HandlerContext) {
         return
     }
 
+    trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
+    
     // Write the new trustline amount to the file
     if err := os.WriteFile(trustlineOutPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
         fmt.Printf("Error writing trustline to file: %v\n", err) // Log detailed error
