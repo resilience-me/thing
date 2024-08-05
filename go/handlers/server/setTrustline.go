@@ -81,7 +81,7 @@ func SetTrustline(ctx main.HandlerContext) {
 
     fmt.Println("Trustline, counter, and timestamp updated successfully.")
 
-    // Prepare the response datagram
+    // Prepare the datagram
     dg := main.Datagram{
         Command:       main.Server_SetSyncCounter,
         XUsername:     ctx.Datagram.YUsername,       // Reverse the usernames for response
@@ -95,7 +95,7 @@ func SetTrustline(ctx main.HandlerContext) {
         return
     }
 
-    // Send the response datagram back to the peer
+    // Send the datagram back to the peer
     _, err = ctx.Conn.WriteToUDP(dg[:], ctx.Addr)
     if err != nil {
         fmt.Printf("Error sending datagram: %v\n", err)
