@@ -3,9 +3,9 @@ package client_trustlines
 import (
     "encoding/binary"
     "fmt"
-
-    "resilience/main"
+    "resilience/database/db_trustlines"
     "resilience/handlers" // Import the handlers package
+    "resilience/main"
 )
 
 // SetTrustline handles setting or updating a trustline from the client's perspective
@@ -18,7 +18,7 @@ func SetTrustline(ctx main.HandlerContext) {
     }
 
     // Retrieve the previous counter value using the getter
-    prevCounter, err := main.GetCounter(ctx.Datagram)
+    prevCounter, err := db_trustlines.GetCounter(ctx.Datagram)
     if err != nil {
         fmt.Printf("Error getting previous counter: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to read counter file.") // Send simpler error message
@@ -37,14 +37,14 @@ func SetTrustline(ctx main.HandlerContext) {
     trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
     // Write the new trustline amount using the setter
-    if err := main.SetTrustlineOut(ctx.Datagram, trustlineAmount); err != nil {
+    if err := db_trustlines.SetTrustlineOut(ctx.Datagram, trustlineAmount); err != nil {
         fmt.Printf("Error writing trustline to file: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to write trustline.") // Send simpler error message
         return
     }
 
     // Write the new counter value using the setter
-    if err := main.SetCounter(ctx.Datagram, counter); err != nil {
+    if err := db_trustlines.SetCounter(ctx.Datagram, counter); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to write counter.") // Send simpler error message
         return
