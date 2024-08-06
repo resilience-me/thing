@@ -22,6 +22,10 @@ Client return values use a standardized datagram too. It includes a random "nonc
         Signature    [32]byte
     }
 
+### Counters for manual retransmissions 
+
+The platform uses UDP and is single-threaded. Thus it is not "connection-oriented" in the traditional sense. But, with a sophisticated set of counters, and setter and getter commands, a client is able to achieve something very similar to connection-orientation, manually.
+
 ### Handling trustlines
 
 A number of counters keep track of state of trustlines. There is `counter`, that tracks an account's most recent update to their trustline to another acount. There is `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. Then, to manage updating the sync timestamp even if there was no need to sync (but an attempt was made), there is `sync_counter_in` and `sync_counter_out`. The platform does not use timestamps as counters or "nonces", but to allow tracking most recent change locally, the extra sync counters are added.
