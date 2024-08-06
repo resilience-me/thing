@@ -36,6 +36,12 @@ func SetSyncIn(dg *Datagram, value uint32) error {
 	return writeUint32ToFile(trustlineDir, "sync_in.txt", value)
 }
 
+// SetSyncOut sets the sync_out value.
+func SetSyncOut(dg *Datagram, value uint32) error {
+	trustlineDir := GetTrustlineDir(dg)
+	return writeUint32ToFile(trustlineDir, "sync_out.txt", value)
+}
+
 // SetTimestamp sets the sync timestamp.
 func SetTimestamp(dg *Datagram, timestamp int64) error {
 	trustlineDir := GetTrustlineDir(dg)
