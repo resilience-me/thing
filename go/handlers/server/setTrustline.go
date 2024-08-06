@@ -63,7 +63,7 @@ func SetTrustline(ctx main.HandlerContext) {
 
 	// Prepare the datagram to send back to the peer
 	dg := main.Datagram{
-		Command:        main.Server_SetSyncCounter,
+		Command:        main.Server_SetSyncOut,
 		XUsername:      ctx.Datagram.YUsername,       // Reverse the usernames for response
 		YUsername:      ctx.Datagram.XUsername,
 		YServerAddress: main.GetServerAddress(),      // Use the server's address
