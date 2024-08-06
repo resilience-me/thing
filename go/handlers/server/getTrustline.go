@@ -15,17 +15,17 @@ func GetTrustline(ctx main.HandlerContext) {
 		return
 	}
 
-	// Retrieve the current trustline amount
-	trustline, err := main.GetTrustlineOut(ctx.Datagram)
-	if err != nil {
-		fmt.Printf("Error getting trustline: %v\n", err)
-		return
-	}
-
 	// Retrieve the current counter value
 	counter, err := main.GetCounterOut(ctx.Datagram)
 	if err != nil {
 		fmt.Printf("Error getting counter: %v\n", err)
+		return
+	}
+
+	// Retrieve the current trustline amount
+	trustline, err := main.GetTrustlineOut(ctx.Datagram)
+	if err != nil {
+		fmt.Printf("Error getting trustline: %v\n", err)
 		return
 	}
 
