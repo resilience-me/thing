@@ -5,19 +5,17 @@ import (
     "resilience/main"
 )
 
-// prepareAndSendResponse is a shared function to set up and send a response datagram.
+// prepareAndSendResponse handles the common tasks for sending a response datagram.
 func prepareAndSendResponse(ctx main.HandlerContext, resultCode byte, message []byte) error {
     var responseDg main.ResponseDatagram
-    // Use the original signature as the nonce, dereferencing ctx.Datagram
     copy(responseDg.Nonce[:], ctx.Datagram.Signature[:])
-    responseDg.Result[0] = resultCode // Set result code (error or success)
+    responseDg.Result[0] = resultCode // Set result code
     copy(responseDg.Result[1:], message) // Copy the message or data
 
     // Generate signature for response datagram
     username := string(ctx.Datagram.XUsername[:])
     if err := main.SignResponseDatagram(&responseDg, username); err != nil {
-        fmt.Printf("Failed to sign response datagram: %v\n", err)
-        return err
+        return fmt.Errorf("failed to sign response datagram: %w", err)
     }
 
     // Send the signed response datagram
@@ -29,12 +27,12 @@ func prepareAndSendResponse(ctx main.HandlerContext, resultCode byte, message []
     return nil
 }
 
-// SendErrorResponse prepares and sends an error response datagram using the shared function.
+// SendErrorResponse prepares and sends an error response datagram.
 func SendErrorResponse(ctx main.HandlerContext, errorMessage string) error {
-    return prepareAndSendResponse(ctx, 1, []byte(errorMessage)) // Set error code to 1
+    return prepareAndSendResponse(ctx, 1, []byte(errorMessage)) // Error code 1
 }
 
-// SendSuccessResponse prepares and sends a success response datagram using the shared function.
+// SendSuccessResponse prepares and sends a success response datagram.
 func SendSuccessResponse(ctx main.HandlerContext, resultData []byte) error {
-    return prepareAndSendResponse(ctx, 0, resultData) // Set success code to 0
+    return prepareAndSendResponse(ctx, 0, resultData) // Success code 0
 }
