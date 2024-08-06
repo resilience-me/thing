@@ -45,9 +45,8 @@ func SetTrustline(ctx main.HandlerContext) {
 		return
 	}
 
-	// Write the Unix timestamp to the file
-	timestampPath := filepath.Join(main.GetTrustlineDir(ctx.Datagram), "sync_timestamp.txt")
-	if err := os.WriteFile(timestampPath, []byte(fmt.Sprintf("%d", time.Now().Unix())), 0644); err != nil {
+	// Write the Unix timestamp using the setter
+	if err := main.SetTimestamp(ctx.Datagram, time.Now().Unix()); err != nil {
 		fmt.Printf("Error writing timestamp to file: %v\n", err)
 		return
 	}
