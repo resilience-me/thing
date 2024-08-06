@@ -36,7 +36,8 @@ type CommandHandler func(HandlerContext)
 // CommandHandlers holds the command handlers
 var commandHandlers = [256]CommandHandler{
     0:   client_trustlines.SetTrustline,    // Client Command
-    1:   client_trustlines.GetTrustline,    // Client Command
+    1:   client_trustlines.GetTrustlineOut, // Client Command
+    2:   client_trustlines.GetTrustlineIn,  // Client Command
     128: client_trustlines.SetTrustline,    // Server Command
     129: server_trustlines.GetTrustline,    // Server Command
     130: server_trustlines.SetSyncOut,      // Server Command
@@ -45,10 +46,11 @@ var commandHandlers = [256]CommandHandler{
 }
 
 const (
-    ClientTrustlines_SetTrustline   = 0
-    ClientTrustlines_GetTrustline   = 1
-    ServerTrustlines_SetTrustline   = 128
-    ServerTrustlines_GetTrustline   = 129
-    ServerTrustlines_SetSyncOut     = 130
-    ServerTrustlines_SetTimestamp   = 131
+    ClientTrustlines_SetTrustline      = 0
+    ClientTrustlines_GetTrustlineOut   = 1
+    ClientTrustlines_GetTrustlineIn    = 2
+    ServerTrustlines_SetTrustline      = 128
+    ServerTrustlines_GetTrustline      = 129
+    ServerTrustlines_SetSyncOut        = 130
+    ServerTrustlines_SetTimestamp      = 131
 )
