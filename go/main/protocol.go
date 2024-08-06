@@ -2,8 +2,8 @@ package main
 
 import (
     "net"
-    "resilience/handlers/client"
-    "resilience/handlers/server"
+    "resilience/handlers/client_trustlines"
+    "resilience/handlers/server_trustlines"
 )
 
 // Datagram holds the structure of the incoming data
@@ -35,16 +35,16 @@ type CommandHandler func(HandlerContext)
 
 // CommandHandlers holds the command handlers
 var commandHandlers = [256]CommandHandler{
-    0:   client.SetTrustline,    // Client Command
-    128: server.SetTrustline,    // Server Command
-    129: server.SetSyncCounter,  // Server Command
-    130: server.GetTrustline,    // Server Command
+    0:   client_trustlines.SetTrustline,    // Client Command
+    128: client_trustlines.SetTrustline,    // Server Command
+    129: server_trustlines.SetSyncCounter,  // Server Command
+    130: server_trustlines.GetTrustline,    // Server Command
     // Other indices are nil by default
 }
 
 const (
-    Client_SetTrustline   = 0
-    Server_SetTrustline   = 128
-    Server_SetSyncCounter = 129
-    Server_GetTrustline   = 130
+    ClientTrustlines_SetTrustline   = 0
+    ServerTrustlines_SetTrustline   = 128
+    ServerTrustlines_SetSyncCounter = 129
+    ServerTrustlines_GetTrustline   = 130
 )
