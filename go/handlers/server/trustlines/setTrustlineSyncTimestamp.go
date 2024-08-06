@@ -1,4 +1,4 @@
-package server
+package trustlines
 
 import (
 	"encoding/binary"
@@ -8,8 +8,8 @@ import (
 	"resilience/handlers"
 )
 
-// SetTrustlineSyncTimestamp handles updating the sync timestamp for trustlines
-func SetTrustlineSyncTimestamp(ctx main.HandlerContext) {
+// SetTimestamp handles updating the sync timestamp for trustlines
+func SetTimestamp(ctx main.HandlerContext) {
 
 	if err := handlers.ValidateServerRequest(ctx); err != nil {
 		fmt.Printf("Validation failed: %v\n", err) // Log detailed error
