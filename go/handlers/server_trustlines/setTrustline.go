@@ -12,7 +12,7 @@ import (
 // SetTrustline handles setting or updating a trustline from another server's perspective
 func SetTrustline(ctx main.HandlerContext) {
 
-	if err := handlers.ValidateServerRequest(ctx); err != nil {
+	if err := handlers.ValidateServerRequest(ctx.Datagram); err != nil {
 		fmt.Printf("Validation failed: %v\n", err) // Log detailed error
 		return
 	}
