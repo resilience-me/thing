@@ -6,6 +6,7 @@ import (
 	"time"
 	"resilience/main"
 	"resilience/handlers"
+	"resilience/database/db_trustlines"
 )
 
 // SetTrustline handles setting or updating a trustline from another server's perspective
@@ -17,7 +18,7 @@ func SetTrustline(ctx main.HandlerContext) {
 	}
 
 	// Retrieve the sync_in value using the new getter
-	syncIn, err := main.GetSyncIn(ctx.Datagram)
+	syncIn, err := db_trustlines.GetSyncIn(ctx.Datagram)
 	if err != nil {
 		fmt.Printf("Error getting sync_in: %v\n", err)
 		return
@@ -34,19 +35,19 @@ func SetTrustline(ctx main.HandlerContext) {
 	trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
 	// Write the new trustline amount using the setter
-	if err := main.SetTrustlineOut(ctx.Datagram, trustlineAmount); err != nil {
+	if err := db_trustlines.SetTrustlineOut(ctx.Datagram, trustlineAmount); err != nil {
 		fmt.Printf("Error writing trustline to file: %v\n", err)
 		return
 	}
 
 	// Write the new sync_in value using the setter
-	if err := main.SetSyncIn(ctx.Datagram, counter); err != nil {
+	if err := db_trustlines.SetSyncIn(ctx.Datagram, counter); err != nil {
 		fmt.Printf("Error writing sync_in to file: %v\n", err)
 		return
 	}
 
 	// Write the Unix timestamp using the setter
-	if err := main.SetTimestamp(ctx.Datagram, time.Now().Unix()); err != nil {
+	if err := db_trustlines.SetTimestamp(ctx.Datagram, time.Now().Unix()); err != nil {
 		fmt.Printf("Error writing timestamp to file: %v\n", err)
 		return
 	}
