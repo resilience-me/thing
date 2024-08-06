@@ -35,7 +35,7 @@ func SetTrustline(ctx main.HandlerContext) {
 	trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
 	// Write the new trustline amount using the setter
-	if err := db_trustlines.SetTrustlineOut(ctx.Datagram, trustlineAmount); err != nil {
+	if err := db_trustlines.SetTrustlineIn(ctx.Datagram, trustlineAmount); err != nil {
 		fmt.Printf("Error writing trustline to file: %v\n", err)
 		return
 	}
@@ -56,7 +56,7 @@ func SetTrustline(ctx main.HandlerContext) {
 
 	// Prepare the datagram to send back to the peer
 	dg := main.Datagram{
-		Command:        main.Server_SetSyncOut,
+		Command:        main.ServerTrustlines_SetSyncOut,
 		XUsername:      ctx.Datagram.YUsername,       // Reverse the usernames for response
 		YUsername:      ctx.Datagram.XUsername,
 		YServerAddress: main.GetServerAddress(),      // Use the server's address
