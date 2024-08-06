@@ -3,7 +3,6 @@ package client
 import (
     "encoding/binary"
     "fmt"
-    "net"
     "os"
     "path/filepath"
     "strconv"
@@ -24,11 +23,11 @@ func SetTrustline(ctx main.HandlerContext) {
     trustlineDir := main.GetTrustlineDir(ctx.Datagram)
 
     // Construct the trustline and counter file paths
-    counterOutPath := filepath.Join(trustlineDir, "counter_out.txt")
+    counterPath := filepath.Join(trustlineDir, "counter.txt")
     trustlineOutPath := filepath.Join(trustlineDir, "trustline_out.txt")
 
     // Load the previous counter value
-    prevCounterStr, err := os.ReadFile(counterOutPath)
+    prevCounterStr, err := os.ReadFile(counterPath)
     if err != nil && !os.IsNotExist(err) {
         fmt.Printf("Error reading counter file: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to read counter file.") // Send simpler error message
@@ -51,8 +50,9 @@ func SetTrustline(ctx main.HandlerContext) {
         return
     }
 
+    // Retrieve the trustline amount from the Datagram
     trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
-    
+
     // Write the new trustline amount to the file
     if err := os.WriteFile(trustlineOutPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
         fmt.Printf("Error writing trustline to file: %v\n", err) // Log detailed error
@@ -62,7 +62,7 @@ func SetTrustline(ctx main.HandlerContext) {
 
     // Write the new counter value as a string
     counterStr := fmt.Sprintf("%d", counter)
-    if err := os.WriteFile(counterOutPath, []byte(counterStr), 0644); err != nil {
+    if err := os.WriteFile(counterPath, []byte(counterStr), 0644); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to write counter.") // Send simpler error message
         return
