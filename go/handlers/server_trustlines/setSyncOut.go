@@ -11,7 +11,7 @@ import (
 // SetSyncOut handles updating the sync_out counter from a received context
 func SetSyncOut(ctx main.HandlerContext) {
 
-	if err := handlers.ValidateServerRequest(ctx); err != nil {
+	if err := handlers.ValidateServerRequest(ctx.Datagram); err != nil {
 		fmt.Printf("Validation failed: %v\n", err) // Log detailed error
 		return
 	}
