@@ -3,8 +3,6 @@ package server
 import (
 	"encoding/binary"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 	"resilience/main"
 	"resilience/handlers"
@@ -32,28 +30,23 @@ func SetTrustline(ctx main.HandlerContext) {
 		return
 	}
 
-	// Get the trustline directory
-	trustlineDir := main.GetTrustlineDir(ctx.Datagram)
-
 	// Retrieve the trustline amount from the Datagram
 	trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
-	// Write the new trustline amount to the file
-	trustlineInPath := filepath.Join(trustlineDir, "trustline_in.txt")
-	if err := os.WriteFile(trustlineInPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
+	// Write the new trustline amount using the setter
+	if err := main.SetTrustlineOut(ctx.Datagram, trustlineAmount); err != nil {
 		fmt.Printf("Error writing trustline to file: %v\n", err)
 		return
 	}
 
-	// Write the new sync_in value to the file
-	syncInPath := filepath.Join(trustlineDir, "sync_in.txt")
-	if err := os.WriteFile(syncInPath, []byte(fmt.Sprintf("%d", counter)), 0644); err != nil {
+	// Write the new sync_in value using the setter
+	if err := main.SetSyncIn(ctx.Datagram, counter); err != nil {
 		fmt.Printf("Error writing sync_in to file: %v\n", err)
 		return
 	}
 
 	// Write the Unix timestamp to the file
-	timestampPath := filepath.Join(trustlineDir, "sync_timestamp.txt")
+	timestampPath := filepath.Join(main.GetTrustlineDir(ctx.Datagram), "sync_timestamp.txt")
 	if err := os.WriteFile(timestampPath, []byte(fmt.Sprintf("%d", time.Now().Unix())), 0644); err != nil {
 		fmt.Printf("Error writing timestamp to file: %v\n", err)
 		return
