@@ -24,7 +24,7 @@ Client return values use a standardized datagram too. It includes a random "nonc
 
 ### Counters for manual retransmissions 
 
-The platform uses UDP and is single-threaded. Thus it is not "connection-oriented" in the traditional sense. But, with a sophisticated set of counters, and setter and getter commands, a client is able to achieve something very similar to connection-orientation, manually. The counters can be likened to sequence numbers in a connection-oriented system, except here they are permanent. They are like a permanent connection. And rather than acknowledgements directly, an account polls the counters to see if a command made it through. And actually, as counter are comamnd specific, there are multiple persistent connections.
+The platform uses UDP and is single-threaded. Thus it is not "connection-oriented" in the traditional sense. But, with a sophisticated set of counters, and setter and getter commands, a client is able to achieve something very similar to connection-orientation, manually. The counters can be likened to sequence numbers in a connection-oriented system, except here they are permanent. They are like a permanent connection. And rather than acknowledgements directly, an account polls the counters to see if a command made it through. And actually, as counter are comamnd specific, there are multiple persistent connections. The platform never uses timestamps as counters or nonces, but may use them locally for display purposes (to communicate to user when an event happened. ) There is no consensus on time between accounts or servers.
 
 ### Handling trustlines
 
