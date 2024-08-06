@@ -23,18 +23,6 @@ func getUint32FromFile(dir, filename string) (uint32, error) {
 	return uint32(value), nil
 }
 
-// GetCounterOut retrieves the outbound counter using the datagram to determine the directory.
-func GetCounterOut(dg *Datagram) (uint32, error) {
-	trustlineDir := GetTrustlineDir(dg)
-	return getUint32FromFile(trustlineDir, "counter_out.txt")
-}
-
-// GetCounterIn retrieves the inbound counter using the datagram to determine the directory.
-func GetCounterIn(dg *Datagram) (uint32, error) {
-	trustlineDir := GetTrustlineDir(dg)
-	return getUint32FromFile(trustlineDir, "counter_in.txt")
-}
-
 // GetTrustlineOut retrieves the outbound trustline using the datagram to determine the directory.
 func GetTrustlineOut(dg *Datagram) (uint32, error) {
 	trustlineDir := GetTrustlineDir(dg)
@@ -45,4 +33,34 @@ func GetTrustlineOut(dg *Datagram) (uint32, error) {
 func GetTrustlineIn(dg *Datagram) (uint32, error) {
 	trustlineDir := GetTrustlineDir(dg)
 	return getUint32FromFile(trustlineDir, "trustline_in.txt")
+}
+
+// GetCounter retrieves the counter value using the datagram to determine the directory.
+func GetCounter(dg *Datagram) (uint32, error) {
+	trustlineDir := GetTrustlineDir(dg)
+	return getUint32FromFile(trustlineDir, "counter.txt")
+}
+
+// GetSyncIn retrieves the sync_in value using the datagram to determine the directory.
+func GetSyncIn(dg *Datagram) (uint32, error) {
+	trustlineDir := GetTrustlineDir(dg)
+	return getUint32FromFile(trustlineDir, "sync_in.txt")
+}
+
+// GetSyncOut retrieves the sync_out value using the datagram to determine the directory.
+func GetSyncOut(dg *Datagram) (uint32, error) {
+	trustlineDir := GetTrustlineDir(dg)
+	return getUint32FromFile(trustlineDir, "sync_out.txt")
+}
+
+// GetSyncCounterIn retrieves the sync_counter_in value using the datagram to determine the directory.
+func GetSyncCounterIn(dg *Datagram) (uint32, error) {
+	trustlineDir := GetTrustlineDir(dg)
+	return getUint32FromFile(trustlineDir, "sync_counter_in.txt")
+}
+
+// GetSyncCounterOut retrieves the sync_counter_out value using the datagram to determine the directory.
+func GetSyncCounterOut(dg *Datagram) (uint32, error) {
+	trustlineDir := GetTrustlineDir(dg)
+	return getUint32FromFile(trustlineDir, "sync_counter_out.txt")
 }
