@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"resilience/main"
 	"resilience/handlers"
+	"resilience/database/db_trustlines"
 )
 
 // GetTrustline handles the request to get the current trustline amount from another server
@@ -16,14 +17,14 @@ func GetTrustline(ctx main.HandlerContext) {
 	}
 
 	// Retrieve the current counter value
-	counter, err := main.GetCounter(ctx.Datagram)
+	counter, err := db_trustlines.GetCounter(ctx.Datagram)
 	if err != nil {
 		fmt.Printf("Error getting counter: %v\n", err)
 		return
 	}
 
 	// Retrieve the current sync_out value
-	syncOut, err := main.GetSyncOut(ctx.Datagram)
+	syncOut, err := db_trustlines.GetSyncOut(ctx.Datagram)
 	if err != nil {
 		fmt.Printf("Error getting sync_out: %v\n", err)
 		return
@@ -32,7 +33,7 @@ func GetTrustline(ctx main.HandlerContext) {
 	// Check if the server is synced
 	if counter == syncOut {
 		// Synced, send SetTrustlineSyncTimestamp command
-		syncCounterOut, err := main.GetSyncCounterOut(ctx.Datagram)
+		syncCounterOut, err := db_trustlines.GetSyncCounterOut(ctx.Datagram)
 		if err != nil {
 			fmt.Printf("Error getting sync_counter_out: %v\n", err)
 			return
@@ -58,7 +59,7 @@ func GetTrustline(ctx main.HandlerContext) {
 	} else {
 		// Not synced, send SetTrustline command
 		// Retrieve the current trustline amount
-		trustline, err := main.GetTrustlineOut(ctx.Datagram)
+		trustline, err := db_trustlines.GetTrustlineOut(ctx.Datagram)
 		if err != nil {
 			fmt.Printf("Error getting trustline: %v\n", err)
 			return
