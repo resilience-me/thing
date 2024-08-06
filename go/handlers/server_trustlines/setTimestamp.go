@@ -6,6 +6,7 @@ import (
 	"time"
 	"resilience/main"
 	"resilience/handlers"
+	"resilience/database/db_trustlines"
 )
 
 // SetTimestamp handles updating the sync timestamp for trustlines
@@ -17,7 +18,7 @@ func SetTimestamp(ctx main.HandlerContext) {
 	}
 
 	// Retrieve the previous sync_counter_in value using the getter
-	prevSyncCounterIn, err := main.GetSyncCounterIn(ctx.Datagram)
+	prevSyncCounterIn, err := db_trustlines.GetSyncCounterIn(ctx.Datagram)
 	if err != nil {
 		fmt.Printf("Error getting previous sync_counter_in: %v\n", err)
 		return
@@ -33,7 +34,7 @@ func SetTimestamp(ctx main.HandlerContext) {
 	}
 
 	// Write the new sync_counter_in value using the setter
-	if err := main.SetSyncCounterIn(ctx.Datagram, counter); err != nil {
+	if err := db_trustlines.SetSyncCounterIn(ctx.Datagram, counter); err != nil {
 		fmt.Printf("Error writing sync_counter_in to file: %v\n", err)
 		return
 	}
@@ -42,7 +43,7 @@ func SetTimestamp(ctx main.HandlerContext) {
 	timestamp := time.Now().Unix()
 
 	// Write the new timestamp using the setter
-	if err := main.SetTimestamp(ctx.Datagram, timestamp); err != nil {
+	if err := db_trustlines.SetTimestamp(ctx.Datagram, timestamp); err != nil {
 		fmt.Printf("Error writing timestamp to file: %v\n", err)
 		return
 	}
