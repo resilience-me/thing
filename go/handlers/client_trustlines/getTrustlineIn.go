@@ -11,9 +11,10 @@ import (
 // GetTrustlineIn handles fetching the inbound trustline information
 func GetTrustlineIn(ctx main.HandlerContext) {
     // Validate the client request
-    if err := handlers.ValidateClientRequest(ctx); err != nil {
+    if errorMessage, err := handlers.ValidateClientRequest(ctx.Datagram); err != nil {
         fmt.Printf("Validation failed: %v\n", err) // Log detailed error
-        return // Error response has already been sent in ValidateClientRequest
+        _ = handlers.SendErrorResponse(ctx, errorMessage)
+        return
     }
 
     // Fetch the inbound trustline
