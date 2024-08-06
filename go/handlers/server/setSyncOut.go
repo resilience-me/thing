@@ -15,11 +15,24 @@ func SetSyncOut(ctx main.HandlerContext) {
 		return
 	}
 
-	// Get the current sync_out value from the datagram
-	syncOut := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
+	// Retrieve the previous sync_out value using the getter
+	currentSyncOut, err := main.GetSyncOut(ctx.Datagram)
+	if err != nil {
+		fmt.Printf("Error getting current sync_out: %v\n", err)
+		return
+	}
 
-	// Write the sync_out value using the setter
-	if err := main.SetSyncOut(ctx.Datagram, syncOut); err != nil {
+	// Get the new sync_out value from the datagram
+	newSyncOut := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
+
+	// Check if the new sync_out is greater than the current sync_out
+	if newSyncOut <= currentSyncOut {
+		fmt.Println("Received sync_out is not greater than current sync_out. Potential replay attack.")
+		return
+	}
+
+	// Write the new sync_out value using the setter
+	if err := main.SetSyncOut(ctx.Datagram, newSyncOut); err != nil {
 		fmt.Printf("Error writing sync_out to file: %v\n", err)
 		return
 	}
