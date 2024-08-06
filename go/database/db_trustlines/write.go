@@ -1,10 +1,6 @@
 package db_trustlines
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
-
 	"resilience/database"
 )
 
