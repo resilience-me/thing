@@ -1,4 +1,4 @@
-package client
+package client_trustlines
 
 import (
     "encoding/binary"
