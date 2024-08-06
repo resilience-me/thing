@@ -1,4 +1,4 @@
-package server
+package trustlines
 
 import (
 	"encoding/binary"
