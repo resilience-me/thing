@@ -22,10 +22,6 @@ Client return values use a standardized datagram too. It includes a random "nonc
         Signature    [32]byte
     }
 
-### Counters for manual retransmissions 
-
-The platform uses UDP and is single-threaded. Thus it is not "connection-oriented" in the traditional sense. But, with a sophisticated set of counters, and setter and getter commands, a client is able to achieve something very similar to connection-orientation, manually. The counters can be likened to sequence numbers in a connection-oriented system, except here they are permanent. They are like a permanent connection. And rather than acknowledgements directly, an account polls the counters to see if a command made it through. And actually, as counter are comamnd specific, there are multiple persistent connections. The platform never uses timestamps as counters or nonces, but may use them locally for display purposes (to communicate to user when an event happened. ) There is no consensus on time between accounts or servers.
-
 ### Handling trustlines
 
 A number of counters keep track of state of trustlines. There is `counter`, that tracks an account's most recent update to their trustline to another acount. There is `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. Then, to manage updating the sync timestamp even if there was no need to sync (but an attempt was made), there is `sync_counter_in` and `sync_counter_out`. The platform does not use timestamps as counters or "nonces", but to allow tracking most recent change locally, the extra sync counters are added.
