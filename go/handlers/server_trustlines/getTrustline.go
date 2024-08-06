@@ -11,7 +11,7 @@ import (
 // GetTrustline handles the request to get the current trustline amount from another server
 func GetTrustline(ctx main.HandlerContext) {
 	// Validate the server request
-	if err := handlers.ValidateServerRequest(ctx); err != nil {
+	if err := handlers.ValidateServerRequest(ctx.Datagram); err != nil {
 		fmt.Printf("Validation failed: %v\n", err)
 		return
 	}
