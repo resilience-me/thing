@@ -28,3 +28,9 @@ func WriteUint32ToFile(dir, filename string, value uint32) error {
     filePath := filepath.Join(dir, filename)
     return os.WriteFile(filePath, []byte(fmt.Sprintf("%d", value)), 0644)
 }
+
+// writeTimeToFile writes a Unix timestamp to a file.
+func WriteTimeToFile(dir, filename string, timestamp int64) error {
+	filePath := filepath.Join(dir, filename)
+	return os.WriteFile(filePath, []byte(fmt.Sprintf("%d", timestamp)), 0644)
+}
