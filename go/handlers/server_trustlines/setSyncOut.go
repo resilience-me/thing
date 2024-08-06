@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"resilience/main"
 	"resilience/handlers"
+	"resilience/database/db_trustlines"
 )
 
 // SetSyncOut handles updating the sync_out counter from a received context
@@ -16,7 +17,7 @@ func SetSyncOut(ctx main.HandlerContext) {
 	}
 
 	// Retrieve the previous sync_out value using the getter
-	prevSyncOut, err := main.GetSyncOut(ctx.Datagram)
+	prevSyncOut, err := db_trustlines.GetSyncOut(ctx.Datagram)
 	if err != nil {
 		fmt.Printf("Error getting previous sync_out: %v\n", err)
 		return
@@ -32,7 +33,7 @@ func SetSyncOut(ctx main.HandlerContext) {
 	}
 
 	// Write the new sync_out value using the setter
-	if err := main.SetSyncOut(ctx.Datagram, syncOut); err != nil {
+	if err := db_trustlines.SetSyncOut(ctx.Datagram, syncOut); err != nil {
 		fmt.Printf("Error writing sync_out to file: %v\n", err)
 		return
 	}
