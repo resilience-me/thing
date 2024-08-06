@@ -42,6 +42,12 @@ func SetSyncOut(dg *Datagram, value uint32) error {
 	return writeUint32ToFile(trustlineDir, "sync_out.txt", value)
 }
 
+// SetSyncCounterOut sets the sync_counter_out value.
+func SetSyncCounterOut(dg *Datagram, value uint32) error {
+	trustlineDir := GetTrustlineDir(dg)
+	return writeUint32ToFile(trustlineDir, "sync_counter_out.txt", value)
+}
+
 // SetSyncCounterIn sets the sync_counter_in value.
 func SetSyncCounterIn(dg *Datagram, value uint32) error {
 	trustlineDir := GetTrustlineDir(dg)
