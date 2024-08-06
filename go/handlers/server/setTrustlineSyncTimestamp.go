@@ -23,17 +23,17 @@ func SetTrustlineSyncTimestamp(ctx main.HandlerContext) {
 		return
 	}
 
-	// Get the new sync_counter_in value from the datagram
-	syncCounterIn := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
+	// Get the new counter value from the datagram
+	counter := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
 
-	// Check if the new sync_counter_in is greater than the previous sync_counter_in
-	if syncCounterIn <= prevSyncCounterIn {
-		fmt.Println("Received sync_counter_in is not greater than previous sync_counter_in. Potential replay attack.")
+	// Check if the new counter is greater than the previous sync_counter_in
+	if counter <= prevSyncCounterIn {
+		fmt.Println("Received counter is not greater than previous sync_counter_in. Potential replay attack.")
 		return
 	}
 
 	// Write the new sync_counter_in value using the setter
-	if err := main.SetSyncCounterIn(ctx.Datagram, syncCounterIn); err != nil {
+	if err := main.SetSyncCounterIn(ctx.Datagram, counter); err != nil {
 		fmt.Printf("Error writing sync_counter_in to file: %v\n", err)
 		return
 	}
