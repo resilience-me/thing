@@ -10,38 +10,20 @@ import (
 
     "resilience/main"
     "resilience/handlers"
+	"resilience/database/db_trustlines"
 )
 
 // getTrustline handles fetching the trustline information for both inbound and outbound.
-func getTrustline(ctx main.HandlerContext, filename string) {
+func getTrustline(ctx main.HandlerContext, trustline uint32) {
     // Validate the client request
     if err := handlers.ValidateClientRequest(ctx); err != nil {
         fmt.Printf("Validation failed: %v\n", err) // Log detailed error
         return // Error response has already been sent in ValidateClientRequest
     }
 
-    // Get the trustline directory
-    trustlineDir := main.GetTrustlineDir(ctx.Datagram)
-
-    trustlinePath := filepath.Join(trustlineDir, filename)
-    trustlineAmountStr, err := os.ReadFile(trustlinePath)
-    if err != nil {
-        fmt.Printf("Error reading trustline file (%s): %v\n", filename, err) // Log the error
-        _ = handlers.SendErrorResponse(ctx, "Error reading trustline file.")
-        return
-    }
-
-    // Convert the string to an integer
-    trustlineAmount, err := strconv.ParseUint(string(trustlineAmountStr), 10, 32)
-    if err != nil {
-        fmt.Printf("Error converting trustline amount to integer: %v\n", err) // Log the error
-        _ = handlers.SendErrorResponse(ctx, "Error converting trustline amount to integer.")
-        return
-    }
-
     // Prepare success response
     responseData := make([]byte, 4) // Allocate 4 bytes for the trustline amount
-    binary.BigEndian.PutUint32(responseData, uint32(trustlineAmount)) // Convert the trustline amount to bytes
+    binary.BigEndian.PutUint32(responseData, uint32(trustline)) // Convert the trustline amount to bytes
 
     // Send the success response back to the client
     if err := handlers.SendSuccessResponse(ctx, responseData); err != nil {
@@ -54,10 +36,22 @@ func getTrustline(ctx main.HandlerContext, filename string) {
 
 // GetTrustlineIn handles fetching the inbound trustline information
 func GetTrustlineIn(ctx main.HandlerContext) {
-    getTrustline(ctx, "trustline_in.txt")
+    trustline := db_trustlines.GetTrustlineIn(ctx.Datagram)
+    if err != nil {
+        fmt.Printf("Error reading inbound trustline amount: %v\n", err) // Log the error
+        _ = handlers.SendErrorResponse(ctx, "Error reading inbound trustline.")
+        return
+    }
+    getTrustline(ctx, trustline)
 }
 
 // GetTrustlineOut handles fetching the outbound trustline information
 func GetTrustlineOut(ctx main.HandlerContext) {
-    getTrustline(ctx, "trustline_out.txt")
+    trustline := db_trustlines.GetTrustlineOut(ctx.Datagram)
+    if err != nil {
+        fmt.Printf("Error reading outbound trustline amount: %v\n", err) // Log the error
+        _ = handlers.SendErrorResponse(ctx, "Error reading outbound trustline.")
+        return
+    }
+    getTrustline(ctx, trustline)
 }
