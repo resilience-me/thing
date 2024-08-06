@@ -4,8 +4,6 @@ import (
     "encoding/binary"
     "fmt"
     "os"
-    "path/filepath"
-    "strconv"
 
     "resilience/main"
     "resilience/handlers" // Import the handlers package
@@ -19,32 +17,17 @@ func SetTrustline(ctx main.HandlerContext) {
         return // Error response has already been sent in ValidateClientRequest
     }
 
-    // Get the trustline directory
-    trustlineDir := main.GetTrustlineDir(ctx.Datagram)
-
-    // Construct the trustline and counter file paths
-    counterPath := filepath.Join(trustlineDir, "counter.txt")
-    trustlineOutPath := filepath.Join(trustlineDir, "trustline_out.txt")
-
-    // Load the previous counter value
-    prevCounterStr, err := os.ReadFile(counterPath)
-    if err != nil && !os.IsNotExist(err) {
-        fmt.Printf("Error reading counter file: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(ctx, "Failed to read counter file.") // Send simpler error message
-        return
-    }
-
-    // Parse previous counter
-    prevCounter, err := strconv.ParseUint(string(prevCounterStr), 10, 32) // Parse as uint64 first
+    // Retrieve the previous counter value using the getter
+    prevCounter, err := main.GetCounter(ctx.Datagram)
     if err != nil {
-        fmt.Printf("Error parsing previous counter string: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(ctx, "Failed to parse previous counter.") // Send simpler error message
+        fmt.Printf("Error getting previous counter: %v\n", err) // Log detailed error
+        _ = handlers.SendErrorResponse(ctx, "Failed to read counter file.") // Send simpler error message
         return
     }
 
     // Check the counter
     counter := binary.BigEndian.Uint32(ctx.Datagram.Counter[:])
-    if counter <= uint32(prevCounter) {
+    if counter <= prevCounter {
         fmt.Println("Received counter is not greater than previous counter. Potential replay attack.")
         _ = handlers.SendErrorResponse(ctx, "Received counter is not valid.") // Send simpler error message
         return
@@ -53,16 +36,15 @@ func SetTrustline(ctx main.HandlerContext) {
     // Retrieve the trustline amount from the Datagram
     trustlineAmount := binary.BigEndian.Uint32(ctx.Datagram.Arguments[:4])
 
-    // Write the new trustline amount to the file
-    if err := os.WriteFile(trustlineOutPath, []byte(fmt.Sprintf("%d", trustlineAmount)), 0644); err != nil {
+    // Write the new trustline amount using the setter
+    if err := main.WriteUint32ToFile(main.GetTrustlineDir(ctx.Datagram), "trustline_out.txt", trustlineAmount); err != nil {
         fmt.Printf("Error writing trustline to file: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to write trustline.") // Send simpler error message
         return
     }
 
-    // Write the new counter value as a string
-    counterStr := fmt.Sprintf("%d", counter)
-    if err := os.WriteFile(counterPath, []byte(counterStr), 0644); err != nil {
+    // Write the new counter value using the setter
+    if err := main.WriteUint32ToFile(main.GetTrustlineDir(ctx.Datagram), "counter.txt", counter); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err) // Log detailed error
         _ = handlers.SendErrorResponse(ctx, "Failed to write counter.") // Send simpler error message
         return
