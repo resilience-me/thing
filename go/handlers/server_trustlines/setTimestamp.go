@@ -12,7 +12,7 @@ import (
 // SetTimestamp handles updating the sync timestamp for trustlines
 func SetTimestamp(ctx main.HandlerContext) {
 
-	if err := handlers.ValidateServerRequest(ctx); err != nil {
+	if err := handlers.ValidateServerRequest(ctx.Datagram); err != nil {
 		fmt.Printf("Validation failed: %v\n", err) // Log detailed error
 		return
 	}
