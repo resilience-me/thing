@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"resilience/database"
 )
 
 // writeUint32ToFile writes a uint32 value to a file.
