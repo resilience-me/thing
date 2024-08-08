@@ -4,18 +4,18 @@ import (
     "time"
 )
 
-type PathCacheEntry struct {
+type PathEntry struct {
     Identifier [32]byte
     Timestamp  time.Time
     Depth      int
     NextHop    [32]byte
-    Next       *PathCacheEntry
+    Next       *PathEntry
 }
 
 type AccountNode struct {
     Username     [32]byte
-    Incoming     *PathCacheEntry
-    Outgoing     *PathCacheEntry
+    Incoming     *PathEntry
+    Outgoing     *PathEntry
     LastModified time.Time
     Next         *AccountNode
 }
