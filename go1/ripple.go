@@ -7,7 +7,7 @@ import (
     "os"
 )
 
-// Datagram represents the structure you provided earlier
+// Datagram represents the updated structure
 type Datagram struct {
     ClientOrServer   byte
     Username         [32]byte
@@ -72,11 +72,11 @@ func (m *SessionManager) run() {
     for {
         select {
         case session := <-m.sessionCh:
-            username := session.GetDatagram().XUsername
+            username := session.GetDatagram().Username
 
-            if !m.processors[username] {
+            if !m.activeHandlers[username] {
                 // No active handler, create HandlerContext and start processing
-                m.processors[username] = true
+                m.activeHandlers[username] = true
 
                 go m.handleSession(session)
             } else {
@@ -105,9 +105,9 @@ func (m *SessionManager) run() {
 // sending a closure signal when processing is complete.
 func (m *SessionManager) handleSession(session Session) {
     defer func() {
-        m.closedCh <- session.GetDatagram().XUsername
+        m.closedCh <- session.GetDatagram().Username
     }()
-    
+
     command := session.GetDatagram().Command
 
     // Look up the command handler
@@ -116,25 +116,25 @@ func (m *SessionManager) handleSession(session Session) {
         fmt.Printf("Unknown command: %d\n", command)
         return
     }
-    
+
     // Execute the handler
     handler(session)
 }
 
 // bytesToDatagram populates a Datagram struct from a byte slice
 func bytesToDatagram(dg *Datagram, buf []byte) {
-    dg.Command = buf[0]
-    copy(dg.XUsername[:], buf[1:33])
-    copy(dg.YUsername[:], buf[33:65])
-    copy(dg.YServerAddress[:], buf[65:97])
-    copy(dg.Arguments[:], buf[97:353])
-    copy(dg.Counter[:], buf[353:357])
-    copy(dg.Signature[:], buf[357:389])
+    dg.ClientOrServer = buf[0]
+    copy(dg.Username[:], buf[1:33])
+    copy(dg.PeerUsername[:], buf[33:65])
+    copy(dg.PeerServerAddress[:], buf[65:97])
+    dg.Command = buf[97]
+    copy(dg.Arguments[:], buf[98:354])
+    copy(dg.Counter[:], buf[354:358])
 }
 
 // handleConnection reads datagrams from the connection and sends them to the SessionManager
 func (m *SessionManager) handleConnection(conn net.Conn) {
-    buf := make([]byte, 389) // Create a buffer with the size of the Datagram
+    buf := make([]byte, 390) // Create a buffer with the size of the Datagram
 
     // Read the full datagram into the buffer
     _, err := io.ReadFull(conn, buf)
@@ -148,13 +148,13 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     }
 
     // Ensure the buffer is the correct size
-    if len(buf) < 389 {
+    if len(buf) < 390 {
         fmt.Println("Buffer is too small")
         return
     }
 
-    // Determine if this is a server or client command based on the command byte
-    isServerCommand := (buf[0] & 0x80) != 0 // Check the MSB of the Command byte
+    // Determine if this is a server or client command based on the ClientOrServer byte
+    isServerCommand := (buf[0] & 0x80) != 0 // Check the MSB of the ClientOrServer byte
 
     if isServerCommand {
         // Create and populate a ServerSession
