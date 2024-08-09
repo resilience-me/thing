@@ -133,8 +133,6 @@ func handleClientCommand2(ctx HandlerContext) {
 
 // handleConnection reads datagrams from the connection and sends them to the AccountManager
 func handleConnection(conn net.Conn, manager *AccountManager) {
-    defer conn.Close()
-
     var datagram Datagram
     err := io.ReadFull(conn, datagramBytes(&datagram))
     if err != nil {
@@ -146,7 +144,19 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
         return
     }
 
-    manager.datagramCh <- datagram
+    // Check the MSB of the Command byte to determine session type
+    isServerCommand := (datagram.Command & 0x80) != 0 // 0x80 is 10000000 in binary
+
+    if isServerCommand {
+        // Handle server command: Send to server channel
+        manager.serverCh <- ServerSession{Datagram: datagram}
+        // Close the connection after ensuring the ServerSession has been sent
+        conn.Close()
+    } else {
+        // Handle client command: Keep the connection open for potential responses
+        manager.clientCh <- ClientSession{Datagram: datagram, Conn: conn}
+        // Connection will remain open for further processing
+    }
 }
 
 // Main function with inlined server logic
