@@ -1,3 +1,5 @@
+package main
+
 // Datagram represents the updated structure
 type Datagram struct {
     ClientOrServer   byte
