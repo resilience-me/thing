@@ -114,9 +114,10 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     if err != nil {
         if err == io.EOF {
             fmt.Println("Connection closed by client")
-        } else {
-            fmt.Printf("Error reading datagram: %v\n", err)
+            return // No need to close the connection here
         }
+        fmt.Printf("Error reading datagram: %v\n", err)
+        conn.Close() // Close the connection in case of other errors
         return
     }
 
