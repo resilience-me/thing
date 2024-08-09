@@ -70,16 +70,6 @@ type AccountManager struct {
     queues         map[[32]byte][]Session      // Queues for sessions waiting to be processed
 }
 
-// NewAccountManager creates a new AccountManager
-func NewAccountManager() *AccountManager {
-    return &AccountManager{
-        sessionCh:      make(chan Session),
-        closedCh:       make(chan [32]byte),
-        activeHandlers: make(map[[32]byte]bool),
-        queues:         make(map[[32]byte][]Session),
-    }
-}
-
 func (m *AccountManager) run() {
     for {
         select {
@@ -187,7 +177,12 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
 
 // Main function with inlined server logic
 func main() {
-    manager := NewAccountManager()
+    manager := &AccountManager{
+        sessionCh:      make(chan Session),
+        closedCh:       make(chan [32]byte),
+        activeHandlers: make(map[[32]byte]bool),
+        queues:         make(map[[32]byte][]Session),
+    }
     go manager.run()
 
     // Start the TCP server on port 2012
