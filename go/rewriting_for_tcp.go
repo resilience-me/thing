@@ -139,8 +139,8 @@ func handleClientCommand2(ctx HandlerContext) {
     // The handler may or may not send a response
 }
 
-// bufToDatagram populates a Datagram struct from a byte slice
-func bufToDatagram(dg *Datagram, buf []byte) {
+// deserializeDatagram populates a Datagram struct from a byte slice
+func deserializeDatagram(dg *Datagram, buf []byte) {
     dg.Command = buf[0]
     copy(dg.XUsername[:], buf[1:33])
     copy(dg.YUsername[:], buf[33:65])
@@ -177,7 +177,7 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
     if isServerCommand {
         // Create and populate a ServerSession
         serverSession := &ServerSession{}
-        bufToDatagram(&serverSession.Datagram, buf)
+        deserializeDatagram(&serverSession.Datagram, buf)
         manager.sessionCh <- serverSession
         conn.Close() // Close the connection for server sessions
     } else {
@@ -185,7 +185,7 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
         clientSession := &ClientSession{
             Conn: conn,
         }
-        bufToDatagram(&clientSession.Datagram, buf)
+        deserializeDatagram(&clientSession.Datagram, buf)
         manager.sessionCh <- clientSession
         // Connection remains open for client sessions
     }
