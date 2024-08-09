@@ -66,8 +66,6 @@ func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
     return plaintext, nil
 }
 
-
-
 func authenticateAndDecrypt(buf *[]byte) ([]byte, error) {
     // Step 1: Load the secret key
     secretKey, err := loadSecretKey(*buf)
