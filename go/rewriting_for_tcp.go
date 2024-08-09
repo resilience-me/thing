@@ -46,6 +46,14 @@ type ServerSession struct {
     BaseSession
 }
 
+// SessionManager manages the processing of datagrams per account
+type SessionManager struct {
+    sessionCh      chan Session                // Create a channel for Session interfaces
+    closedCh       chan [32]byte               // Channel for closed sessions
+    activeHandlers map[[32]byte]bool           // Tracks active handlers by username
+    queues         map[[32]byte][]Session      // Queues for sessions waiting to be processed
+}
+
 // HandlerContext holds the common parameters for handler functions
 type HandlerContext struct {
     Session Session          // The session, which can be ClientSession or ServerSession
@@ -60,14 +68,6 @@ var commandHandlers = [256]CommandHandler{
     0x01: handleClientCommand1,
     0x02: handleClientCommand2,
     // Add more command handlers as needed
-}
-
-// SessionManager manages the processing of datagrams per account
-type SessionManager struct {
-    sessionCh      chan Session                // Create a channel for Session interfaces
-    closedCh       chan [32]byte               // Channel for closed sessions
-    activeHandlers map[[32]byte]bool           // Tracks active handlers by username
-    queues         map[[32]byte][]Session      // Queues for sessions waiting to be processed
 }
 
 func (m *SessionManager) run() {
