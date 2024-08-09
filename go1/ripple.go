@@ -52,14 +52,8 @@ type SessionManager struct {
     queues         map[[32]byte][]Session      // Queues for sessions waiting to be processed
 }
 
-// HandlerContext holds the common parameters for handler functions
-type HandlerContext struct {
-    Session Session          // The session, which can be ClientSession or ServerSession
-    CloseCh chan [32]byte    // Channel to signal completion
-}
-
 // CommandHandler defines the type for command handling functions
-type CommandHandler func(ctx HandlerContext)
+type CommandHandler func(session Session)
 
 // CommandHandlers maps command bytes to handler functions
 var commandHandlers = [256]CommandHandler{
