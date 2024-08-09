@@ -102,7 +102,9 @@ func (m *SessionManager) run() {
     }
 }
 
-// handleSession creates a new context and processes the datagram
+// handleSession manages the processing of a session's datagram, 
+// ensuring the appropriate command handler is called and
+// sending a closure signal when processing is complete.
 func (m *SessionManager) handleSession(session Session) {
     defer func() {
         m.closedCh <- session.GetDatagram().XUsername
