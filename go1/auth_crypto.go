@@ -132,7 +132,7 @@ func validateAndParseDatagram(buf *[]byte, dg *Datagram) error {
         dg.PeerUsername = ToString((*buf)[33:65])
         dg.PeerServerAddress = ToString((*buf)[65:97])
 
-        peerDir := filepath.Join(datadir, dg.Username, "peers", dg.PeerServerAddress, dg.PeerUsername)
+        peerDir := filepath.Join(datadir, "accounts", dg.Username, "peers", dg.PeerServerAddress, dg.PeerUsername)
 
         // Inline the peer existence check
         if err := os.Stat(peerDir); err != nil {
