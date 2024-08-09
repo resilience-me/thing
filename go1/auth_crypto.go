@@ -127,7 +127,7 @@ func authenticateAndDecrypt(buf *[]byte, dg *Datagram) error {
         return fmt.Errorf("failed to decrypt datagram: %v", err)
     }
 
-    // Step 6: Populate the Datagram fields for client session
+    // Step 7: Write decrypted data back into the Datagram's Arguments field
     if clientOrServer == 0 {
         dg.PeerUsername = ToString((*buf)[33:65])
         dg.PeerServerAddress = ToString((*buf)[65:97])
@@ -138,11 +138,11 @@ func authenticateAndDecrypt(buf *[]byte, dg *Datagram) error {
         if err := os.Stat(peerDir); err != nil {
             return fmt.Errorf("peer directory does not exist: %v", err)
         }
+        copy(dg.Arguments[:], decryptedData[64:]) // Copy the rest to Arguments
+    } else {
+        // For server sessions, directly copy the decrypted data into Arguments
+        copy(dg.Arguments[:], decryptedData)
     }
-
-    // Step 7: Write decrypted data back into the Datagram's Arguments field
-    copy(dg.Arguments[:], decryptedData) // Insert decrypted data for both client and server sessions
-
     // Return nil to indicate success
     return nil
 }
