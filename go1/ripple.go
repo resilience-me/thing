@@ -147,9 +147,11 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Ensure the buffer is the correct size
-    if len(buf) < 390 {
-        fmt.Println("Buffer is too small")
+    // Load the secret key based on the session type
+    secretKey, err := loadSecretKey(buf)
+    if err != nil {
+        fmt.Printf("Failed to load secret key: %v\n", err)
+        conn.Close()
         return
     }
 
