@@ -121,14 +121,23 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
+    clientOrServer := buf[0] // Read the ClientOrServer byte from the buffer
+
     // Step 1: Authenticate and decrypt the datagram
     if err := authenticateAndDecrypt(&buf); err != nil {
         fmt.Printf("Authentication and decryption failed: %v\n", err)
+
+        // If it is a client session, send a generic error response
+        if clientOrServer == 0 { // Check if it's a client session
+            // Inline sending the error response
+            if _, writeErr := conn.Write([]byte{1}); writeErr != nil {
+                fmt.Printf("Failed to send error response: %v\n", writeErr)
+            }
+        }
+
         conn.Close() // Close the connection if authentication fails
         return
     }
-
-    clientOrServer := buf[0] // Read the ClientOrServer byte from the buffer
 
     if clientOrServer == 0 { // Client session
         // Create and populate a ClientSession
