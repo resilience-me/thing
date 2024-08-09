@@ -139,9 +139,20 @@ func handleClientCommand2(ctx HandlerContext) {
     // The handler may or may not send a response
 }
 
+
+func bufToDatagram(dg *Datagram, buf []byte) {
+    dg.Command = buf[0]
+    copy(dg.XUsername[:], buf[1:33])
+    copy(dg.YUsername[:], buf[33:65])
+    copy(dg.YServerAddress[:], buf[65:97])
+    copy(dg.Arguments[:], buf[97:353])
+    copy(dg.Counter[:], buf[353:357])
+    copy(dg.Signature[:], buf[357:389])
+}
+
 // handleConnection reads datagrams from the connection and sends them to the AccountManager
 func handleConnection(conn net.Conn, manager *AccountManager) {
-    var datagram Datagram
+    buf := make([]byte, 389) // Create a buffer with the size of the Datagram
     err := io.ReadFull(conn, datagramBytes(&datagram))
     if err != nil {
         if err == io.EOF {
@@ -152,17 +163,28 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
         return
     }
 
+    if len(buf) < 389 {
+        // You might want to handle this error differently, perhaps returning an error
+        fmt.Println("Buffer is too small")
+        return
+    }
+
     // Check the MSB of the Command byte to determine session type
     isServerCommand := (datagram.Command & 0x80) != 0 // 0x80 is 10000000 in binary
 
     if isServerCommand {
+        var serverSession ServerSession
+        bufToDatagram(&session.Datagram, buf)
         // Handle server command: Send to server channel
-        manager.serverCh <- ServerSession{Datagram: datagram}
+        manager.serverCh <- serverSession
         // Close the connection after ensuring the ServerSession has been sent
         conn.Close()
     } else {
+        var clientSession ClientSession
+        bufToDatagram(&session.Datagram, buf)
+        clientSession.Conn = conn
         // Handle client command: Keep the connection open for potential responses
-        manager.clientCh <- ClientSession{Datagram: datagram, Conn: conn}
+        manager.clientCh <- clientSession
         // Connection will remain open for further processing
     }
 }
