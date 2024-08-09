@@ -64,10 +64,10 @@ var commandHandlers = [256]CommandHandler{
 
 // AccountManager manages the processing of datagrams per account
 type AccountManager struct {
-    sessionCh   chan Session                   // Create a channel for Session interfaces
-    closedCh      chan [32]byte                // Channel for closed sessions
+    sessionCh      chan Session                   // Create a channel for Session interfaces
+    closedCh       chan [32]byte                // Channel for closed sessions
     activeHandlers map[[32]byte]bool           // Tracks active handlers by username
-    queues      map[[32]byte][]Session         // Queues for sessions waiting to be processed
+    queues         map[[32]byte][]Session         // Queues for sessions waiting to be processed
 }
 
 // NewAccountManager creates a new AccountManager
