@@ -139,7 +139,7 @@ func handleClientCommand2(ctx HandlerContext) {
     // The handler may or may not send a response
 }
 
-
+// bufToDatagram populates a Datagram struct from a byte slice
 func bufToDatagram(dg *Datagram, buf []byte) {
     dg.Command = buf[0]
     copy(dg.XUsername[:], buf[1:33])
