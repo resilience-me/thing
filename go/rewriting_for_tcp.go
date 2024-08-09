@@ -104,23 +104,21 @@ func (m *SessionManager) run() {
 
 // commandDispatcher creates a new context and processes the datagram
 func (m *SessionManager) commandDispatcher(session Session) {
+    defer func() {
+        m.closedCh <- session.GetDatagram().Username()
+    }()
+    
     command := session.GetDatagram().Command
 
     // Look up the command handler
     handler := commandHandlers[command]
     if handler == nil {
         fmt.Printf("Unknown command: %d\n", command)
-        m.closedCh <- session.GetDatagram().XUsername
         return
     }
-
-    ctx := &HandlerContext{
-        Session: session,
-        CloseCh: m.closedCh,
-    }
-
+    
     // Execute the handler
-    handler(ctx)
+    handler(session)
 }
 
 // bytesToDatagram populates a Datagram struct from a byte slice
