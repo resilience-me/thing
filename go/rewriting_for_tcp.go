@@ -62,12 +62,9 @@ var commandHandlers = [256]CommandHandler{
     // Add more command handlers as needed
 }
 
-// Create a channel for Session interfaces
-var sessionCh = make(chan Session)
-
 // AccountManager manages the processing of datagrams per account
 type AccountManager struct {
-    sessionCh   chan Session
+    sessionCh   chan Session                   // Create a channel for Session interfaces
     closedCh      chan [32]byte                // Channel for closed sessions
     activeHandlers map[[32]byte]bool           // Tracks active handlers by username
     queues      map[[32]byte][]Session         // Queues for sessions waiting to be processed
