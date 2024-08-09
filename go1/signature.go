@@ -23,6 +23,7 @@ func loadSecretKeyFromDir(dir string) ([]byte, error) {
     return secretKey, nil
 }
 
+// loadSecretKey loads the secret key based on the datagram buffer.
 func loadSecretKey(buf []byte) ([]byte, error) {
     clientOrServer := buf[0]
 
@@ -45,6 +46,7 @@ func loadSecretKey(buf []byte) ([]byte, error) {
     return secretKey, nil
 }
 
+// authenticateDatagram authenticates the datagram using HMAC.
 func authenticateDatagram(datagram []byte, key []byte) ([]byte, error) {
     if len(datagram) < 422 { // Ensure the datagram meets the minimum length requirement.
         return nil, errors.New("datagram too short")
@@ -64,6 +66,7 @@ func authenticateDatagram(datagram []byte, key []byte) ([]byte, error) {
     return data, nil
 }
 
+// decryptDatagram decrypts the encrypted part of the datagram.
 func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
     block, err := aes.NewCipher(key)
     if err != nil {
@@ -80,6 +83,8 @@ func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
     return plaintext, nil
 }
 
+// authenticateAndDecrypt handles the entire process of loading the secret key,
+// authenticating the datagram, and decrypting the message.
 func authenticateAndDecrypt(buf *[]byte) ([]byte, error) {
     // Step 1: Load the secret key
     secretKey, err := loadSecretKey(*buf)
