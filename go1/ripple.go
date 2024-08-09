@@ -153,16 +153,9 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Determine if this is a server or client command based on the ClientOrServer byte
-    isServerCommand := (buf[0] & 0x80) != 0 // Check the MSB of the ClientOrServer byte
+    clientOrServer := buf[0] // Read the ClientOrServer byte
 
-    if isServerCommand {
-        // Create and populate a ServerSession
-        serverSession := &ServerSession{}
-        bytesToDatagram(&serverSession.Datagram, buf)
-        m.sessionCh <- serverSession
-        conn.Close() // Close the connection for server sessions
-    } else {
+    if clientOrServer == 0 { // Client session
         // Create and populate a ClientSession
         clientSession := &ClientSession{
             Conn: conn,
@@ -170,6 +163,12 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         bytesToDatagram(&clientSession.Datagram, buf)
         m.sessionCh <- clientSession
         // Connection remains open for client sessions
+    } else { // Server session
+        // Create and populate a ServerSession
+        serverSession := &ServerSession{}
+        bytesToDatagram(&serverSession.Datagram, buf)
+        m.sessionCh <- serverSession
+        conn.Close() // Close the connection for server sessions
     }
 }
 
