@@ -89,15 +89,21 @@ func NewAccountManager() *AccountManager {
 func (m *AccountManager) Run() {
     for {
         select {
-        case data := <-m.datagramCh:
-            username := data.XUsername
+        case session := <-m.sessionCh:
+            username := session.GetDatagram().XUsername
             if !m.processors[username] {
-                // No active processor, start one
+                // No active handler, create HandlerContext and start processing
                 m.processors[username] = true
-                go m.ProcessDatagram(data, nil, m.closedCh)
+
+                ctx := &HandlerContext{
+                    Session: session,
+                    CloseCh: make(chan [32]byte),
+                }
+
+                go m.ProcessDatagram(ctx)
             } else {
                 // Processor is active, enqueue the datagram
-                m.queues[username] = append(m.queues[username], data)
+                m.queues[username] = append(m.queues[username], session)
             }
 
         case username := <-m.closedCh:
