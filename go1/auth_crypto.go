@@ -97,8 +97,9 @@ func authenticateAndDecrypt(buf *[]byte, dg *Datagram) error {
         dirPath = filepath.Join(datadir, "accounts", dg.Username)
     } else { // Server session
         // Populate PeerUsername and PeerServerAddress for server sessions
-        copy(dg.PeerUsername[:], (*buf)[33:65])      // Populate PeerUsername
-        copy(dg.PeerServerAddress[:], (*buf)[65:97]) // Populate PeerServerAddress
+        dg.PeerUsername = ToString((*buf)[33:65]) // Populate PeerUsername
+        dg.PeerServerAddress = ToString((*buf)[65:97]) // Populate PeerServerAddress
+
         dirPath = filepath.Join(datadir, "accounts", dg.Username, "peers", ToString(dg.PeerServerAddress[:]), ToString(dg.PeerUsername[:]))
     }
 
