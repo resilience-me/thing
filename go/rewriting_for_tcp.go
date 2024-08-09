@@ -173,16 +173,17 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
     isServerCommand := (datagram.Command & 0x80) != 0 // 0x80 is 10000000 in binary
 
     if isServerCommand {
-        var serverSession ServerSession
-        bufToDatagram(&session.Datagram, buf)
+        serverSession := &ServerSession{}
+        bufToDatagram(&serverSession.Datagram, buf)
         // Handle server command: Send to server channel
         manager.sessionCh <- serverSession
         // Close the connection after ensuring the ServerSession has been sent
         conn.Close()
     } else {
-        var clientSession ClientSession
-        bufToDatagram(&session.Datagram, buf)
-        clientSession.Conn = conn
+        clientSession := &ClientSession{
+            Conn: conn,
+        }
+        bufToDatagram(&clientSession.Datagram, buf)
         // Handle client command: Keep the connection open for potential responses
         manager.sessionCh <- clientSession
         // Connection will remain open for further processing
