@@ -135,7 +135,7 @@ func bytesToDatagram(dg *Datagram, buf []byte) {
 }
 
 // handleConnection reads datagrams from the connection and sends them to the AccountManager
-func handleConnection(conn net.Conn, manager *AccountManager) {
+func (m *AccountManager) handleConnection(conn net.Conn) {
     buf := make([]byte, 389) // Create a buffer with the size of the Datagram
 
     // Read the full datagram into the buffer
@@ -162,7 +162,7 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
         // Create and populate a ServerSession
         serverSession := &ServerSession{}
         bytesToDatagram(&serverSession.Datagram, buf)
-        manager.sessionCh <- serverSession
+        m.sessionCh <- serverSession
         conn.Close() // Close the connection for server sessions
     } else {
         // Create and populate a ClientSession
@@ -170,7 +170,7 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
             Conn: conn,
         }
         bytesToDatagram(&clientSession.Datagram, buf)
-        manager.sessionCh <- clientSession
+        m.sessionCh <- clientSession
         // Connection remains open for client sessions
     }
 }
