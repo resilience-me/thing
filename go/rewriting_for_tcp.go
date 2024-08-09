@@ -109,16 +109,18 @@ func (m *AccountManager) ProcessDatagram(datagram Datagram, conn net.Conn, close
 func handleConnection(conn net.Conn, manager *AccountManager) {
     defer conn.Close()
 
-    for {
-        var datagram Datagram
-        err := io.ReadFull(conn, datagramBytes(&datagram))
-        if err != nil {
+    var datagram Datagram
+    err := io.ReadFull(conn, datagramBytes(&datagram))
+    if err != nil {
+        if err == io.EOF {
+            fmt.Println("Connection closed by client")
+        } else {
             fmt.Printf("Error reading datagram: %v\n", err)
-            return
         }
-
-        manager.datagramCh <- datagram
+        return
     }
+
+    manager.datagramCh <- datagram
 }
 
 // datagramBytes provides a slice that covers the entire datagram for reading
