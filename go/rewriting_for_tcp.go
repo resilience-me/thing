@@ -80,7 +80,7 @@ func (m *SessionManager) run() {
                 // No active handler, create HandlerContext and start processing
                 m.processors[username] = true
 
-                go m.ProcessDatagram(session)
+                go m.commandDispatcher(session)
             } else {
                 // Processor is active, enqueue the session
                 m.queues[username] = append(m.queues[username], session)
@@ -93,7 +93,7 @@ func (m *SessionManager) run() {
                 nextSession := queue[0]
                 m.queues[username] = queue[1:]
 
-                go m.ProcessDatagram(nextSession)
+                go m.commandDispatcher(nextSession)
             } else {
                 // No sessions left, mark processor as not running
                 delete(m.activeHandlers, username)
