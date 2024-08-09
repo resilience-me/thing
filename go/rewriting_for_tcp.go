@@ -176,7 +176,7 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
         var serverSession ServerSession
         bufToDatagram(&session.Datagram, buf)
         // Handle server command: Send to server channel
-        manager.serverCh <- serverSession
+        manager.sessionCh <- serverSession
         // Close the connection after ensuring the ServerSession has been sent
         conn.Close()
     } else {
@@ -184,7 +184,7 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
         bufToDatagram(&session.Datagram, buf)
         clientSession.Conn = conn
         // Handle client command: Keep the connection open for potential responses
-        manager.clientCh <- clientSession
+        manager.sessionCh <- clientSession
         // Connection will remain open for further processing
     }
 }
