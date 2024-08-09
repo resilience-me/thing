@@ -20,24 +20,6 @@ type Datagram struct {
     Signature      [32]byte
 }
 
-// HandlerContext holds the common parameters for handler functions
-type HandlerContext struct {
-    Datagram *Datagram    // Pointer to Datagram
-    Conn     net.Conn     // TCP connection, for client-server responses
-    CloseCh  chan [32]byte  // Channel to signal completion
-}
-
-// CommandHandler defines the type for command handling functions
-type CommandHandler func(ctx HandlerContext)
-
-// CommandHandlers maps command bytes to handler functions
-var commandHandlers = [256]CommandHandler{
-    0x01: handleClientCommand1,
-    0x02: handleClientCommand2,
-    // Add more command handlers as needed
-}
-
-
 // Define the BaseSession struct, embedding the Datagram
 type BaseSession struct {
     Datagram
@@ -62,6 +44,22 @@ type ClientSession struct {
 // Define the ServerSession struct
 type ServerSession struct {
     BaseSession
+}
+
+// HandlerContext holds the common parameters for handler functions
+type HandlerContext struct {
+    Session Session          // The session, which can be ClientSession or ServerSession
+    CloseCh chan [32]byte    // Channel to signal completion
+}
+
+// CommandHandler defines the type for command handling functions
+type CommandHandler func(ctx HandlerContext)
+
+// CommandHandlers maps command bytes to handler functions
+var commandHandlers = [256]CommandHandler{
+    0x01: handleClientCommand1,
+    0x02: handleClientCommand2,
+    // Add more command handlers as needed
 }
 
 // Create a channel for Session interfaces
