@@ -9,7 +9,6 @@ import (
     "fmt"
     "os"
     "path/filepath"
-    "strings"
 )
 
 // loadSecretKey loads the secret key from the specified directory.
@@ -19,7 +18,6 @@ func loadSecretKey(dir string) ([]byte, error) {
     if err != nil {
         return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
     }
-
     return secretKey, nil
 }
 
@@ -63,14 +61,14 @@ func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
 // validateAndParseDatagram authenticates and decrypts the datagram,
 // populating the provided Datagram pointer with the decrypted data.
 func validateAndParseDatagram(buf *[]byte, dg *Datagram) error {
-    dg.clientOrServer = (*buf)[0] // Read the ClientOrServer byte
+    dg.ClientOrServer = (*buf)[0] // Read the ClientOrServer byte
 
     // Step 1: Populate the Datagram fields
     dg.Username = ToString((*buf)[1:33]) // Populate Username
 
     // Construct directory path based on the session type
     var dirPath string
-    if dg.clientOrServer == 0 { // Client session
+    if dg.ClientOrServer == 0 { // Client session
         dirPath = filepath.Join(datadir, "accounts", dg.Username)
     } else { // Server session
         dg.PeerUsername = ToString((*buf)[33:65]) // Populate PeerUsername
@@ -92,7 +90,7 @@ func validateAndParseDatagram(buf *[]byte, dg *Datagram) error {
 
     // Step 4: Determine the encrypted part based on session type
     var encryptedPart []byte
-    if dg.clientOrServer == 0 { // Client session
+    if dg.ClientOrServer == 0 { // Client session
         encryptedPart = authenticatedData[33:390] // Adjusted for client session encryption range
     } else { // Server session
         encryptedPart = authenticatedData[97:390] // Adjusted for server session encryption range
@@ -105,7 +103,7 @@ func validateAndParseDatagram(buf *[]byte, dg *Datagram) error {
     }
 
     // Step 6: Write decrypted data back into the Datagram's Arguments field
-    if dg.clientOrServer == 0 {
+    if dg.ClientOrServer == 0 {
         dg.PeerUsername = ToString((*buf)[33:65])
         dg.PeerServerAddress = ToString((*buf)[65:97])
 
