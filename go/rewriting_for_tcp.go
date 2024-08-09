@@ -134,32 +134,6 @@ func (m *AccountManager) commandDispatcher(session Session) {
     handler(ctx)
 }
 
-// datagramBytes provides a slice that covers the entire datagram for reading
-func datagramBytes(d *Datagram) []byte {
-    size := 1 + 32 + 32 + 32 + 256 + 4 + 32 // Total size of the Datagram struct
-    return (*[389]byte)(d)[:size]
-}
-
-// Example client-server command handler 1
-func handleClientCommand1(ctx HandlerContext) {
-    defer func() {
-        ctx.CloseCh <- ctx.Datagram.XUsername
-    }()
-
-    fmt.Println("Handling Client Command 1")
-    // The handler may or may not send a response
-}
-
-// Example client-server command handler 2
-func handleClientCommand2(ctx HandlerContext) {
-    defer func() {
-        ctx.CloseCh <- ctx.Datagram.XUsername
-    }()
-
-    fmt.Println("Handling Client Command 2")
-    // The handler may or may not send a response
-}
-
 // bytesToDatagram populates a Datagram struct from a byte slice
 func bytesToDatagram(dg *Datagram, buf []byte) {
     dg.Command = buf[0]
