@@ -2,13 +2,13 @@ package main
 
 // Datagram represents the updated structure
 type Datagram struct {
-    ClientOrServer   byte
-    Username         [32]byte
-    PeerUsername     [32]byte
-    PeerServerAddress [32]byte
-    Command          byte
-    Arguments        [256]byte
-    Counter          [4]byte
+    ClientOrServer     byte
+    Username           string
+    PeerUsername       string
+    PeerServerAddress  string
+    Command            byte
+    Arguments          [256]byte
+    Counter            [4]byte
 }
 
 // CommandHandler defines the type for command handling functions
