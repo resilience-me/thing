@@ -85,17 +85,17 @@ func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
 
 // authenticateAndDecrypt handles the entire process of loading the secret key,
 // authenticating the datagram, and decrypting the message.
-func authenticateAndDecrypt(buf *[]byte) ([]byte, error) {
+func authenticateAndDecrypt(buf *[]byte) error {
     // Step 1: Load the secret key
     secretKey, err := loadSecretKey(*buf)
     if err != nil {
-        return nil, fmt.Errorf("failed to load secret key: %v", err)
+        return fmt.Errorf("failed to load secret key: %v", err)
     }
 
     // Step 2: Authenticate the datagram
     authenticatedData, err := authenticateDatagram(*buf, secretKey)
     if err != nil {
-        return nil, fmt.Errorf("failed to authenticate datagram: %v", err)
+        return fmt.Errorf("failed to authenticate datagram: %v", err)
     }
 
     // Step 3: Determine the encrypted part based on session type
@@ -109,9 +109,16 @@ func authenticateAndDecrypt(buf *[]byte) ([]byte, error) {
     // Step 4: Decrypt the datagram
     decryptedData, err := decryptDatagram(encryptedPart, secretKey)
     if err != nil {
-        return nil, fmt.Errorf("failed to decrypt datagram: %v", err)
+        return fmt.Errorf("failed to decrypt datagram: %v", err)
     }
 
-    // Return the decrypted data
-    return decryptedData, nil
+    // Step 5: Write decrypted data back into the original buffer
+    if (*buf)[0] == 0 { // Client session
+        copy((*buf)[33:390], decryptedData) // Insert decrypted data for client session
+    } else { // Server session
+        copy((*buf)[97:390], decryptedData) // Insert decrypted data for server session
+    }
+
+    // Return nil to indicate success
+    return nil
 }
