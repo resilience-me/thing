@@ -96,8 +96,9 @@ func bytesToDatagram(dg *Datagram, buf []byte) {
 
 // handleConnection reads datagrams from the connection and sends them to the SessionManager
 func (m *SessionManager) handleConnection(conn net.Conn) {
-    buf := make([]byte, 390)
+    buf := make([]byte, 390) // Create a buffer with the size of the Datagram
 
+    // Read the full datagram into the buffer
     _, err := io.ReadFull(conn, buf)
     if err != nil {
         if err == io.EOF {
@@ -105,31 +106,45 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
             return
         }
         fmt.Printf("Error reading datagram: %v\n", err)
-        conn.Close()
+        conn.Close() // Close the connection in case of errors
         return
     }
 
+    // Determine session type early from the first byte
     clientOrServer := buf[0]
-    if err := authenticateAndDecrypt(&buf); err != nil {
+
+    // Create a Datagram struct to hold the processed data
+    dg := &Datagram{}
+
+    // Step 1: Authenticate and decrypt the datagram
+    if err := authenticateAndDecrypt(&buf, dg); err != nil {
         fmt.Printf("Authentication and decryption failed: %v\n", err)
-        if clientOrServer == 0 {
+        
+        // If it is a client session, send a generic error response
+        if clientOrServer == 0 { // Check if it's a client session
             if _, writeErr := conn.Write([]byte{1}); writeErr != nil {
                 fmt.Printf("Failed to send error response: %v\n", writeErr)
             }
         }
-        conn.Close()
+
+        conn.Close() // Close the connection if authentication fails
         return
     }
 
-    if clientOrServer == 0 {
-        clientSession := &ClientSession{Conn: conn}
-        bytesToDatagram(&clientSession.Datagram, buf)
+    // Create session based on the clientOrServer flag and enqueue
+    if clientOrServer == 0 { // Client session
+        clientSession := &ClientSession{
+            Datagram: *dg,
+            Conn: conn,
+        }
         m.sessionCh <- clientSession
-    } else {
-        serverSession := &ServerSession{}
-        bytesToDatagram(&serverSession.Datagram, buf)
+        // Connection remains open for client sessions
+    } else { // Server session
+        serverSession := &ServerSession{
+            Datagram: *dg,
+        }
         m.sessionCh <- serverSession
-        conn.Close()
+        conn.Close() // Close the connection for server sessions
     }
 }
 
