@@ -122,34 +122,30 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     }
 
     // Step 1: Authenticate and decrypt the datagram
-    decryptedData, err := authenticateAndDecrypt(&buf)
-    if err != nil {
+    if err := authenticateAndDecrypt(&buf); err != nil {
         fmt.Printf("Authentication and decryption failed: %v\n", err)
-        conn.Close()
+        conn.Close() // Close the connection if authentication fails
         return
     }
 
-    clientOrServer := buf[0] // Read the ClientOrServer byte
+    clientOrServer := buf[0] // Read the ClientOrServer byte from the buffer
 
     if clientOrServer == 0 { // Client session
         // Create and populate a ClientSession
         clientSession := &ClientSession{
             Conn: conn,
         }
-        // Use decrypted data instead of the original buffer to populate the datagram
-        bytesToDatagram(&clientSession.Datagram, decryptedData)
+        bytesToDatagram(&clientSession.Datagram, buf) // Populate using the modified buffer
         m.sessionCh <- clientSession
         // Connection remains open for client sessions
     } else { // Server session
         // Create and populate a ServerSession
         serverSession := &ServerSession{}
-        // Use decrypted data instead of the original buffer to populate the datagram
-        bytesToDatagram(&serverSession.Datagram, decryptedData)
+        bytesToDatagram(&serverSession.Datagram, buf) // Populate using the modified buffer
         m.sessionCh <- serverSession
         conn.Close() // Close the connection for server sessions
     }
 }
-
 
 // Main function with inlined server logic
 func main() {
