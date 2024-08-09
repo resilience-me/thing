@@ -83,17 +83,6 @@ func (m *SessionManager) handleSession(session Session) {
     handler(session)
 }
 
-// bytesToDatagram populates a Datagram struct from a byte slice
-func bytesToDatagram(dg *Datagram, buf []byte) {
-    dg.ClientOrServer = buf[0]
-    dg.Username = ToString(buf[1:33])
-    dg.PeerUsername = ToString(buf[33:65])
-    dg.PeerServerAddress = ToString(buf[65:97])
-    dg.Command = buf[97]
-    copy(dg.Arguments[:], buf[98:354])
-    copy(dg.Counter[:], buf[354:358])
-}
-
 // handleConnection reads datagrams from the connection and sends them to the SessionManager
 func (m *SessionManager) handleConnection(conn net.Conn) {
     buf := make([]byte, 390)
