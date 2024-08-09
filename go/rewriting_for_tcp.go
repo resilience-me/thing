@@ -80,7 +80,7 @@ func NewAccountManager() *AccountManager {
     }
 }
 
-func (m *AccountManager) Run() {
+func (m *AccountManager) run() {
     for {
         select {
         case session := <-m.sessionCh:
@@ -188,7 +188,7 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
 // Main function with inlined server logic
 func main() {
     manager := NewAccountManager()
-    go manager.Run()
+    go manager.run()
 
     // Start the TCP server on port 2012
     listener, err := net.Listen("tcp", ":2012")
