@@ -49,3 +49,19 @@ func authenticateDatagram(datagram []byte, key []byte) ([]byte, error) {
 
     return data, nil
 }
+
+func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
+    block, err := aes.NewCipher(key)
+    if err != nil {
+        return nil, err
+    }
+    if len(encryptedPart) < aes.BlockSize {
+        return nil, errors.New("ciphertext too short")
+    }
+    iv := encryptedPart[:aes.BlockSize]
+    ciphertext := encryptedPart[aes.BlockSize:]
+    plaintext := make([]byte, len(ciphertext))
+    stream := cipher.NewCFBDecrypter(block, iv)
+    stream.XORKeyStream(plaintext, ciphertext)
+    return plaintext, nil
+}
