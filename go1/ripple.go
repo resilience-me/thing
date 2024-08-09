@@ -132,19 +132,11 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     }
 
     // Create session based on the clientOrServer flag and enqueue
-    if clientOrServer == 0 { // Client session
-        clientSession := &ClientSession{
-            Datagram: *dg,
-            Conn: conn,
-        }
-        m.sessionCh <- clientSession
-        // Connection remains open for client sessions
-    } else { // Server session
-        serverSession := &ServerSession{
-            Datagram: *dg,
-        }
-        m.sessionCh <- serverSession
-        conn.Close() // Close the connection for server sessions
+    if dg.ClientOrServer == 0 {
+        m.sessionCh <- &ClientSession{Datagram: *dg, Conn: conn}
+    } else {
+        m.sessionCh <- &ServerSession{Datagram: *dg}
+        conn.Close()
     }
 }
 
