@@ -127,7 +127,7 @@ func validateAndParseDatagram(buf *[]byte, dg *Datagram) error {
         return fmt.Errorf("failed to decrypt datagram: %v", err)
     }
 
-    // Step 7: Write decrypted data back into the Datagram's Arguments field
+    // Step 6: Write decrypted data back into the Datagram's Arguments field
     if dg.clientOrServer == 0 {
         dg.PeerUsername = ToString((*buf)[33:65])
         dg.PeerServerAddress = ToString((*buf)[65:97])
