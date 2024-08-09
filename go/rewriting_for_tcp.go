@@ -9,7 +9,7 @@ import (
     "os"
 )
 
-// Datagram represents the structure you provided earlier.
+// Datagram represents the structure you provided earlier
 type Datagram struct {
     Command        byte
     XUsername      [32]byte
@@ -46,7 +46,7 @@ type ServerSession struct {
     BaseSession
 }
 
-// SessionManager manages the processing of sessions, including client and server datagrams.
+// SessionManager manages the processing of sessions, including client and server datagrams
 type SessionManager struct {
     sessionCh      chan Session                // Create a channel for Session interfaces
     closedCh       chan [32]byte               // Channel for closed sessions
