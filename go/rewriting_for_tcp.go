@@ -67,12 +67,10 @@ var sessionCh = make(chan Session)
 
 // AccountManager manages the processing of datagrams per account
 type AccountManager struct {
-    datagramCh    chan ClientSession           // Channel for client sessions
-    serverCh      chan ServerSession           // Channel for server sessions
+    sessionCh   chan Session
     closedCh      chan [32]byte                // Channel for closed sessions
-    processors    map[[32]byte]bool            // Track active processors by username
-    clientQueues  map[[32]byte][]ClientSession // Queue for client datagrams
-    serverQueues  map[[32]byte][]Datagram      // Queue for server datagrams
+    activeHandlers map[[32]byte]bool           // Tracks active handlers by username
+    queues      map[[32]byte][]Session         // Queues for sessions waiting to be processed
 }
 
 // NewAccountManager creates a new AccountManager
