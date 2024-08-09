@@ -83,9 +83,9 @@ func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
     return plaintext, nil
 }
 
-// authenticateAndDecrypt authenticates and decrypts the datagram,
+// validateAndParseDatagram authenticates and decrypts the datagram,
 // populating the provided Datagram pointer with the decrypted data.
-func authenticateAndDecrypt(buf *[]byte, dg *Datagram) error {
+func validateAndParseDatagram(buf *[]byte, dg *Datagram) error {
     clientOrServer := (*buf)[0] // Read the ClientOrServer byte
 
     // Step 1: Populate the Datagram fields
