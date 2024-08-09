@@ -1,5 +1,3 @@
-// Will rewrite things to use tcp instead of udp, just to have the retransmission feature built-in. This is a quick first outline/sketch
-
 package main
 
 import (
