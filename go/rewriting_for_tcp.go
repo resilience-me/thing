@@ -45,11 +45,12 @@ type ClientSession struct {
 
 // AccountManager manages the processing of datagrams per account
 type AccountManager struct {
-    clientCh   chan ClientSession
-    serverCh   chan Datagram
-    closedCh   chan [32]byte              // Channel for signals from processors
-    processors map[[32]byte]bool          // Active processors
-    queues     map[[32]byte][]Datagram    // Queues for pending datagrams per account
+    datagramCh    chan ClientSession           // Channel for client sessions
+    serverCh      chan ServerSession           // Channel for server sessions
+    closedCh      chan [32]byte                // Channel for closed sessions
+    processors    map[[32]byte]bool            // Track active processors by username
+    clientQueues  map[[32]byte][]ClientSession // Queue for client datagrams
+    serverQueues  map[[32]byte][]Datagram      // Queue for server datagrams
 }
 
 // NewAccountManager creates a new AccountManager
