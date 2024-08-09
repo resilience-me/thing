@@ -116,7 +116,7 @@ func (m *AccountManager) Run() {
 }
 
 // ProcessDatagram creates a new context and processes the datagram
-func (m *AccountManager) ProcessDatagram(session Session) {
+func (m *AccountManager) commandDispatcher(session Session) {
 
     command := session.GetDatagram().Command
     // Look up the command handler
