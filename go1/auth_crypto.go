@@ -128,11 +128,10 @@ func authenticateAndDecrypt(buf *[]byte, dg *Datagram) error {
         return fmt.Errorf("failed to decrypt datagram: %v", err)
     }
 
-    // Step 6: Check if the session is a client session and validate the peer
+    // Step 6: Populate the Datagram fields
     if clientOrServer == 0 { // Client session
-        // Populate PeerUsername and PeerServerAddress for client sessions
-        copy(dg.PeerUsername[:], (*buf)[33:65])      // Populate PeerUsername
-        copy(dg.PeerServerAddress[:], (*buf)[65:97]) // Populate PeerServerAddress
+        dg.PeerUsername = ToString((*buf)[33:65])        // Populate PeerUsername
+        dg.PeerServerAddress = ToString((*buf)[65:97])   // Populate PeerServerAddress
 
         peerDir := filepath.Join(datadir, dg.Username, "peers", ToString(dg.PeerServerAddress[:]), ToString(dg.PeerUsername[:]))
 
