@@ -65,3 +65,36 @@ func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
     stream.XORKeyStream(plaintext, ciphertext)
     return plaintext, nil
 }
+
+
+
+func authenticateAndDecrypt(buf *[]byte) ([]byte, error) {
+    // Step 1: Load the secret key
+    secretKey, err := loadSecretKey(*buf)
+    if err != nil {
+        return nil, fmt.Errorf("failed to load secret key: %v", err)
+    }
+
+    // Step 2: Authenticate the datagram
+    authenticatedData, err := authenticateDatagram(*buf, secretKey)
+    if err != nil {
+        return nil, fmt.Errorf("failed to authenticate datagram: %v", err)
+    }
+
+    // Step 3: Determine the encrypted part based on session type
+    var encryptedPart []byte
+    if (*buf)[0] == 0 { // Client session
+        encryptedPart = authenticatedData[33:390] // Adjusted for client session encryption range
+    } else { // Server session
+        encryptedPart = authenticatedData[97:390] // Adjusted for server session encryption range
+    }
+
+    // Step 4: Decrypt the datagram
+    decryptedData, err := decryptDatagram(encryptedPart, secretKey)
+    if err != nil {
+        return nil, fmt.Errorf("failed to decrypt datagram: %v", err)
+    }
+
+    // Return the decrypted data
+    return decryptedData, nil
+}
