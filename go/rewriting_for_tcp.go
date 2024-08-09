@@ -153,7 +153,9 @@ func bufToDatagram(dg *Datagram, buf []byte) {
 // handleConnection reads datagrams from the connection and sends them to the AccountManager
 func handleConnection(conn net.Conn, manager *AccountManager) {
     buf := make([]byte, 389) // Create a buffer with the size of the Datagram
-    err := io.ReadFull(conn, datagramBytes(&datagram))
+
+    // Read the full datagram into the buffer
+    _, err := io.ReadFull(conn, buf)
     if err != nil {
         if err == io.EOF {
             fmt.Println("Connection closed by client")
@@ -163,30 +165,29 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
         return
     }
 
+    // Ensure the buffer is the correct size
     if len(buf) < 389 {
-        // You might want to handle this error differently, perhaps returning an error
         fmt.Println("Buffer is too small")
         return
     }
 
-    // Check the MSB of the Command byte to determine session type
-    isServerCommand := (datagram.Command & 0x80) != 0 // 0x80 is 10000000 in binary
+    // Determine if this is a server or client command based on the command byte
+    isServerCommand := (buf[0] & 0x80) != 0 // Check the MSB of the Command byte
 
     if isServerCommand {
+        // Create and populate a ServerSession
         serverSession := &ServerSession{}
         bufToDatagram(&serverSession.Datagram, buf)
-        // Handle server command: Send to server channel
         manager.sessionCh <- serverSession
-        // Close the connection after ensuring the ServerSession has been sent
-        conn.Close()
+        conn.Close() // Close the connection for server sessions
     } else {
+        // Create and populate a ClientSession
         clientSession := &ClientSession{
             Conn: conn,
         }
         bufToDatagram(&clientSession.Datagram, buf)
-        // Handle client command: Keep the connection open for potential responses
         manager.sessionCh <- clientSession
-        // Connection will remain open for further processing
+        // Connection remains open for client sessions
     }
 }
 
