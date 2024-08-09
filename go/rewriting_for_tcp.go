@@ -203,6 +203,6 @@ func main() {
         }
 
         // Handle each connection in a separate goroutine
-        go handleConnection(conn, manager)
+        go manager.handleConnection(conn)
     }
 }
