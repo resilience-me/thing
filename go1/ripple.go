@@ -104,23 +104,12 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Determine session type early from the first byte
-    clientOrServer := buf[0]
-
-    // Create a Datagram struct to hold the processed data
     dg := &Datagram{}
-
-    // Step 1: Authenticate and decrypt the datagram
     if err := authenticateAndDecrypt(&buf, dg); err != nil {
         fmt.Printf("Authentication and decryption failed: %v\n", err)
-        
-        // If it is a client session, send a generic error response
-        if clientOrServer == 0 { // Check if it's a client session
-            if _, writeErr := conn.Write([]byte{1}); writeErr != nil {
-                fmt.Printf("Failed to send error response: %v\n", writeErr)
-            }
+        if buf[0] == 0 {
+            conn.Write([]byte{1})  // Send error response for client session
         }
-
         conn.Close() // Close the connection if authentication fails
         return
     }
