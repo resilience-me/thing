@@ -96,11 +96,9 @@ func authenticateAndDecrypt(buf *[]byte, dg *Datagram) error {
     if clientOrServer == 0 { // Client session
         dirPath = filepath.Join(datadir, "accounts", dg.Username)
     } else { // Server session
-        // Populate PeerUsername and PeerServerAddress for server sessions
         dg.PeerUsername = ToString((*buf)[33:65]) // Populate PeerUsername
         dg.PeerServerAddress = ToString((*buf)[65:97]) // Populate PeerServerAddress
-
-        dirPath = filepath.Join(datadir, "accounts", dg.Username, "peers", ToString(dg.PeerServerAddress[:]), ToString(dg.PeerUsername[:]))
+        dirPath = filepath.Join(datadir, "accounts", dg.Username, "peers", dg.PeerServerAddress, dg.PeerUsername)
     }
 
     // Step 2: Load the secret key
@@ -129,12 +127,12 @@ func authenticateAndDecrypt(buf *[]byte, dg *Datagram) error {
         return fmt.Errorf("failed to decrypt datagram: %v", err)
     }
 
-    // Step 6: Populate the Datagram fields
-    if clientOrServer == 0 { // Client session
-        dg.PeerUsername = ToString((*buf)[33:65])        // Populate PeerUsername
-        dg.PeerServerAddress = ToString((*buf)[65:97])   // Populate PeerServerAddress
+    // Step 6: Populate the Datagram fields for client session
+    if clientOrServer == 0 {
+        dg.PeerUsername = ToString((*buf)[33:65])
+        dg.PeerServerAddress = ToString((*buf)[65:97])
 
-        peerDir := filepath.Join(datadir, dg.Username, "peers", ToString(dg.PeerServerAddress[:]), ToString(dg.PeerUsername[:]))
+        peerDir := filepath.Join(datadir, dg.Username, "peers", dg.PeerServerAddress, dg.PeerUsername)
 
         // Inline the peer existence check
         if err := os.Stat(peerDir); err != nil {
@@ -148,4 +146,3 @@ func authenticateAndDecrypt(buf *[]byte, dg *Datagram) error {
     // Return nil to indicate success
     return nil
 }
-
