@@ -94,7 +94,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     }
 
     dg := &Datagram{}
-    if err := authenticateAndDecrypt(&buf, dg); err != nil {
+    if err := validateAndParseDatagram(&buf, dg); err != nil {
         fmt.Printf("Authentication and decryption failed: %v\n", err)
         if buf[0] == 0 {
             conn.Write([]byte{1})  // Send error response for client session
