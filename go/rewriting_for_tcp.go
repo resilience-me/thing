@@ -93,12 +93,7 @@ func (m *AccountManager) Run() {
                 // No active handler, create HandlerContext and start processing
                 m.processors[username] = true
 
-                ctx := &HandlerContext{
-                    Session: session,
-                    CloseCh: make(chan [32]byte),
-                }
-
-                go m.ProcessDatagram(ctx)
+                go m.ProcessDatagram(session)
             } else {
                 // Processor is active, enqueue the session
                 m.queues[username] = append(m.queues[username], session)
@@ -111,12 +106,7 @@ func (m *AccountManager) Run() {
                 nextSession := queue[0]
                 m.queues[username] = queue[1:]
 
-                ctx := &HandlerContext{
-                    Session: nextSession,
-                    CloseCh: make(chan [32]byte),
-                }
-
-                go m.ProcessDatagram(ctx)
+                go m.ProcessDatagram(nextSession)
             } else {
                 // No sessions left, mark processor as not running
                 delete(m.activeHandlers, username)
@@ -126,16 +116,20 @@ func (m *AccountManager) Run() {
 }
 
 // ProcessDatagram creates a new context and processes the datagram
-func (m *AccountManager) ProcessDatagram(ctx HandlerContext) {
+func (m *AccountManager) ProcessDatagram(session Session) {
 
+    command := session.GetDatagram().Command
     // Look up the command handler
-    handler := commandHandlers[ctx.Datagram.Command]
+    handler := commandHandlers[command]
     if handler == nil {
-        fmt.Printf("Unknown command: %d\n", ctx.Datagram.Command)
-        ctx.CloseCh <- ctx.Datagram.XUsername
+        fmt.Printf("Unknown command: %d\n", command)
+        m.closedCh <- session.GetDatagram().XUsername
         return
     }
-
+    ctx := &HandlerContext{
+        Session: session,
+        CloseCh: m.closedCh,
+    }
     // Execute the handler
     handler(ctx)
 }
