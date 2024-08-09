@@ -105,7 +105,7 @@ func (m *SessionManager) run() {
 // commandDispatcher creates a new context and processes the datagram
 func (m *SessionManager) commandDispatcher(session Session) {
     defer func() {
-        m.closedCh <- session.GetDatagram().Username()
+        m.closedCh <- session.GetDatagram().XUsername
     }()
     
     command := session.GetDatagram().Command
