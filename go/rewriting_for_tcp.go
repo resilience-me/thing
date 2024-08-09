@@ -46,7 +46,7 @@ type ServerSession struct {
     BaseSession
 }
 
-// SessionManager manages the processing of datagrams per account
+// SessionManager manages the processing of sessions, including client and server datagrams.
 type SessionManager struct {
     sessionCh      chan Session                // Create a channel for Session interfaces
     closedCh       chan [32]byte               // Channel for closed sessions
