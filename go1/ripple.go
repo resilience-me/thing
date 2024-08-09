@@ -120,10 +120,10 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Load the secret key based on the session type
-    secretKey, err := loadSecretKey(buf)
+    // Step 1: Authenticate and decrypt the datagram
+    decryptedData, err := authenticateAndDecrypt(&buf)
     if err != nil {
-        fmt.Printf("Failed to load secret key: %v\n", err)
+        fmt.Printf("Authentication and decryption failed: %v\n", err)
         conn.Close()
         return
     }
@@ -135,17 +135,20 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         clientSession := &ClientSession{
             Conn: conn,
         }
-        bytesToDatagram(&clientSession.Datagram, buf)
+        // Use decrypted data instead of the original buffer to populate the datagram
+        bytesToDatagram(&clientSession.Datagram, decryptedData)
         m.sessionCh <- clientSession
         // Connection remains open for client sessions
     } else { // Server session
         // Create and populate a ServerSession
         serverSession := &ServerSession{}
-        bytesToDatagram(&serverSession.Datagram, buf)
+        // Use decrypted data instead of the original buffer to populate the datagram
+        bytesToDatagram(&serverSession.Datagram, decryptedData)
         m.sessionCh <- serverSession
         conn.Close() // Close the connection for server sessions
     }
 }
+
 
 // Main function with inlined server logic
 func main() {
