@@ -7,8 +7,6 @@ import (
     "crypto/sha256"
     "errors"
     "fmt"
-    "io"
-    "net"
     "os"
     "path/filepath"
     "strings"
