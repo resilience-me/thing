@@ -76,10 +76,10 @@ type AccountManager struct {
 // NewAccountManager creates a new AccountManager
 func NewAccountManager() *AccountManager {
     return &AccountManager{
-        datagramCh: make(chan Datagram),
-        closedCh:   make(chan [32]byte),
-        processors: make(map[[32]byte]bool),
-        queues:     make(map[[32]byte][]Datagram),
+        sessionCh:      make(chan Session),
+        closedCh:       make(chan [32]byte),
+        activeHandlers: make(map[[32]byte]bool),
+        queues:         make(map[[32]byte][]Session),
     }
 }
 
