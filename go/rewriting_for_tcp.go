@@ -131,6 +131,11 @@ func handleClientCommand2(ctx HandlerContext) {
     // The handler may or may not send a response
 }
 
+// isServerCommand checks if the command indicates a server command
+func isServerCommand(command byte) bool {
+    return (command & 0x80) != 0 // 0x80 is 10000000 in binary
+}
+
 // handleConnection reads datagrams from the connection and sends them to the AccountManager
 func handleConnection(conn net.Conn, manager *AccountManager) {
     var datagram Datagram
@@ -144,10 +149,8 @@ func handleConnection(conn net.Conn, manager *AccountManager) {
         return
     }
 
-    // Check the MSB of the Command byte to determine session type
-    isServerCommand := (datagram.Command & 0x80) != 0 // 0x80 is 10000000 in binary
-
-    if isServerCommand {
+    // Use the isServerCommand function to determine session type
+    if isServerCommand(datagram.Command) {
         // Handle server command: Send to server channel
         manager.serverCh <- ServerSession{Datagram: datagram}
         // Close the connection after ensuring the ServerSession has been sent
