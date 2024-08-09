@@ -134,7 +134,7 @@ func bytesToDatagram(dg *Datagram, buf []byte) {
     copy(dg.Signature[:], buf[357:389])
 }
 
-// handleConnection reads datagrams from the connection and sends them to the AccountManager
+// handleConnection reads datagrams from the connection and sends them to the SessionManager
 func (m *SessionManager) handleConnection(conn net.Conn) {
     buf := make([]byte, 389) // Create a buffer with the size of the Datagram
 
