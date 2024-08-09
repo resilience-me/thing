@@ -37,11 +37,35 @@ var commandHandlers = [256]CommandHandler{
     // Add more command handlers as needed
 }
 
-// ClientSession holds a Datagram and net.Conn for client-to-server connections.
-type ClientSession struct {
-    Datagram Datagram
-    Conn     net.Conn
+
+// Define the BaseSession struct, embedding the Datagram
+type BaseSession struct {
+    Datagram
 }
+
+// Define the Session interface with a GetDatagram method
+type Session interface {
+    GetDatagram() *Datagram
+}
+
+// Implement the GetDatagram method for BaseSession
+func (bs *BaseSession) GetDatagram() *Datagram {
+    return &bs.Datagram
+}
+
+// Define the ClientSession struct
+type ClientSession struct {
+    BaseSession
+    Conn net.Conn
+}
+
+// Define the ServerSession struct
+type ServerSession struct {
+    BaseSession
+}
+
+// Create a channel for Session interfaces
+var sessionCh = make(chan Session)
 
 // AccountManager manages the processing of datagrams per account
 type AccountManager struct {
