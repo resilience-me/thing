@@ -126,12 +126,7 @@ func (m *AccountManager) Run() {
 }
 
 // ProcessDatagram creates a new context and processes the datagram
-func (m *AccountManager) ProcessDatagram(datagram Datagram, conn net.Conn, closeCh chan [32]byte) {
-    ctx := HandlerContext{
-        Datagram: &datagram,
-        Conn:     conn,
-        CloseCh:  closeCh,
-    }
+func (m *AccountManager) ProcessDatagram(ctx HandlerContext) {
 
     // Look up the command handler
     handler := commandHandlers[ctx.Datagram.Command]
