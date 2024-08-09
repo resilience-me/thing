@@ -7,17 +7,6 @@ import (
     "os"
 )
 
-// Datagram represents the updated structure
-type Datagram struct {
-    ClientOrServer   byte
-    Username         [32]byte
-    PeerUsername     [32]byte
-    PeerServerAddress [32]byte
-    Command          byte
-    Arguments        [256]byte
-    Counter          [4]byte
-}
-
 // Define the BaseSession struct, embedding the Datagram
 type BaseSession struct {
     Datagram
@@ -50,16 +39,6 @@ type SessionManager struct {
     closedCh       chan [32]byte               // Channel for closed sessions
     activeHandlers map[[32]byte]bool           // Tracks active handlers by username
     queues         map[[32]byte][]Session      // Queues for sessions waiting to be processed
-}
-
-// CommandHandler defines the type for command handling functions
-type CommandHandler func(session Session)
-
-// CommandHandlers maps command bytes to handler functions
-var commandHandlers = [256]CommandHandler{
-    0x01: handleClientCommand1,
-    0x02: handleClientCommand2,
-    // Add more command handlers as needed
 }
 
 func (m *SessionManager) run() {
