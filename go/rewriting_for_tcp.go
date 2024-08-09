@@ -115,10 +115,10 @@ func (m *AccountManager) Run() {
     }
 }
 
-// ProcessDatagram creates a new context and processes the datagram
+// commandDispatcher creates a new context and processes the datagram
 func (m *AccountManager) commandDispatcher(session Session) {
-
     command := session.GetDatagram().Command
+
     // Look up the command handler
     handler := commandHandlers[command]
     if handler == nil {
@@ -126,10 +126,12 @@ func (m *AccountManager) commandDispatcher(session Session) {
         m.closedCh <- session.GetDatagram().XUsername
         return
     }
+
     ctx := &HandlerContext{
         Session: session,
         CloseCh: m.closedCh,
     }
+
     // Execute the handler
     handler(ctx)
 }
