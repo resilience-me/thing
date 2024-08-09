@@ -37,9 +37,16 @@ var commandHandlers = [256]CommandHandler{
     // Add more command handlers as needed
 }
 
+// ClientSession holds a Datagram and net.Conn for client-to-server connections.
+type ClientSession struct {
+    Datagram Datagram
+    Conn     net.Conn
+}
+
 // AccountManager manages the processing of datagrams per account
 type AccountManager struct {
-    datagramCh chan Datagram              // Channel for incoming datagrams
+    clientCh   chan ClientSession
+    serverCh   chan Datagram
     closedCh   chan [32]byte              // Channel for signals from processors
     processors map[[32]byte]bool          // Active processors
     queues     map[[32]byte][]Datagram    // Queues for pending datagrams per account
