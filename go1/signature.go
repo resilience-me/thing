@@ -1,3 +1,19 @@
+package main
+
+import (
+    "crypto/aes"
+    "crypto/cipher"
+    "crypto/hmac"
+    "crypto/sha256"
+    "errors"
+    "fmt"
+    "io"
+    "net"
+    "os"
+    "path/filepath"
+    "strings"
+)
+
 // loadSecretKey loads the secret key from the specified directory.
 func loadSecretKeyFromDir(dir string) ([]byte, error) {
     secretKeyPath := filepath.Join(dir, "secretkey.txt")
