@@ -13,36 +13,13 @@ import (
 )
 
 // loadSecretKey loads the secret key from the specified directory.
-func loadSecretKeyFromDir(dir string) ([]byte, error) {
+func loadSecretKey(dir string) ([]byte, error) {
     secretKeyPath := filepath.Join(dir, "secretkey.txt")
     secretKey, err := os.ReadFile(secretKeyPath)
     if err != nil {
         return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
     }
 
-    return secretKey, nil
-}
-
-// loadSecretKey loads the secret key based on the datagram buffer.
-func loadSecretKey(buf []byte) ([]byte, error) {
-    clientOrServer := buf[0]
-
-    var dirPath string
-    if clientOrServer == 0 { // Client session
-        username := ToString(buf[1:33]) // Convert [32]byte to a slice and trim
-        dirPath = filepath.Join(datadir, "accounts", username)
-    } else { // Server session
-        username := ToString(buf[1:33]) // Convert [32]byte to a slice and trim
-        peerUsername := ToString(buf[33:65]) // Convert [32]byte to a slice and trim
-        peerServerAddress := ToString(buf[65:97]) // Convert [32]byte to a slice and trim
-        dirPath = filepath.Join(datadir, "accounts", username, "peers", peerServerAddress, peerUsername)
-    }
-
-    // Load the secret key from the constructed directory path
-    secretKey, err := loadSecretKeyFromDir(dirPath)
-    if err != nil {
-        return nil, fmt.Errorf("failed to load secret key: %v", err)
-    }
     return secretKey, nil
 }
 
@@ -102,7 +79,7 @@ func validateAndParseDatagram(buf *[]byte, dg *Datagram) error {
     }
 
     // Step 2: Load the secret key
-    secretKey, err := loadSecretKeyFromDir(dirPath)
+    secretKey, err := loadSecretKey(dirPath)
     if err != nil {
         return fmt.Errorf("failed to load secret key: %v", err)
     }
