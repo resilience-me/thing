@@ -83,12 +83,12 @@ func NewAccountManager() *AccountManager {
     }
 }
 
-// Run listens for datagrams and manages their processing
 func (m *AccountManager) Run() {
     for {
         select {
         case session := <-m.sessionCh:
             username := session.GetDatagram().XUsername
+
             if !m.processors[username] {
                 // No active handler, create HandlerContext and start processing
                 m.processors[username] = true
@@ -100,20 +100,26 @@ func (m *AccountManager) Run() {
 
                 go m.ProcessDatagram(ctx)
             } else {
-                // Processor is active, enqueue the datagram
+                // Processor is active, enqueue the session
                 m.queues[username] = append(m.queues[username], session)
             }
 
         case username := <-m.closedCh:
-            // Processor finished, check if there are queued datagrams
+            // Processor finished, check if there are queued sessions
             if queue, exists := m.queues[username]; exists && len(queue) > 0 {
-                // Start a new processor with the next datagram
-                nextDg := queue[0]
+                // Start a new processor with the next session
+                nextSession := queue[0]
                 m.queues[username] = queue[1:]
-                go m.ProcessDatagram(nextDg, nil, m.closedCh)
+
+                ctx := &HandlerContext{
+                    Session: nextSession,
+                    CloseCh: make(chan [32]byte),
+                }
+
+                go m.ProcessDatagram(ctx)
             } else {
-                // No datagrams left, mark processor as not running
-                m.processors[username] = false
+                // No sessions left, mark processor as not running
+                delete(m.activeHandlers, username)
             }
         }
     }
