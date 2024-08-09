@@ -105,24 +105,6 @@ func (m *AccountManager) ProcessDatagram(datagram Datagram, conn net.Conn, close
     handler(ctx)
 }
 
-// handleConnection reads datagrams from the connection and sends them to the AccountManager
-func handleConnection(conn net.Conn, manager *AccountManager) {
-    defer conn.Close()
-
-    var datagram Datagram
-    err := io.ReadFull(conn, datagramBytes(&datagram))
-    if err != nil {
-        if err == io.EOF {
-            fmt.Println("Connection closed by client")
-        } else {
-            fmt.Printf("Error reading datagram: %v\n", err)
-        }
-        return
-    }
-
-    manager.datagramCh <- datagram
-}
-
 // datagramBytes provides a slice that covers the entire datagram for reading
 func datagramBytes(d *Datagram) []byte {
     size := 1 + 32 + 32 + 32 + 256 + 4 + 32 // Total size of the Datagram struct
@@ -147,6 +129,24 @@ func handleClientCommand2(ctx HandlerContext) {
 
     fmt.Println("Handling Client Command 2")
     // The handler may or may not send a response
+}
+
+// handleConnection reads datagrams from the connection and sends them to the AccountManager
+func handleConnection(conn net.Conn, manager *AccountManager) {
+    defer conn.Close()
+
+    var datagram Datagram
+    err := io.ReadFull(conn, datagramBytes(&datagram))
+    if err != nil {
+        if err == io.EOF {
+            fmt.Println("Connection closed by client")
+        } else {
+            fmt.Printf("Error reading datagram: %v\n", err)
+        }
+        return
+    }
+
+    manager.datagramCh <- datagram
 }
 
 // Main function with inlined server logic
