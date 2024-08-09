@@ -96,17 +96,11 @@ func bytesToDatagram(dg *Datagram, buf []byte) {
 
 // handleConnection reads datagrams from the connection and sends them to the SessionManager
 func (m *SessionManager) handleConnection(conn net.Conn) {
-    buf := make([]byte, 390) // Create a buffer with the size of the Datagram
-
-    // Read the full datagram into the buffer
+    buf := make([]byte, 390)
     _, err := io.ReadFull(conn, buf)
     if err != nil {
-        if err == io.EOF {
-            fmt.Println("Connection closed by client")
-            return
-        }
         fmt.Printf("Error reading datagram: %v\n", err)
-        conn.Close() // Close the connection in case of errors
+        conn.Close()
         return
     }
 
