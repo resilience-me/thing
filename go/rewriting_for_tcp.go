@@ -62,15 +62,15 @@ var commandHandlers = [256]CommandHandler{
     // Add more command handlers as needed
 }
 
-// AccountManager manages the processing of datagrams per account
-type AccountManager struct {
+// SessionManager manages the processing of datagrams per account
+type SessionManager struct {
     sessionCh      chan Session                // Create a channel for Session interfaces
     closedCh       chan [32]byte               // Channel for closed sessions
     activeHandlers map[[32]byte]bool           // Tracks active handlers by username
     queues         map[[32]byte][]Session      // Queues for sessions waiting to be processed
 }
 
-func (m *AccountManager) run() {
+func (m *SessionManager) run() {
     for {
         select {
         case session := <-m.sessionCh:
@@ -103,7 +103,7 @@ func (m *AccountManager) run() {
 }
 
 // commandDispatcher creates a new context and processes the datagram
-func (m *AccountManager) commandDispatcher(session Session) {
+func (m *SessionManager) commandDispatcher(session Session) {
     command := session.GetDatagram().Command
 
     // Look up the command handler
@@ -135,7 +135,7 @@ func bytesToDatagram(dg *Datagram, buf []byte) {
 }
 
 // handleConnection reads datagrams from the connection and sends them to the AccountManager
-func (m *AccountManager) handleConnection(conn net.Conn) {
+func (m *SessionManager) handleConnection(conn net.Conn) {
     buf := make([]byte, 389) // Create a buffer with the size of the Datagram
 
     // Read the full datagram into the buffer
@@ -177,7 +177,7 @@ func (m *AccountManager) handleConnection(conn net.Conn) {
 
 // Main function with inlined server logic
 func main() {
-    manager := &AccountManager{
+    manager := &SessionManager{
         sessionCh:      make(chan Session),
         closedCh:       make(chan [32]byte),
         activeHandlers: make(map[[32]byte]bool),
