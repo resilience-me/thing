@@ -1,3 +1,14 @@
+// loadSecretKey loads the secret key from the specified directory.
+func loadSecretKeyFromDir(dir string) ([]byte, error) {
+    secretKeyPath := filepath.Join(dir, "secretkey.txt")
+    secretKey, err := os.ReadFile(secretKeyPath)
+    if err != nil {
+        return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
+    }
+
+    return secretKey, nil
+}
+
 func loadSecretKey(buf []byte) ([]byte, error) {
     clientOrServer := buf[0]
 
