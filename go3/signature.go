@@ -34,6 +34,8 @@ func verifyHMAC(buf []byte, key []byte) bool {
     return hmac.Equal(signature, expectedMAC)
 }
 
-func authenticateAndParseDatagram() {
-    
+func authenticateAndParseDatagram(buf []byte) {
+    dg := parseDatagram(buf)
+    secretKey := loadSecretKey(&dg)
+    return verifyHMAC(buf, secretKey)
 }
