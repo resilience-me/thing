@@ -7,30 +7,10 @@ import (
     "os"   // For OS-level operations like exiting the program with os.Exit
 )
 
-// Session interface with a GetDatagram method
-type Session interface {
-    GetDatagram() *Datagram
-}
-
-// ClientSession struct
-type ClientSession struct {
-    Datagram
-    Conn net.Conn
-}
-
-// ServerSession struct
-type ServerSession struct {
-    Datagram
-}
-
-// GetDatagram method for ClientSession
-func (cs *ClientSession) GetDatagram() *Datagram {
-    return &cs.Datagram
-}
-
-// GetDatagram method for ServerSession
-func (ss *ServerSession) GetDatagram() *Datagram {
-    return &ss.Datagram
+// Unified Session struct
+type Session struct {
+    Datagram          // Embedded Datagram struct for session data
+    Conn      net.Conn  // Connection, can be nil for sessions that don't use it
 }
 
 // SessionManager manages the processing of sessions
