@@ -5,7 +5,6 @@ import (
     "crypto/cipher"
     "crypto/hmac"
     "crypto/sha256"
-    "errors"
     "fmt"
     "os"
     "path/filepath"
@@ -49,17 +48,22 @@ func authenticatePayload(buf []byte, authKey []byte) error {
 
 // decryptPayload decrypts the payload directly into the buffer, removing the hash identifier and HMAC
 func decryptPayload(buf []byte, cryptoKey []byte) error {
-    iv := buf[:aes.BlockSize]
-    ciphertext := buf[aes.BlockSize : len(buf)-32] // Exclude HMAC length
+    iv := buf[32 : 32+aes.BlockSize]                             // IV starts after the 32-byte hash identifier
+    ciphertext := buf[32+aes.BlockSize : len(buf)-32]            // Exclude hash identifier and HMAC length
 
     block, err := aes.NewCipher(cryptoKey)
     if err != nil {
-        return nil, fmt.Errorf("failed to create AES cipher: %v", err)
+        return fmt.Errorf("failed to create AES cipher: %v", err)
     }
     stream := cipher.NewCFBDecrypter(block, iv)
     stream.XORKeyStream(ciphertext, ciphertext) // Decrypt in place
 
-    return ciphertext, nil // Return the decrypted payload
+    // Shift the decrypted payload to the start of the buffer, removing the hash identifier and IV
+    copy(buf, ciphertext)
+    // Truncate the buffer to only include the decrypted payload
+    buf = buf[:len(ciphertext)]
+
+    return nil
 }
 
 // authenticateAndDecrypt authenticates and decrypts the datagram
