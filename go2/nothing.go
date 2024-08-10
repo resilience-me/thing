@@ -1,3 +1,8 @@
+type Datagram struct {
+    Identifier []byte
+    Ciphertext []byte
+}
+
 func parseTransaction(plaintext []byte) (*Transaction, error) {
 
     tx := &Transaction{
