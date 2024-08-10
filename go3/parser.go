@@ -1,3 +1,9 @@
+package main
+
+import (
+    "bytes"   // For trimming null characters from byte slices
+)
+
 func parseDatagram(buf []byte) *Datagram {
     // Assuming buf is already confirmed to be of the correct length via io.ReadFull
     datagram := &Datagram{
