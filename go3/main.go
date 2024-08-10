@@ -93,7 +93,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Decrypt and parse the datagram to obtain the Transaction struct
+    // Authenticate and parse the datagram
     dg, err := authenticateAndParseDatagram(buf)
     if err != nil {
         fmt.Printf("Error processing incoming datagram: %v\n", err)
@@ -101,7 +101,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Determine whether it's a client or server session based on the most significant bit of tx.Command
+    // Determine whether it's a client or server session based on the most significant bit of dg.Command
     if dg.Command & 0x80 == 0 { // Check if the most significant bit is 0 (client)
         m.sessionCh <- &ClientSession{tx, conn}
     } else { // Most significant bit is 1 (server)
