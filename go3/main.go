@@ -26,7 +26,7 @@ func (m *SessionManager) run() {
     for {
         select {
         case session := <-m.sessionCh:
-            username := session.GetDatagram().Username
+            username := session.Username
 
             if !m.activeHandlers[username] {
                 m.activeHandlers[username] = true
