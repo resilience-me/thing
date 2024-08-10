@@ -9,14 +9,14 @@ import (
 )
 
 type DatagramParser struct {
-    Identifier []byte
+    Identifier string
     Salt       []byte
     Ciphertext []byte
 }
 
 // loadKey loads the cryptographic key based on the hash identifier in the datagram
 func (dp *DatagramParser) loadKey() ([]byte, error) {
-    keyDirPath := filepath.Join(datadir, "keys", string(dp.Identifier))
+    keyDirPath := filepath.Join(datadir, "keys", dp.Identifier)
 
     // Load cryptographic key
     cryptoKey, err := loadSecretKey(keyDirPath, "crypto_key.txt")
