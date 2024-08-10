@@ -17,7 +17,14 @@ func parseTransaction(plaintext []byte) (*Transaction, error) {
     return tx, nil
 }
 
-func decryptAndParseDatagram(dg *Datagram) (*Transaction, error) {
+func decryptAndParseDatagram(buf []byte) (*Transaction, error) {
+    // Assume the identifier is the first 32 bytes, the salt is the next 12 bytes, and the rest is ciphertext
+    dg := Datagram{
+        Identifier: buf[:32],
+        Salt:       buf[32:44], // 12 bytes for the AES-GCM salt
+        Ciphertext: buf[44:],   // Remaining bytes are the ciphertext
+    }
+
     // Load the cryptographic key based on the hash identifier in the buffer
     sectetKey, err := loadKey(dg.Identifier)
     if err != nil {
