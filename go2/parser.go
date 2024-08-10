@@ -3,8 +3,6 @@ package main
 import (
     "crypto/aes"
     "crypto/cipher"
-    "crypto/hmac"
-    "crypto/sha256"
     "fmt"
     "os"
     "path/filepath"
@@ -16,18 +14,20 @@ type DatagramParser struct {
     Ciphertext []byte
 }
 
-// loadKeys loads the cryptographic key based on the hash identifier in the datagram
+// loadKey loads the cryptographic key based on the hash identifier in the datagram
 func (dp *DatagramParser) loadKey() ([]byte, error) {
-    keyDirPath := filepath.Join(datadir, "keys", dp.Identifier)
+    keyDirPath := filepath.Join(datadir, "keys", string(dp.Identifier))
 
     // Load cryptographic key
-    cryptoKey, err = loadSecretKey(keyDirPath, "crypto_key.txt")
+    cryptoKey, err := loadSecretKey(keyDirPath, "crypto_key.txt")
     if err != nil {
         return nil, fmt.Errorf("failed to load cryptographic key: %v", err)
     }
 
     return cryptoKey, nil
 }
+
+// decryptPayload decrypts the ciphertext using AES-GCM
 func (dp *DatagramParser) decryptPayload(key []byte) ([]byte, error) {
     block, err := aes.NewCipher(key)
     if err != nil {
@@ -39,7 +39,7 @@ func (dp *DatagramParser) decryptPayload(key []byte) ([]byte, error) {
         return nil, fmt.Errorf("failed to create GCM mode: %v", err)
     }
 
-    plaintext, err := gcm.Open(nil, dp.salt, dp.ciphertext, nil)
+    plaintext, err := gcm.Open(nil, dp.Salt, dp.Ciphertext, nil)
     if err != nil {
         return nil, fmt.Errorf("decryption failed: %v", err)
     }
@@ -47,6 +47,7 @@ func (dp *DatagramParser) decryptPayload(key []byte) ([]byte, error) {
     return plaintext, nil
 }
 
+// parseTransaction parses the decrypted plaintext into a Transaction struct
 func (dp *DatagramParser) parseTransaction(plaintext []byte) (*Transaction, error) {
     tx := &Transaction{
         Command:           plaintext[0],
@@ -60,21 +61,22 @@ func (dp *DatagramParser) parseTransaction(plaintext []byte) (*Transaction, erro
     return tx, nil
 }
 
+// decryptAndParseDatagram decrypts and parses the datagram into a Transaction
 func (dp *DatagramParser) decryptAndParseDatagram(buf []byte) (*Transaction, error) {
     // Load the cryptographic key based on the identifier in the datagram
-    secretKey, err := loadKey(dp.Identifier)
+    secretKey, err := dp.loadKey()
     if err != nil {
         return nil, fmt.Errorf("failed to load cryptographic key: %v", err)
     }
 
     // Decrypt the payload using AES-GCM
-    plaintext, err := decryptPayload(secretKey)
+    plaintext, err := dp.decryptPayload(secretKey)
     if err != nil {
         return nil, fmt.Errorf("decryption failed: %v", err)
     }
 
     // Parse the decrypted payload into the Transaction struct
-    tx, err := parseTransaction(plaintext)
+    tx, err := dp.parseTransaction(plaintext)
     if err != nil {
         return nil, fmt.Errorf("failed to parse transaction: %v", err)
     }
