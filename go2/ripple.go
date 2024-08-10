@@ -94,7 +94,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     }
 
     // Decrypt and parse the datagram to obtain the Transaction struct
-    tx, err := decryptAndParseDatagram(buf)
+    tx, err := newDatagramParser(buf).decryptAndParseDatagram()
     if err != nil {
         fmt.Printf("Error processing incoming datagram: %v\n", err)
         conn.Close()
