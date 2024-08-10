@@ -93,15 +93,8 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Assume the identifier is the first 32 bytes, the salt is the next 12 bytes, and the rest is ciphertext
-    dg := &Datagram{
-        Identifier: buf[:32],
-        Salt:       buf[32:44], // 12 bytes for the AES-GCM salt
-        Ciphertext: buf[44:],   // Remaining bytes are the ciphertext
-    }
-
     // Decrypt and parse the datagram to obtain the Transaction struct
-    tx, err := decryptAndParseDatagram(dg)
+    tx, err := decryptAndParseDatagram(buf)
     if err != nil {
         fmt.Printf("Error processing incoming datagram: %v\n", err)
         conn.Close()
