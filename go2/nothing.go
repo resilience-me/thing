@@ -5,7 +5,6 @@ type Datagram struct {
 }
 
 func parseTransaction(plaintext []byte) (*Transaction, error) {
-
     tx := &Transaction{
         Command:           plaintext[0],
         Username:          string(plaintext[1:33]),  // Assuming Username is 32 bytes
