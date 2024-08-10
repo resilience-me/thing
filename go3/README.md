@@ -16,7 +16,7 @@ The command is one byte, allowing 256 commands. The first 128 commands are clien
 
 ### Handling trustlines
 
-A number of counters keep track of state of trustlines. There is `counter`, that tracks an account's most recent update to their trustline to another acount. There is `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. Then, to manage updating the sync timestamp even if there was no need to sync (but an attempt was made), there is `sync_counter_in` and `sync_counter_out`. The platform does not use timestamps as counters or "nonces", but to allow tracking most recent change locally, the extra sync counters are added.
+A number of counters keep track of state of trustlines. There is `counter`, that tracks an account's most recent update to their trustline to another acount. There is `counter_out` and `counter_in` that track trustline related commands in server-to-server exchanges between an account and a peer. Then, there is also `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. The timestamp is never exchanged and there is no need for consensus on time, the platform does not use timestamps as counters or "nonces".
 
 ### Coordinating payments
 
