@@ -1,7 +1,8 @@
 package main
 
 import (
-    "bytes"   // For trimming null characters from byte slices
+    "bytes"        // For trimming null characters from byte slices
+    "encoding/binary"
 )
 
 func parseDatagram(buf []byte) *Datagram {
@@ -12,13 +13,12 @@ func parseDatagram(buf []byte) *Datagram {
         PeerUsername:      trimRightZeroes(buf[33:65]),
         PeerServerAddress: trimRightZeroes(buf[65:97]),
         Arguments:         [256]byte{},
-        Counter:           [4]byte{},
+        Counter:           binary.BigEndian.Uint32(buf[353:357]),  // Directly initializing the Counter
         Signature:         [32]byte{},
     }
 
-    // Copy data into fixed-size arrays
+    // Copy data into fixed-size arrays for Arguments and Signature
     copy(datagram.Arguments[:], buf[97:353])
-    copy(datagram.Counter[:], buf[353:357])
     copy(datagram.Signature[:], buf[357:389])  // Ensure the signature is exactly 32 bytes
 
     return datagram
