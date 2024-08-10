@@ -1,4 +1,3 @@
-var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
 
 // loadSecretKey loads the secret key from the specified directory.
 func loadSecretKeyFromDir(dir string) ([]byte, error) {
