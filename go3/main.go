@@ -7,10 +7,10 @@ import (
     "os"   // For OS-level operations like exiting the program with os.Exit
 )
 
-// Unified Session struct
+// Session struct represents a network session with an optional connection
 type Session struct {
-    Datagram          // Embedded Datagram struct for session data
-    Conn      net.Conn  // Connection, can be nil for sessions that don't use it
+    *Datagram
+    Conn net.Conn  // Connection, can be nil if no network connection is associated
 }
 
 // SessionManager manages the processing of sessions
