@@ -1,5 +1,6 @@
 type Datagram struct {
     Identifier []byte
+    Salt       []byte
     Ciphertext []byte
 }
 
