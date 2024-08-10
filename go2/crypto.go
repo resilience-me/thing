@@ -10,10 +10,9 @@ import (
     "path/filepath"
 )
 
-// loadKeys loads the cryptographic key based on the hash identifier in the buffer
-func loadKey(buf []byte) (cryptoKey []byte, err error) {
-    hashIdentifier := string(buf[:32]) // Assume HashIdentifier is the first 32 bytes
-    keyDirPath := filepath.Join(datadir, "keys", hashIdentifier)
+// loadKeys loads the cryptographic key based on the hash identifier in the datagram
+func loadKey(dg Datagram) (cryptoKey []byte, err error) {
+    keyDirPath := filepath.Join(datadir, "keys", dg.Identifier)
 
     // Load cryptographic key
     cryptoKey, err = loadSecretKey(keyDirPath, "crypto_key.txt")
