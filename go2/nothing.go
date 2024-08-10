@@ -38,4 +38,3 @@ func decryptAndParseDatagram(dg *Datagram) (*Transaction, error) {
 
     return tx, nil
 }
-
