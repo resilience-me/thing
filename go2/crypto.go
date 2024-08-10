@@ -22,8 +22,8 @@ func loadKey(dg Datagram) (cryptoKey []byte, err error) {
 
     return cryptoKey, nil
 }
-func decryptPayload(buf []byte, cryptoKey []byte) ([]byte, error) {
-    block, err := aes.NewCipher(cryptoKey)
+func decryptPayload(ciphertext, salt, key []byte) ([]byte, error) {
+    block, err := aes.NewCipher(key)
     if err != nil {
         return nil, fmt.Errorf("failed to create AES cipher: %v", err)
     }
@@ -33,15 +33,7 @@ func decryptPayload(buf []byte, cryptoKey []byte) ([]byte, error) {
         return nil, fmt.Errorf("failed to create GCM mode: %v", err)
     }
 
-    nonceSize := gcm.NonceSize()
-    if len(buf) < nonceSize {
-        return nil, fmt.Errorf("ciphertext too short")
-    }
-
-    nonce, ciphertext := buf[:nonceSize], buf[nonceSize:]
-
-    // Decrypt the ciphertext and verify the authentication tag
-    plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+    plaintext, err := gcm.Open(nil, salt, ciphertext, nil)
     if err != nil {
         return nil, fmt.Errorf("decryption failed: %v", err)
     }
