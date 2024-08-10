@@ -11,8 +11,8 @@ import (
 )
 
 // loadKeys loads the cryptographic key based on the hash identifier in the datagram
-func loadKey(identifier Datagram.Identifier) ([]byte, error) {
-    keyDirPath := filepath.Join(datadir, "keys", identifier)
+func (dp *DatagramParser) loadKey() ([]byte, error) {
+    keyDirPath := filepath.Join(datadir, "keys", dp.Identifier)
 
     // Load cryptographic key
     cryptoKey, err = loadSecretKey(keyDirPath, "crypto_key.txt")
@@ -22,7 +22,7 @@ func loadKey(identifier Datagram.Identifier) ([]byte, error) {
 
     return cryptoKey, nil
 }
-func decryptPayload(ciphertext, salt, key []byte) ([]byte, error) {
+func (dp *DatagramParser) decryptPayload(key []byte) ([]byte, error) {
     block, err := aes.NewCipher(key)
     if err != nil {
         return nil, fmt.Errorf("failed to create AES cipher: %v", err)
@@ -33,7 +33,7 @@ func decryptPayload(ciphertext, salt, key []byte) ([]byte, error) {
         return nil, fmt.Errorf("failed to create GCM mode: %v", err)
     }
 
-    plaintext, err := gcm.Open(nil, salt, ciphertext, nil)
+    plaintext, err := gcm.Open(nil, dp.salt, dp.ciphertext, nil)
     if err != nil {
         return nil, fmt.Errorf("decryption failed: %v", err)
     }
