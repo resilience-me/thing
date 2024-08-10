@@ -34,8 +34,14 @@ func verifyHMAC(buf []byte, key []byte) bool {
     return hmac.Equal(signature, expectedMAC)
 }
 
-func authenticateAndParseDatagram(buf []byte) {
+func authenticateAndParseDatagram(buf []byte) (*Datagram, error) {
     dg := parseDatagram(buf)
-    secretKey := loadSecretKey(&dg)
-    return verifyHMAC(buf, secretKey)
+    secretKey, err := loadSecretKey(&dg)
+    if err != nil {
+        return nil, err
+    }
+    if(!verifyHMAC(buf, secretKey)) {
+        return nil, fmt.Errorf("error verifying HMAC")
+    }
+    return dg, nil
 }
