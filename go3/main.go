@@ -80,16 +80,20 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         conn.Close()
         return
     }
-    session := Session{
-        Datagram: dg
-    }
+
+    // Prepare the session struct
+    session := Session{Datagram: dg} // Conn is nil by default
+
     // Determine whether it's a client or server session based on the most significant bit of dg.Command
     if dg.Command & 0x80 == 0 { // Check if the most significant bit is 0 (client)
-        session.Conn = conn
+        session.Conn = conn // Maintain the connection open for client sessions
     } else { // Most significant bit is 1 (server)
-        conn.Close()
+        conn.Close() // Close the connection for server sessions
+        // No need to set session.Conn to nil; it is already nil by default
     }
-    m.sessionCh <-session
+
+    // Send the session to the session channel for further processing
+    m.sessionCh <- session
 }
 
 // Main function with inlined server logic
