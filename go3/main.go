@@ -50,10 +50,10 @@ func (m *SessionManager) run() {
 // handleSession manages the processing of a session's datagram
 func (m *SessionManager) handleSession(session Session) {
     defer func() {
-        m.closedCh <- session.GetDatagram().Username
+        m.closedCh <- session.Datagram.Username
     }()
 
-    command := session.GetDatagram().Command
+    command := session.Datagram.Command
     handler := commandHandlers[command]
     if handler == nil {
         fmt.Printf("Unknown command: %d\n", command)
