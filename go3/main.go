@@ -1,10 +1,10 @@
 package main
 
 import (
-    "fmt"
-    "io"
-    "net"
-    "os"
+    "fmt"  // For formatted I/O operations like Printf, Println, etc.
+    "io"   // For I/O operations, including ReadFull
+    "net"  // For networking operations, including net.Conn, net.Listen, etc.
+    "os"   // For OS-level operations like exiting the program with os.Exit
 )
 
 // Session interface with a GetDatagram method
