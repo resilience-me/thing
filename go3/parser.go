@@ -1,4 +1,4 @@
-func parseDatagram(buf []byte) (*Datagram, error) {
+func parseDatagram(buf []byte) *Datagram {
     // Assuming buf is already confirmed to be of the correct length via io.ReadFull
     datagram := &Datagram{
         Command:           buf[0],
@@ -15,7 +15,7 @@ func parseDatagram(buf []byte) (*Datagram, error) {
     copy(datagram.Counter[:], buf[353:357])
     copy(datagram.Signature[:], buf[357:389])  // Ensure the signature is exactly 32 bytes
 
-    return datagram, nil
+    return datagram
 }
 
 // Helper function to trim null characters from byte slices for proper string conversion
