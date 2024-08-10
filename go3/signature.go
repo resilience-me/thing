@@ -51,7 +51,7 @@ func authenticateAndParseDatagram(buf []byte) (*Datagram, error) {
         return nil, err
     }
     if !verifyHMAC(buf, secretKey) {
-        return nil, fmt.Errorf("error verifying HMAC")
+        return nil, errors.New("error verifying HMAC")
     }
     return dg, nil
 }
