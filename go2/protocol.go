@@ -1,6 +1,6 @@
 package main
 
-// Datagram represents the updated structure
+// Transaction represents the updated structure
 type Transaction struct {
     Command            byte
     Username           string
@@ -15,7 +15,9 @@ type CommandHandler func(session Session)
 
 // CommandHandlers maps command bytes to handler functions
 var commandHandlers = [256]CommandHandler{
-    0x01: handleClientCommand1,
-    0x02: handleClientCommand2,
+    0: handleClientCommand1,
+    1: handleClientCommand2,
+    127: handleServerCommand1,
+    128: handleServerCommand2,
     // Add more command handlers as needed
 }
