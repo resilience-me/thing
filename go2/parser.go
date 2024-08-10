@@ -14,6 +14,17 @@ type DatagramParser struct {
     Ciphertext []byte
 }
 
+// newDatagramParser creates a new instance of DatagramParser from a buffer
+func newDatagramParser(buf []byte) DatagramParser {
+    parser := DatagramParser{
+        Identifier: string(buf[:32]),   // Convert the first 32 bytes to a string for Identifier
+        Salt:       buf[32:44],         // Extract the next 12 bytes as Salt
+        Ciphertext: buf[44:],           // The rest is the Ciphertext
+    }
+
+    return parser
+}
+
 // parseTransaction parses the decrypted plaintext into a Transaction struct
 func (dp *DatagramParser) parseTransaction(plaintext []byte) (*Transaction, error) {
     tx := &Transaction{
@@ -62,14 +73,7 @@ func (dp *DatagramParser) decryptPayload(key []byte) ([]byte, error) {
 }
 
 // decryptAndParseDatagram decrypts and parses the datagram into a Transaction
-func decryptAndParseDatagram(buf []byte) (*Transaction, error) {
-
-    // Create a DatagramParser instance directly, inlining the string conversion
-    dp := DatagramParser{
-        Identifier: string(buf[:32]),   // Convert the identifier part to a string
-        Salt:       buf[32:44],         // The salt part (12 bytes)
-        Ciphertext: buf[44:],           // The rest is the ciphertext
-    }
+func (dp *DatagramParser) decryptAndParseDatagram() (*Transaction, error) {
 
     // Load the cryptographic key based on the identifier in the datagram
     secretKey, err := dp.loadKey()
