@@ -4,13 +4,13 @@ import (
     "fmt"
 )
 
-type Datagram struct {
+type DatagramParser struct {
     Identifier []byte
     Salt       []byte
     Ciphertext []byte
 }
 
-func parseTransaction(plaintext []byte) (*Transaction, error) {
+func (dp *DatagramParser) parseTransaction(plaintext []byte) (*Transaction, error) {
     tx := &Transaction{
         Command:           plaintext[0],
         Username:          string(plaintext[1:33]),  // Assuming Username is 32 bytes
@@ -23,22 +23,15 @@ func parseTransaction(plaintext []byte) (*Transaction, error) {
     return tx, nil
 }
 
-func decryptAndParseDatagram(buf []byte) (*Transaction, error) {
-    // Construct the Datagram from the buffer
-    dg := Datagram{
-        Identifier: buf[:32],
-        Salt:       buf[32:44], // 12 bytes for the AES-GCM salt
-        Ciphertext: buf[44:],   // Remaining bytes are the ciphertext
-    }
-
+func (dp *DatagramParser) decryptAndParseDatagram(buf []byte) (*Transaction, error) {
     // Load the cryptographic key based on the identifier in the datagram
-    secretKey, err := loadKey(dg.Identifier)
+    secretKey, err := loadKey(dp.Identifier)
     if err != nil {
         return nil, fmt.Errorf("failed to load cryptographic key: %v", err)
     }
 
     // Decrypt the payload using AES-GCM
-    plaintext, err := decryptPayload(dg.Ciphertext, dg.Salt, secretKey)
+    plaintext, err := decryptPayload(secretKey)
     if err != nil {
         return nil, fmt.Errorf("decryption failed: %v", err)
     }
