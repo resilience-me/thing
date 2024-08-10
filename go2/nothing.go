@@ -1,3 +1,9 @@
+package main
+
+import (
+    "fmt"
+)
+
 type Datagram struct {
     Identifier []byte
     Salt       []byte
@@ -45,4 +51,3 @@ func decryptAndParseDatagram(buf []byte) (*Transaction, error) {
 
     return tx, nil
 }
-
