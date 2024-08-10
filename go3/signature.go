@@ -25,21 +25,18 @@ func verifyHMAC(buf []byte, key []byte) bool {
     // The signature is the last 32 bytes of the buffer
     data := buf[:len(buf)-32]
     signature := buf[len(buf)-32:]
-
     mac := hmac.New(sha256.New, key)
     mac.Write(data)
     expectedMAC := mac.Sum(nil)
-
     return hmac.Equal(signature, expectedMAC)
 }
 
 func loadSecretKey(dg *Datagram) ([]byte, error) {
     var keyDir string
-    // Assuming that username, peerAddress, and peerUsername are fields of dg
     if dg.Command & 0x80 == 0 {
-        keyDir = filepath.Join(datadir, "accounts", dg.Username)
+        keyDir = GetAccountDir(dg)
     } else {
-        keyDir = filepath.Join(datadir, "accounts", dg.Username, "peers", dg.PeerServerAddress, dg.PeerUsername)
+        keyDir = GetPeerDir(dg)
     }
     return loadSecretKeyFromDir(keyDir)
 }
@@ -55,11 +52,9 @@ func checkAccountsExist(dg *Datagram) error {
 
 func validateAndParseDatagram(buf []byte) (*Datagram, error) {
     dg := parseDatagram(buf)
-
     if err := checkAccountsExist(dg); err != nil {
-        return nil, err
+        return err
     }
-
     secretKey, err := loadSecretKey(dg)
     if err != nil {
         return nil, err
