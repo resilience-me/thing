@@ -50,7 +50,10 @@ func (m *SessionManager) run() {
 // handleSession manages the processing of a session's datagram
 func (m *SessionManager) handleSession(session Session) {
     defer func() {
-        m.closedCh <- session.Datagram.Username
+        if session.Conn != nil { // Check if the connection exists
+            session.Conn.Close() // Close the connection to free up resources
+        }
+        m.closedCh <- session.Datagram.Username // Notify that the session is closed
     }()
 
     command := session.Datagram.Command
