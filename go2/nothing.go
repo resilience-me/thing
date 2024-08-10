@@ -20,13 +20,13 @@ func parseTransaction(plaintext []byte) (*Transaction, error) {
 
 func decryptAndParseDatagram(dg *Datagram) (*Transaction, error) {
     // Load the cryptographic key based on the hash identifier in the buffer
-    cryptoKey, err := loadKey(dg.Identifier)
+    sectetKey, err := loadKey(dg.Identifier)
     if err != nil {
         return nil, fmt.Errorf("failed to load cryptographic key: %v", err)
     }
 
     // Decrypt the payload using AES-GCM
-    plaintext, err := decryptPayload(dg.Ciphertext, cryptoKey)
+    plaintext, err := decryptPayload(dg.Ciphertext, dg.Salt, sectetKey)
     if err != nil {
         return nil, fmt.Errorf("decryption failed: %v", err)
     }
