@@ -7,7 +7,7 @@ type Datagram struct {
     PeerUsername      string
     PeerServerAddress string
     Arguments         [256]byte
-    Counter           [4]byte
+    Counter           uint32       // Storing the counter as uint32
     Signature         [32]byte
 }
 
