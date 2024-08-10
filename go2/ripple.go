@@ -7,30 +7,30 @@ import (
     "os"
 )
 
-// Session interface with a GetDatagram method
+// Session interface with a GetTransaction method
 type Session interface {
-    GetDatagram() *Datagram
+    GetTransaction() *Transaction
 }
 
 // ClientSession struct
 type ClientSession struct {
-    Datagram
+    Transaction
     Conn net.Conn
 }
 
 // ServerSession struct
 type ServerSession struct {
-    Datagram
+    Transaction
 }
 
-// GetDatagram method for ClientSession
-func (cs *ClientSession) GetDatagram() *Datagram {
-    return &cs.Datagram
+// GetTransaction method for ClientSession
+func (cs *ClientSession) GetTransaction() *Transaction {
+    return &cs.Transaction
 }
 
-// GetDatagram method for ServerSession
-func (ss *ServerSession) GetDatagram() *Datagram {
-    return &ss.Datagram
+// GetTransaction method for ServerSession
+func (ss *ServerSession) GetTransaction() *Transaction {
+    return &ss.Transaction
 }
 
 // SessionManager manages the processing of sessions
@@ -46,7 +46,7 @@ func (m *SessionManager) run() {
     for {
         select {
         case session := <-m.sessionCh:
-            username := session.GetDatagram().Username
+            username := session.GetTransaction().Username
 
             if !m.activeHandlers[username] {
                 m.activeHandlers[username] = true
@@ -70,7 +70,7 @@ func (m *SessionManager) run() {
 // handleSession manages the processing of a session's datagram
 func (m *SessionManager) handleSession(session Session) {
     defer func() {
-        m.closedCh <- session.GetDatagram().Username
+        m.closedCh <- session.GetTransaction().Username
     }()
 
     command := session.GetDatagram().Command
