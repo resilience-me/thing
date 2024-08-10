@@ -7,30 +7,30 @@ import (
     "os"
 )
 
-// BaseSession struct, embedding the Datagram
-type BaseSession struct {
-    Datagram
-}
-
 // Session interface with a GetDatagram method
 type Session interface {
     GetDatagram() *Datagram
 }
 
-// GetDatagram method for BaseSession
-func (bs *BaseSession) GetDatagram() *Datagram {
-    return &bs.Datagram
-}
-
 // ClientSession struct
 type ClientSession struct {
-    BaseSession
+    Datagram
     Conn net.Conn
 }
 
 // ServerSession struct
 type ServerSession struct {
-    BaseSession
+    Datagram
+}
+
+// GetDatagram method for ClientSession
+func (cs *ClientSession) GetDatagram() *Datagram {
+    return &cs.Datagram
+}
+
+// GetDatagram method for ServerSession
+func (ss *ServerSession) GetDatagram() *Datagram {
+    return &ss.Datagram
 }
 
 // SessionManager manages the processing of sessions
