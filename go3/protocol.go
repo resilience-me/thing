@@ -1,3 +1,5 @@
+package main
+
 // Datagram holds the structure of the incoming data
 type Datagram struct {
     Command           byte
