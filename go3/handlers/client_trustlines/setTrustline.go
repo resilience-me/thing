@@ -2,8 +2,8 @@ package client_trustlines
 
 import (
     "fmt"
-    "resilience/database/db_trustlines"
-    "resilience/handlers" // Import the handlers package
+    "ripple/database/db_trustlines"
+    "ripple/handlers" // Import the handlers package
 )
 
 // Assuming the Session and Datagram structures are defined as per your latest setup
