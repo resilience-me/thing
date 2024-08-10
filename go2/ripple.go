@@ -110,9 +110,9 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
 
     // Determine whether it's a client or server session based on the most significant bit of tx.Command
     if tx.Command&0x80 == 0 { // Check if the most significant bit is 0 (client)
-        m.sessionCh <- &ClientSession{BaseSession{*tx}, conn}
+        m.sessionCh <- &ClientSession{BaseSession{tx}, conn}
     } else { // Most significant bit is 1 (server)
-        m.sessionCh <- &ServerSession{BaseSession{*tx}}
+        m.sessionCh <- &ServerSession{BaseSession{tx}}
         conn.Close()
     }
 }
