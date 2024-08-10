@@ -93,21 +93,26 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    dg := &Datagram{}
-    if err := validateAndParseDatagram(&buf, dg); err != nil {
-        fmt.Printf("Authentication and decryption failed: %v\n", err)
-        if buf[0] == 0 {
-            conn.Write([]byte{1})  // Send error response for client session
-        }
-        conn.Close() // Close the connection if authentication fails
+    // Assume the identifier is the first 32 bytes, the salt is the next 12 bytes, and the rest is ciphertext
+    dg := &Datagram{
+        Identifier: buf[:32],
+        Salt:       buf[32:44], // 12 bytes for the AES-GCM salt
+        Ciphertext: buf[44:],   // Remaining bytes are the ciphertext
+    }
+
+    // Decrypt and parse the datagram to obtain the Transaction struct
+    tx, err := decryptAndParseDatagram(dg)
+    if err != nil {
+        fmt.Printf("Error processing incoming datagram: %v\n", err)
+        conn.Close()
         return
     }
 
-    // Create session based on the clientOrServer flag and enqueue
-    if dg.ClientOrServer == 0 {
-        m.sessionCh <- &ClientSession{Datagram: *dg, Conn: conn}
+    // Determine whether it's a client or server session based on the Transaction
+    if tx.Command == 0 { // Replace this with appropriate logic for distinguishing clients and servers
+        m.sessionCh <- &ClientSession{tx, conn}
     } else {
-        m.sessionCh <- &ServerSession{Datagram: *dg}
+        m.sessionCh <- &ServerSession{tx}
         conn.Close()
     }
 }
