@@ -11,8 +11,8 @@ import (
 )
 
 // loadKeys loads the cryptographic key based on the hash identifier in the datagram
-func loadKey(dg Datagram) (cryptoKey []byte, err error) {
-    keyDirPath := filepath.Join(datadir, "keys", dg.Identifier)
+func loadKey(identifier Datagram.Identifier) ([]byte, error) {
+    keyDirPath := filepath.Join(datadir, "keys", identifier)
 
     // Load cryptographic key
     cryptoKey, err = loadSecretKey(keyDirPath, "crypto_key.txt")
