@@ -1,5 +1,7 @@
+var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
+
 // loadSecretKey loads the secret key from the specified directory.
-func loadSecretKey(dir string) ([]byte, error) {
+func loadSecretKeyFromDir(dir string) ([]byte, error) {
     secretKeyPath := filepath.Join(dir, "secretkey.txt")
     secretKey, err := os.ReadFile(secretKeyPath)
     if err != nil {
@@ -7,6 +9,16 @@ func loadSecretKey(dir string) ([]byte, error) {
     }
 
     return secretKey, nil
+}
+
+func loadSecretKey(dg *Datagram) ([]byte, error) {
+    var keyDir string
+    if dg.Command & 0x80 == 0 {
+        keyDir = filepath.Join(datadir, "accounts", username)
+    } else {
+        keyDir = filepath.Join(datadir, "accounts", username, "peers", peerAddress, peerUsername)
+    }
+    return loadSecretKeyFromDir(keyDir)
 }
 
 // verifyHMAC checks the integrity and authenticity of the received buffer
@@ -20,4 +32,8 @@ func verifyHMAC(buf []byte, key []byte) bool {
     expectedMAC := mac.Sum(nil)
 
     return hmac.Equal(signature, expectedMAC)
+}
+
+func authenticateAndParseDatagram() {
+    
 }
