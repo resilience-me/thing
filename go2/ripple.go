@@ -85,7 +85,7 @@ func (m *SessionManager) handleSession(session Session) {
 
 // handleConnection reads datagrams from the connection and sends them to the SessionManager
 func (m *SessionManager) handleConnection(conn net.Conn) {
-    buf := make([]byte, 390)
+    buf := make([]byte, 402) // Adjust the buffer size according to your actual data size (e.g., identifier + salt + ciphertext)
     _, err := io.ReadFull(conn, buf)
     if err != nil {
         fmt.Printf("Error reading datagram: %v\n", err)
@@ -108,11 +108,11 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Determine whether it's a client or server session based on the Transaction
-    if tx.Command == 0 { // Replace this with appropriate logic for distinguishing clients and servers
-        m.sessionCh <- &ClientSession{tx, conn}
-    } else {
-        m.sessionCh <- &ServerSession{tx}
+    // Determine whether it's a client or server session based on the most significant bit of tx.Command
+    if tx.Command&0x80 == 0 { // Check if the most significant bit is 0 (client)
+        m.sessionCh <- &ClientSession{BaseSession{*tx}, conn}
+    } else { // Most significant bit is 1 (server)
+        m.sessionCh <- &ServerSession{BaseSession{*tx}}
         conn.Close()
     }
 }
