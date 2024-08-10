@@ -58,66 +58,23 @@ func decryptDatagram(encryptedPart []byte, key []byte) ([]byte, error) {
     return plaintext, nil
 }
 
-// validateAndParseDatagram authenticates and decrypts the datagram,
-// populating the provided Datagram pointer with the decrypted data.
-func validateAndParseDatagram(buf *[]byte, dg *Datagram) error {
-    dg.ClientOrServer = (*buf)[0] // Read the ClientOrServer byte
-
-    // Step 1: Populate the Datagram fields
-    dg.Username = ToString((*buf)[1:33]) // Populate Username
-
-    // Construct directory path based on the session type
-    var dirPath string
-    if dg.ClientOrServer == 0 { // Client session
-        dirPath = filepath.Join(datadir, "accounts", dg.Username)
-    } else { // Server session
-        dg.PeerUsername = ToString((*buf)[33:65]) // Populate PeerUsername
-        dg.PeerServerAddress = ToString((*buf)[65:97]) // Populate PeerServerAddress
-        dirPath = filepath.Join(datadir, "accounts", dg.Username, "peers", dg.PeerServerAddress, dg.PeerUsername)
-    }
-
-    // Step 2: Load the secret key
-    secretKey, err := loadSecretKey(dirPath)
+// authenticateAndDecrypt authenticates and decrypts the datagram
+func authenticateAndDecrypt(buf []byte) error {
+    // Load both cryptographic and authentication keys
+    cryptoKey, authKey, err := loadKeys(buf)
     if err != nil {
-        return fmt.Errorf("failed to load secret key: %v", err)
+        return err // error already formatted
     }
 
-    // Step 3: Authenticate the datagram
-    authenticatedData, err := authenticateDatagram(*buf, secretKey)
-    if err != nil {
-        return fmt.Errorf("failed to authenticate datagram: %v", err)
+    // Authenticate the encrypted payload first
+    if err := authenticatePayload(buf, authKey); err != nil {
+        return fmt.Errorf("authentication failed: %v", err)
     }
 
-    // Step 4: Determine the encrypted part based on session type
-    var encryptedPart []byte
-    if dg.ClientOrServer == 0 { // Client session
-        encryptedPart = authenticatedData[33:390] // Adjusted for client session encryption range
-    } else { // Server session
-        encryptedPart = authenticatedData[97:390] // Adjusted for server session encryption range
+    // Decrypt the payload after authentication is successful
+    if err := decryptPayload(buf, cryptoKey); err != nil {
+        return fmt.Errorf("decryption failed: %v", err)
     }
 
-    // Step 5: Decrypt the datagram
-    decryptedData, err := decryptDatagram(encryptedPart, secretKey)
-    if err != nil {
-        return fmt.Errorf("failed to decrypt datagram: %v", err)
-    }
-
-    // Step 6: Write decrypted data back into the Datagram's Arguments field
-    if dg.ClientOrServer == 0 {
-        dg.PeerUsername = ToString((*buf)[33:65])
-        dg.PeerServerAddress = ToString((*buf)[65:97])
-
-        peerDir := filepath.Join(datadir, "accounts", dg.Username, "peers", dg.PeerServerAddress, dg.PeerUsername)
-
-        // Inline the peer existence check
-        if err := os.Stat(peerDir); err != nil {
-            return fmt.Errorf("peer directory does not exist: %v", err)
-        }
-        copy(dg.Arguments[:], decryptedData[64:]) // Copy the rest to Arguments
-    } else {
-        // For server sessions, directly copy the decrypted data into Arguments
-        copy(dg.Arguments[:], decryptedData)
-    }
-    // Return nil to indicate success
     return nil
 }
