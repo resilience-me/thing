@@ -94,7 +94,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     }
 
     // Authenticate and parse the datagram
-    dg, err := authenticateAndParseDatagram(buf)
+    dg, err := validateAndParseDatagram(buf)
     if err != nil {
         fmt.Printf("Error processing incoming datagram: %v\n", err)
         conn.Close()
