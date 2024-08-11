@@ -53,6 +53,5 @@ func SetTrustline(session Session) {
         fmt.Printf("Error sending success response: %v\n", err) // Log detailed error
         return
     }
-    session.Conn.Close() // Close the connection without error check
     fmt.Println("Sent success response to client and closed connection.")
 }
