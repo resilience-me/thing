@@ -19,7 +19,7 @@ func CreateSignedDatagram(session main.Session, dg *main.Datagram) error {
     }
 
     // Generate HMAC for the serialized data
-    signature, err := GenerateHMAC(serializedData, secretKey)
+    signature, err := main.GenerateHMAC(serializedData, secretKey)
     if err != nil {
         return fmt.Errorf("failed to generate HMAC: %w", err)
     }
