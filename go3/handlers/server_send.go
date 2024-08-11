@@ -1,8 +1,9 @@
 package handlers
 
 import (
-    "fmt"            // For formatted I/O
-    "ripple/main"    // For the main package, which includes the Session and Datagram types
+    "fmt"
+    "net"
+    "ripple/main" // Assuming this contains your Datagram and Session types
 )
 
 // CreateSignedDatagram creates a signed datagram by serializing it and adding a signature.
@@ -31,4 +32,31 @@ func CreateSignedDatagram(session main.Session, dg *main.Datagram) ([]byte, erro
 
     // Return the serialized data including the signature
     return serializedData, nil
+}
+
+
+// SendDatagram sends a datagram to the specified server address and port.
+func SendDatagram(session main.Session, data []byte) error {
+    // Get the server address from the session
+    serverAddress := session.Datagram.PeerServerAddress
+
+    // Resolve the address, treating it as an IP address or domain name
+    addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", serverAddress, 2012))
+    if err != nil {
+        return fmt.Errorf("failed to resolve server address '%s': %w", serverAddress, err)
+    }
+
+    // Establish a connection to the server
+    conn, err := net.DialTCP("tcp", nil, addr)
+    if err != nil {
+        return fmt.Errorf("failed to connect to server '%s': %w", serverAddress, err)
+    }
+    defer conn.Close() // Ensure the connection is closed after sending
+
+    // Send the data to the server
+    if _, err := conn.Write(data); err != nil {
+        return fmt.Errorf("failed to send data to server '%s': %w", serverAddress, err)
+    }
+
+    return nil // Successfully sent the datagram
 }
