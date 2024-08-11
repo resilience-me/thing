@@ -34,6 +34,12 @@ func SetCounterIn(dg *Datagram, value uint32) error {
 	return database.WriteUint32ToFile(trustlineDir, "counter_in.txt", value)
 }
 
+// SetSyncCounter sets the sync_counter value.
+func SetSyncCounter(dg *Datagram, value uint32) error {
+	trustlineDir := database.GetTrustlineDir(dg)
+	return database.WriteUint32ToFile(trustlineDir, "sync_counter.txt", value)
+}
+
 // SetSyncIn sets the sync_in value.
 func SetSyncIn(dg *Datagram, value uint32) error {
 	trustlineDir := database.GetTrustlineDir(dg)
