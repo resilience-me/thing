@@ -82,29 +82,6 @@ func readRawTransactionFromFile(index int, filename string) ([]byte, error) {
 	return data, nil
 }
 
-// GetLatestTransaction retrieves the raw bytes of the latest transaction in the file.
-func GetLatestTransaction(filename string) ([]byte, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	// Calculate the offset for the last transaction
-	info, err := file.Stat()
-	if err != nil {
-		return nil, err
-	}
-	lastTransactionOffset := info.Size() - int64(SizeTransaction)
-	transaction := make([]byte, SizeTransaction)
-	_, err = file.ReadAt(transaction, lastTransactionOffset)
-	if err != nil {
-		return nil, err
-	}
-
-	return transaction, nil
-}
-
 // GetTransactionChainHeight returns the number of transactions stored in the file
 func GetTransactionChainHeight(filename string) (uint32, error) {
     file, err := os.Open(filename)
@@ -121,6 +98,23 @@ func GetTransactionChainHeight(filename string) (uint32, error) {
     // Calculate the number of transactions
     transactionCount := uint32(info.Size() / int64(SizeTransaction))
     return transactionCount, nil
+}
+
+// GetLatestTransaction retrieves the raw bytes of the latest transaction in the file.
+func GetLatestTransaction(filename string) ([]byte, error) {
+    // Get the height of the transaction chain which will also be the new transaction's number
+    chainHeight, err := GetTransactionChainHeight(filename)
+    if err != nil {
+        return _, err
+    }
+
+    // Retrieve the latest transaction to get the ParentHash
+    latestTransaction, err := readRawTransactionFromFile(chainHeight-1, filename)
+    if err != nil {
+        return _, err
+    }
+
+    return transaction, nil
 }
 
 // ExtractParentHash extracts the ParentHash from the transaction bytes.
