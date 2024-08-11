@@ -151,4 +151,8 @@ func main() {
             go manager.handleConnection(conn)
         }
     }
+
+    // Wait for all sessions to finish before exiting
+    manager.wg.Wait()
+    fmt.Println("All sessions and queues have been processed. Exiting.")
 }
