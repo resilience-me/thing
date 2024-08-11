@@ -27,16 +27,22 @@ func GetCounter(dg *Datagram) (uint32, error) {
 	return database.GetUint32FromFile(trustlineDir, "counter.txt")
 }
 
-// GetCounterOut retrieves the sync_counter_out value using the datagram to determine the directory.
-func GetSyncCounterOut(dg *Datagram) (uint32, error) {
+// GetCounterOut retrieves the counter_out value using the datagram to determine the directory.
+func GetCounterOut(dg *Datagram) (uint32, error) {
 	trustlineDir := database.GetTrustlineDir(dg)
 	return database.GetUint32FromFile(trustlineDir, "counter_out.txt")
 }
 
-// GetSyncCounterIn retrieves the sync_counter_in value using the datagram to determine the directory.
+// GetCounterIn retrieves the counter_in value using the datagram to determine the directory.
 func GetCounterIn(dg *Datagram) (uint32, error) {
 	trustlineDir := database.GetTrustlineDir(dg)
 	return database.GetUint32FromFile(trustlineDir, "counter_in.txt")
+}
+
+// GetSyncCounter retrieves the sync_counter_in value using the datagram to determine the directory.
+func GetSyncCounter(dg *Datagram) (uint32, error) {
+	trustlineDir := database.GetTrustlineDir(dg)
+	return database.GetUint32FromFile(trustlineDir, "sync_counter.txt")
 }
 
 // GetSyncIn retrieves the sync_in value using the datagram to determine the directory.
