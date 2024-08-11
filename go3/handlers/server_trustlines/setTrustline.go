@@ -37,6 +37,7 @@ func SetTrustline(session main.Session) {
     // Retrieve the syncIn counter from the Datagram
     syncInBytes := session.Datagram.Arguments[4:8]
     syncIn := main.BytesToUint32(syncInBytes)
+
     if syncIn > prevSyncIn {
         // Write the new trustline amount using the setter
         if err := db_trustlines.SetTrustlineIn(session.Datagram, trustlineAmount); err != nil {
