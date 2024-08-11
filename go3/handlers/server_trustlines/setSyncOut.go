@@ -1,7 +1,6 @@
 package server_trustlines
 
 import (
-    "encoding/binary"
     "log"
     "ripple/main"
     "ripple/database/db_trustlines"
