@@ -25,7 +25,7 @@ func SetTrustline(session main.Session) {
     }
 
     // Retrieve the trustline amount from the Datagram
-    trustlineAmount := binary.BigEndian.Uint32(session.Datagram.Arguments[:4])
+    trustlineAmount := main.BytesToUint32(session.Datagram.Arguments[:4])
 
     // Write the new trustline amount using the setter
     if err := db_trustlines.SetTrustlineIn(session.Datagram, trustlineAmount); err != nil {
