@@ -2,6 +2,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
 	"os"
@@ -16,6 +17,21 @@ type Transaction struct {
     PreviousHash      [32]byte // Hash of the previous transaction in the chain
     Signature         [64]byte // Digital signature using the validator's private key
 }
+
+// CalculateHash computes the SHA-256 hash of a transaction
+func CalculateHash(tx Transaction) [32]byte {
+	// Create a new SHA-256 hash
+	hash := sha256.New()
+
+	// Write the transaction data to the hash
+	hash.Write(tx[:]) // Convert the struct to bytes and write
+
+	// Return the computed hash
+	var hashArray [32]byte
+	copy(hashArray[:], hash.Sum(nil))
+	return hashArray
+}
+
 
 // AppendTransaction appends a new transaction to the specified file
 func AppendTransaction(filePath string, tx Transaction) error {
