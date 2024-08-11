@@ -66,21 +66,13 @@ func (m *SessionManager) handleSession(session Session) {
     handler(session)
 }
 
-// handleConnection reads datagrams from the connection and sends them to the SessionManager
-func (m *SessionManager) handleConnection(conn net.Conn) {
-    buf := make([]byte, 389) // Adjust the buffer size according to your actual data size
-    _, err := io.ReadFull(conn, buf)
-    if err != nil {
-        fmt.Printf("Error reading datagram: %v\n", err)
-        conn.Close()
-        return
-    }
 
+// handleClientConnection processes a connection from a client.
+func (m *SessionManager) handleClientConnection(conn net.Conn, buf []byte) {
     dg := parseDatagram(buf)
-    isClientSession := dg.Command & 0x80 == 0
 
     if errorCode, err := checkUserAndPeerExist(dg); err != nil {
-        if errorCode != 0 && isClientSession {
+        if errorCode != 0 {
             conn.Write([]byte{errorCode}) // No error check here
         }
         fmt.Printf("Error during user and peer check: %v\n", err)
@@ -96,18 +88,43 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     }
 
     // Prepare the session struct
-    session := Session{Datagram: dg} // Conn is nil by default
-
-    // Determine whether it's a client or server session based on the most significant bit of dg.Command
-    if isClientSession { // Check if the most significant bit is 0 (client)
-        session.Conn = conn // Maintain the connection open for client sessions
-    } else { // Most significant bit is 1 (server)
-        conn.Close() // Close the connection for server sessions
-        // No need to set session.Conn to nil; it is already nil by default
-    }
+    session := Session{Datagram: dg, Conn: conn} // Client sessions keep the connection open
 
     // Send the session to the session channel for further processing
     m.sessionCh <- session
+}
+
+// handleServerConnection processes a connection from another server.
+func (m *SessionManager) handleServerConnection(buf []byte) {
+    dg := parseDatagram(buf)
+
+    // Authenticate the datagram
+    if err := authenticateDatagram(buf, dg); err != nil {
+        fmt.Printf("Error authenticating incoming datagram: %v\n", err)
+        return
+    }
+
+    // Send the session to the session channel for further processing
+    m.sessionCh <- Session{Datagram: dg} // Conn is nil for server sessions
+}
+
+// handleConnection reads datagrams from the connection and decides whether to handle a client or server connection.
+func (m *SessionManager) handleConnection(conn net.Conn) {
+    buf := make([]byte, 389) // Adjust the buffer size according to your actual data size
+    _, err := io.ReadFull(conn, buf)
+    if err != nil {
+        fmt.Printf("Error reading datagram: %v\n", err)
+        conn.Close()
+        return
+    }
+
+    // Determine whether it's a client or server session and handle accordingly
+    if buf[0]&0x80 == 0 { // Client session if MSB is 0
+        m.handleClientConnection(conn, buf)
+    } else { // Server session
+        m.handleServerConnection(buf)
+        conn.Close() // Close the connection directly after processing
+    }
 }
 
 // Main function with inlined server logic
