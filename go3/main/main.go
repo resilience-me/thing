@@ -109,6 +109,7 @@ func main() {
         closedCh:       make(chan string),
         activeHandlers: make(map[string]bool),
         queues:         make(map[string][]Session),
+        shutdown:       make(chan struct{}),
     }
     go manager.run()
 
@@ -119,14 +120,18 @@ func main() {
     }
     defer listener.Close()
 
-    // Goroutine to monitor for shutdown signals
+    // Setup for capturing OS signals for graceful shutdown
+    signals := make(chan os.Signal, 1)
+    signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+
+    // Goroutine to handle shutdown
     go func() {
-        <-manager.shutdown
-        listener.Close()  // Close the listener to unblock Accept
+        <-signals
+        close(manager.shutdown)  // Signal to shutdown the manager and other components
+        listener.Close()  // Close the listener to trigger 'Accept' to return an error
     }()
 
     fmt.Println("Listening on port 2012...")
-
     // Loop to handle connections with a select for shutdown
     for {
         select {
