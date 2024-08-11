@@ -57,18 +57,18 @@ func validateAndParseClientDatagram(buf []byte) (*Datagram, string, error) {
     // Check user and peer existence
     errorMessage, err := checkUserAndPeerExist(dg)
     if err != nil {
-        return nil, errorMessage, err
+        return nil, errorMessage, fmt.Errorf("validation failed during user and peer existence check: %w", err)
     }
 
     // Load client secret key
     secretKey, err := loadClientSecretKey(dg)
     if err != nil {
-        return nil, "Error loading client secret key", err
+        return nil, "Error loading client secret key", fmt.Errorf("validation failed during secret key loading: %w", err)
     }
 
     // Verify HMAC
     if !verifyHMAC(buf, secretKey) {
-        return nil, "Error verifying HMAC", errors.New("HMAC verification failed")
+        return nil, "Error verifying HMAC", errors.New("validation failed: HMAC verification")
     }
 
     // Return the parsed datagram if everything is successful
