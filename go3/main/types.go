@@ -12,7 +12,7 @@ func uint32ToBytes(value uint32) []byte {
     return responseData
 }
 
-// trimRightZeroes trims null characters from byte slices for proper string conversion.
-func trimRightZeroes(data []byte) string {
+// bytesToTrimmedString trims null characters from byte slices for proper string conversion.
+func bytesToTrimmedString(data []byte) string {
     return string(bytes.TrimRight(data, "\x00"))
 }
