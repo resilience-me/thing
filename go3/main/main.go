@@ -133,6 +133,11 @@ func (m *SessionManager) shutdownHandler(listener net.Listener) {
 
 // Main function with inlined server logic
 func main() {
+
+    if err := initConfig(); err != nil {
+        log.Fatalf("Configuration failed: %v", err)
+    }
+
     manager := &SessionManager{
         sessionCh:      make(chan Session),
         closedCh:       make(chan string),
