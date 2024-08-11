@@ -9,30 +9,26 @@ import (
 )
 
 const (
-    OffsetTransactionNumber = 0
-    OffsetValidator         = OffsetTransactionNumber + 4
-    OffsetFromUsername      = OffsetValidator + 32
-    OffsetFromServerAddress = OffsetFromUsername + 32
-    OffsetToUsername        = OffsetFromServerAddress + 32
-    OffsetToServerAddress   = OffsetToUsername + 32
-    OffsetData              = OffsetToServerAddress + 32
-    OffsetPreviousHash      = OffsetData + 256
-    OffsetSignature         = OffsetPreviousHash + 32
-    LengthTransaction       = OffsetSignature + 32
+    OffsetNumber 	= 0
+    OffsetValidator    	= OffsetNumber + 4
+    OffsetFrom      	= OffsetValidator + 32
+    OffsetTo        	= OffsetFrom + 32
+    OffsetData         	= OffsetTo + 32
+    OffsetParentHash    = OffsetData + 256
+    OffsetSignature     = OffsetParentHash + 32
+    LengthTransaction   = OffsetSignature + 32
 )
 
-// Transaction struct definition
 type Transaction struct {
-    TransactionNumber [4]byte // Optional transaction number to track order
-    Validator         [32]byte // Public key or identifier of the validator
-    FromUsername      [32]byte // Initiating user's identifier
-    FromServerAddress [32]byte // Address of the initiating user's server
-    ToUsername        [32]byte // Receiving user's identifier
-    ToServerAddress   [32]byte // Address of the receiving user's server
-    Data              [256]byte // The first byte here represents the Command
-    PreviousHash      [32]byte // Hash of the previous transaction in the chain
-    Signature         [32]byte // Digital signature using the validator's private key
+    Number            [4]byte
+    Validator         [32]byte
+    From              [32]byte
+    To	              [32]byte
+    Data              [256]byte
+    ParentHash        [32]byte
+    Signature         [32]byte
 }
+
 package main
 
 import (
