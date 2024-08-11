@@ -20,13 +20,13 @@ func loadSecretKeyFromDir(dir string) ([]byte, error) {
     return secretKey, nil
 }
 
-func loadSecretKey(dg *Datagram) ([]byte, error) {
-    var keyDir string
-    if dg.Command & 0x80 == 0 {
-        keyDir = GetAccountDir(dg)
-    } else {
-        keyDir = GetPeerDir(dg)
-    }
+func loadClientSecretKey(dg *Datagram) ([]byte, error) {
+    keyDir := GetAccountDir(dg)
+    return loadSecretKeyFromDir(keyDir)
+}
+
+func loadServerSecretKey(dg *Datagram) ([]byte, error) {
+    keyDir := GetPeerDir(dg)
     return loadSecretKeyFromDir(keyDir)
 }
 
