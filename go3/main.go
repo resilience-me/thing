@@ -66,32 +66,18 @@ func (m *SessionManager) handleSession(session Session) {
     handler(session)
 }
 
-
 // handleClientConnection processes a connection from a client.
 func (m *SessionManager) handleClientConnection(conn net.Conn, buf []byte) {
-    dg := parseDatagram(buf)
-
-    if errorCode, err := checkUserAndPeerExist(dg); err != nil {
-        if errorCode != 0 {
-            conn.Write([]byte{errorCode}) // No error check here
-        }
-        fmt.Printf("Error during user and peer check: %v\n", err)
+    dg, errorMessage, err := validateAndParseClientDatagram(buf)
+    if err != nil {
+        conn.Write([]byte{1})                      // Indicate error with '1'
+        conn.Write([]byte(errorMessage))           // Send the specific error message
+        fmt.Printf("Error during datagram validation: %v\n", err)
         conn.Close()
         return
     }
-
-    // Authenticate the datagram
-    if err := authenticateDatagram(buf, dg); err != nil {
-        fmt.Printf("Error authenticating incoming datagram: %v\n", err)
-        conn.Close()
-        return
-    }
-
-    // Prepare the session struct
-    session := Session{Datagram: dg, Conn: conn} // Client sessions keep the connection open
-
     // Send the session to the session channel for further processing
-    m.sessionCh <- session
+    m.sessionCh <- Session{Datagram: dg, Conn: conn} // Client sessions keep the connection open
 }
 
 // handleServerConnection processes a connection from another server.
