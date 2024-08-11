@@ -32,43 +32,45 @@ func (tx *Transaction) Serialize() []byte {
 	return data
 }
 
-// CalculateHash computes the SHA-256 hash of a transaction
-func CalculateHash(tx Transaction) [32]byte {
-	hash := sha256.New()
-	hash.Write(tx.Serialize())
-	var hashArray [32]byte
-	copy(hashArray[:], hash.Sum(nil))
-	return hashArray
+// fetchLastTransaction retrieves the raw bytes of the last transaction from the file.
+func fetchLastTransaction(filename string) ([]byte, error) {
+    file, err := os.Open(filename)
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close()
+
+    // Move to the end of the file
+    stat, err := file.Stat()
+    if err != nil {
+        return nil, err
+    }
+
+    // Calculate the size of the transaction struct
+    txSize := 4 + 32 + 32 + 32 + 256 + 32 + 64 // Total size of Transaction struct
+    offset := stat.Size() - txSize
+
+    // Read the raw bytes of the last transaction
+    data := make([]byte, txSize)
+    _, err = file.ReadAt(data, offset)
+    if err != nil {
+        return nil, err
+    }
+
+    return data, nil
 }
 
-// FetchLastTransaction reads the last transaction from the specified file
-func FetchLastTransaction(filePath string) (Transaction, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return Transaction{}, err
-	}
-	defer file.Close()
+// fetchLastTransactionHash computes the hash of the last transaction.
+func fetchLastTransactionHash(filename string) ([32]byte, error) {
+    data, err := fetchLastTransaction(filename)
+    if err != nil {
+        return [32]byte{}, err
+    }
 
-	stat, err := file.Stat()
-	if err != nil {
-		return Transaction{}, err
-	}
+    // Compute the hash of the raw bytes
+    hash := sha256.Sum256(data)
 
-	if stat.Size() < int64(binary.Size(Transaction{})) {
-		return Transaction{}, fmt.Errorf("file size is smaller than transaction size")
-	}
-
-	if _, err := file.Seek(-int64(binary.Size(Transaction{})), os.SEEK_END); err != nil {
-		return Transaction{}, err
-	}
-
-	var lastTx Transaction
-	err = binary.Read(file, binary.LittleEndian, &lastTx)
-	if err != nil {
-		return Transaction{}, err
-	}
-
-	return lastTx, nil
+    return hash, nil
 }
 
 // AppendTransaction appends a transaction to the file
