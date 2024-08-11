@@ -83,8 +83,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     if dg.Command & 0x80 == 0 { // Client session if MSB is 0
         errorMessage, err := validateClientDatagram(buf, dg)
         if err != nil {
-            conn.Write([]byte{1})                      // Indicate error with '1'
-            conn.Write([]byte(errorMessage))           // Send the specific error message
+            SendErrorResponse(errorMessage, conn)
             fmt.Printf("Error during datagram validation: %v\n", err)
             conn.Close()
             return
