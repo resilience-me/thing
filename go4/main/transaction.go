@@ -158,11 +158,14 @@ func PrepareAndStoreTransaction(filename string, rawTransaction []byte) error {
     parentHash := ExtractParentHash(latestTransaction)
     copy(rawTransaction[OffsetParentHash:], parentHash)
 
-    // Sign the transaction
-    err = signTransactionData(rawTransaction)
+    // Sign the transaction data and set the signature
+    signature, err := HashAndSignTransaction(privateKey, rawTransaction[:OffsetSignature])
     if err != nil {
         return fmt.Errorf("failed to sign transaction: %v", err)
     }
+
+    // Copy the signature into the Signature field
+    copy(rawTransaction[OffsetSignature:], signature)
 
     // Store the updated transaction
     return writeRawTransactionToFile(rawTransaction, filename)
