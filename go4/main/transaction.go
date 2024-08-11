@@ -139,11 +139,8 @@ func PrepareAndStoreTransaction(filename string, rawTransaction []byte) error {
     }
 
     // Extract and set the ParentHash in the raw bytes
-    parentHash, err := ExtractParentHash(latestTransaction)
-    if err != nil {
-        return err
-    }
-    copy(rawTransaction[OffsetParentHash:], parentHash[:])
+    parentHash := ExtractParentHash(latestTransaction)
+    copy(rawTransaction[OffsetParentHash:], parentHash)
 
     // Sign the transaction
     err = signTransactionData(rawTransaction)
