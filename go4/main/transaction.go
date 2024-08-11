@@ -117,11 +117,9 @@ func GetLatestTransaction(filename string) ([]byte, error) {
     return transaction, nil
 }
 
-// ExtractParentHash extracts the ParentHash from the transaction bytes.
-func ExtractParentHash(transaction []byte) ([32]byte, error) {
-	var parentHash [32]byte
-	copy(parentHash[:], transaction[OffsetParentHash:OffsetParentHash+SizeParentHash])
-	return parentHash, nil
+// ExtractParentHash extracts the ParentHash from the transaction bytes and returns it as a []byte.
+func ExtractParentHash(transaction []byte) []byte {
+    return transaction[OffsetParentHash : OffsetParentHash+SizeParentHash]
 }
 
 // PrepareAndStoreTransaction prepares a transaction from raw bytes with Number and ParentHash, signs it, and stores it.
