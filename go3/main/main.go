@@ -136,12 +136,13 @@ func (m *SessionManager) shutdownHandler(listener net.Listener) {
 
 // Main function with inlined server logic
 func main() {
+
     if err := initConfig(); err != nil {
         log.Fatalf("Configuration failed: %v", err)
     }
 
-    // Manually log the server address
-    log.Printf("Server is running at address: %s", GetServerAddress())
+    // Direct user feedback to stdout, which is suitable for console messages.
+    fmt.Printf("Server is running at address: %s\n", GetServerAddress())
 
     manager := &SessionManager{
         sessionCh:      make(chan Session),
@@ -157,15 +158,15 @@ func main() {
         log.Fatalf("Error starting TCP server: %v", err)
     }
 
+    fmt.Println("Listening on port 2012...") // Direct user feedback for server start
+
     // Goroutine to handle shutdown
     go manager.shutdownHandler(listener)
 
-    log.Println("Listening on port 2012...")
-    // Loop to handle connections with a select for shutdown
     for {
         select {
         case <-manager.shutdown:
-            log.Println("Server is shutting down...")
+            fmt.Println("Server is shutting down...") // Direct user feedback for server shutdown
             return // Exit the main loop and function
 
         default:
@@ -178,6 +179,7 @@ func main() {
             go manager.handleConnection(conn)
         }
     }
+
 
     // Wait for all sessions to finish before exiting
     manager.wg.Wait()
