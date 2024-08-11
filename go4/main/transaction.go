@@ -67,3 +67,27 @@ func ReadTransactions(filePath string) ([]Transaction, error) {
 
 	return transactions, nil
 }
+
+// FetchLastTransaction reads the last transaction from the specified file
+func FetchLastTransaction(filePath string) (Transaction, error) {
+	// Open the file for reading
+	file, err := os.Open(filePath)
+	if err != nil {
+		return Transaction{}, err
+	}
+	defer file.Close()
+
+	// Seek to the end of the file
+	if _, err := file.Seek(-int64(binary.Size(Transaction{})), os.SEEK_END); err != nil {
+		return Transaction{}, err
+	}
+
+	// Read the last transaction
+	var lastTx Transaction
+	err = binary.Read(file, binary.LittleEndian, &lastTx)
+	if err != nil {
+		return Transaction{}, err
+	}
+
+	return lastTx, nil
+}
