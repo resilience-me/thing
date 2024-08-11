@@ -95,3 +95,10 @@ func GetLatestTransaction(filename string) ([]byte, error) {
 
 	return transaction, nil
 }
+
+// ExtractParentHash extracts the ParentHash from the transaction bytes.
+func ExtractParentHash(transaction []byte) ([32]byte, error) {
+	var parentHash [32]byte
+	copy(parentHash[:], transaction[OffsetParentHash:OffsetParentHash+SizeParentHash])
+	return parentHash, nil
+}
