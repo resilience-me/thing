@@ -129,3 +129,31 @@ func ExtractParentHash(transaction []byte) ([32]byte, error) {
 	copy(parentHash[:], transaction[OffsetParentHash:OffsetParentHash+SizeParentHash])
 	return parentHash, nil
 }
+
+// PrepareAndStoreTransaction prepares a transaction with Number and ParentHash and stores it.
+func PrepareAndStoreTransaction(filename string, t *Transaction) error {
+    // Get the height of the transaction chain which will also be the new transaction's number
+    chainHeight, err := GetTransactionChainHeight(filename)
+    if err != nil {
+        return err
+    }
+
+    // Set the transaction number to the current height of the chain
+    binary.BigEndian.PutUint32(t.Number[:], chainHeight)
+
+    // Retrieve the latest transaction to get the ParentHash
+    latestTransaction, err := readRawTransactionFromFile(chainHeight-1, filename)
+    if err != nil {
+        return err
+    }
+
+    // Extract ParentHash from the latest transaction
+    parentHash, err := ExtractParentHash(latestTransaction)
+    if err != nil {
+        return err
+    }
+    copy(t.ParentHash[:], parentHash[:])
+
+    // Store the updated transaction
+    return WriteTransactionToFile(t, filename)
+}
