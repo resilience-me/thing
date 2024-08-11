@@ -112,13 +112,13 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
 // Ensure that the shutdown process is also communicated clearly
 func (m *SessionManager) shutdownHandler(listener net.Listener) {
     interruptCount := 0 // Scoped to this function
-
-    // Channel to capture OS signals
     signals := make(chan os.Signal, 1)
     signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
-    for range signals {
+    for sig := range signals {
         interruptCount++
+        log.Printf("Signal received: %v", sig)  // Logging the signal for better traceability
+
         if interruptCount == 1 {
             fmt.Println("Interrupt received, initiating graceful shutdown...")
             fmt.Println("Press Ctrl+C up to 9 times in total to force quit immediately.")
@@ -127,7 +127,7 @@ func (m *SessionManager) shutdownHandler(listener net.Listener) {
             continue           // Skip to the next iteration
         }
 
-        if interruptCount >= 9 {
+        if interruptCount == 9 {
             fmt.Println("Force quitting after 9 interrupts...")
             os.Exit(1) // Force exit after receiving 9 interrupts
         }
