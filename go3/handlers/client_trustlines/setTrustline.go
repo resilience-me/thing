@@ -16,14 +16,14 @@ func SetTrustline(session Session) {
     prevCounter, err := db_trustlines.GetCounter(datagram)
     if err != nil {
         fmt.Printf("Error getting previous counter: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(session, "Failed to read counter file.") // Send simpler error message
+        _ = handlers.SendErrorResponse("Failed to read counter file.", session.Conn) // Send simpler error message
         return
     }
 
     // Check the counter directly as it is already a uint32
     if datagram.Counter <= prevCounter {
         fmt.Println("Received counter is not greater than previous counter. Potential replay attack.")
-        _ = handlers.SendErrorResponse(session, "Received counter is not valid.") // Send simpler error message
+        _ = handlers.SendErrorResponse("Received counter is not valid.", session.Conn) // Send simpler error message
         return
     }
 
@@ -33,25 +33,23 @@ func SetTrustline(session Session) {
     // Write the new trustline amount using the setter
     if err := db_trustlines.SetTrustlineOut(datagram, trustlineAmount); err != nil {
         fmt.Printf("Error writing trustline to file: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(session, "Failed to write trustline.") // Send simpler error message
+        _ = handlers.SendErrorResponse("Failed to write trustline.", session.Conn) // Send simpler error message
         return
     }
 
     // Write the new counter value using the setter
     if err := db_trustlines.SetCounter(datagram, datagram.Counter); err != nil {
         fmt.Printf("Error writing counter to file: %v\n", err) // Log detailed error
-        _ = handlers.SendErrorResponse(session, "Failed to write counter.") // Send simpler error message
+        _ = handlers.SendErrorResponse("Failed to write counter.", session.Conn) // Send simpler error message
         return
     }
 
     fmt.Println("Trustline and counter updated successfully.")
 
-    // Prepare success response
-    response := append([]byte{0}, []byte("Trustline updated successfully.")...) // Combine success indicator and message
-    
-    if _, err := session.Conn.Write(response); err != nil { // Send combined response
-        fmt.Printf("Error sending success response: %v\n", err) // Log detailed error
+    if err := sendSuccessResponse("Trustline updated successfully."); err != nil {
+        fmt.Printf("Failed to send success response: %v\n", err) // Log detailed error if any
         return
     }
-    fmt.Println("Sent success response to client and closed connection.")
+
+    fmt.Println("Sent success response to client.")
 }
