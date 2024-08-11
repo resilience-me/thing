@@ -138,6 +138,9 @@ func main() {
         log.Fatalf("Configuration failed: %v", err)
     }
 
+    // Manually print the server address to the console
+    fmt.Printf("Server is running at address: %s\n", GetServerAddress())
+
     manager := &SessionManager{
         sessionCh:      make(chan Session),
         closedCh:       make(chan string),
