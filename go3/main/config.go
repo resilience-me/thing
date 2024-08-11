@@ -1,16 +1,15 @@
 package main
 
 import (
-    "fmt"
     "io"
     "log"
     "os"
     "path/filepath"
 )
 
-var serverAddress string // Store the server address as a byte array
+var serverAddress string // Store the server address as a string
 
-// GetServerAddress returns the server address as a byte slice
+// GetServerAddress returns the server address as a string
 func GetServerAddress() string {
     return serverAddress
 }
@@ -20,9 +19,12 @@ func loadServerAddress() error {
     addressPath := filepath.Join(datadir, "server_address.txt")
     address, err := os.ReadFile(addressPath)
     if err != nil {
-        return fmt.Errorf("error loading server address: %w", err)
+        // Log the error with details rather than returning it with fmt.Errorf
+        log.Printf("Error loading server address from %s: %v", addressPath, err)
+        return err
     }
     serverAddress = string(address)
+    log.Printf("Loaded server address: %s", serverAddress) // Log that the address was loaded
     return nil
 }
 
@@ -32,21 +34,22 @@ func setupLogger() {
     if err != nil {
         log.Fatalf("Failed to open log file: %v", err) // log.Fatalf logs to stderr and calls os.Exit(1)
     }
+    defer logFile.Close() // Ensure the log file is closed when the setupLogger function exits
+
     // Set up logging to both the file and stderr
     multiWriter := io.MultiWriter(os.Stdout, logFile)
     log.SetOutput(multiWriter)
 
-    // Optional: Set the logging format to include the date, time, and file source
+    // Set the logging format to include the date, time, and file source
     log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
 // InitConfig initializes the configuration
 func initConfig() error {
     setupLogger()
-    // Log that the logger has been successfully set up
     log.Println("Logger setup completed, initializing configuration...")
 
-    // Example function to load server address, handle its error
+    // Load server address, handle its error
     if err := loadServerAddress(); err != nil {
         log.Printf("Failed to load server address: %v", err)
         return err
