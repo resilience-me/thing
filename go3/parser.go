@@ -51,43 +51,39 @@ func checkUserAndPeerExist(dg *Datagram) (string, error) {
 }
 
 // validateAndParseClientDatagram validates the datagram and returns a parsed Datagram, an error message if any, and an error object.
-func validateAndParseClientDatagram(buf []byte) (*Datagram, string, error) {
-    dg := parseDatagram(buf)
-
+func validateAndParseClientDatagram(buf []byte, dg *Datagram) (string, error) {
     // Check user and peer existence
     errorMessage, err := checkUserAndPeerExist(dg)
     if err != nil {
-        return nil, errorMessage, fmt.Errorf("validation failed during user and peer existence check: %w", err)
+        return errorMessage, fmt.Errorf("validation failed during user and peer existence check: %w", err)
     }
 
     // Load client secret key
     secretKey, err := loadClientSecretKey(dg)
     if err != nil {
-        return nil, "Error loading client secret key", fmt.Errorf("validation failed during secret key loading: %w", err)
+        return "Error loading client secret key", fmt.Errorf("validation failed during secret key loading: %w", err)
     }
 
     // Verify HMAC
     if !verifyHMAC(buf, secretKey) {
-        return nil, "Error verifying HMAC", errors.New("validation failed: HMAC verification")
+        return "Error verifying HMAC", errors.New("validation failed: HMAC verification")
     }
 
     // Return the parsed datagram if everything is successful
-    return dg, "", nil
+    return "", nil
 }
 
 // validateAndParseServerDatagram validates the server datagram and returns a parsed Datagram and an error if any.
-func validateAndParseServerDatagram(buf []byte) (*Datagram, error) {
-    dg := parseDatagram(buf)
-
+func validateAndParseServerDatagram(buf []byte, dg *Datagram) error {
     secretKey, err := loadServerSecretKey(dg)
     if err != nil {
-        return nil, fmt.Errorf("error loading server secret key: %w", err)
+        return fmt.Errorf("error loading server secret key: %w", err)
     }
 
     if !verifyHMAC(buf, secretKey) {
-        return nil, errors.New("error verifying HMAC for server datagram")
+        return errors.New("error verifying HMAC for server datagram")
     }
 
-    return dg, nil
+    return nil
 }
 
