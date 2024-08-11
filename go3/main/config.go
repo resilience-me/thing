@@ -32,15 +32,9 @@ func setupLogger() {
     // Create or open a log file
     logFile, err := os.OpenFile("ripple.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
     if err != nil {
-        log.Fatalf("Failed to open log file: %v", err) // log.Fatalf logs to stderr and calls os.Exit(1)
+        log.Fatalf("Failed to open log file: %v", err) // log.Fatalf logs to stderr and exits the program
     }
-    defer logFile.Close() // Ensure the log file is closed when the setupLogger function exits
-
-    // Set up logging to both the file and stderr
-    multiWriter := io.MultiWriter(os.Stdout, logFile)
-    log.SetOutput(multiWriter)
-
-    // Set the logging format to include the date, time, and file source
+    log.SetOutput(logFile)
     log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
