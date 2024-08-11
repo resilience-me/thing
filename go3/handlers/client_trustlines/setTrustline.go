@@ -37,7 +37,7 @@ func SetTrustline(session main.Session) {
         return
     }
 
-    // Retrieve and increment the sync_counter from permanent storage
+    // Increment the sync_counter without needing to return the value
     if err := db_trustlines.IncrementSyncCounter(datagram); err != nil {
         log.Printf("Error incrementing sync_counter for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Failed to update sync counter.", session.Conn)
@@ -51,8 +51,8 @@ func SetTrustline(session main.Session) {
         return
     }
 
-    // At this point, syncCounter has been incremented and saved to permanent storage
-    log.Printf("Trustline and counters (client counter: %d, sync counter: %d) updated successfully for user %s.", datagram.Counter, syncCounter, datagram.Username)
+    // Log success
+    log.Printf("Trustline and counters updated successfully for user %s.", datagram.Username)
 
     // Send success response
     if err := main.SendSuccessResponse([]byte("Trustline updated successfully."), session.Conn); err != nil {
