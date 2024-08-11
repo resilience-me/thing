@@ -30,7 +30,7 @@ func SetTrustline(session main.Session) {
     // Retrieve the sync_in value using the new getter
     prevSyncIn, err := db_trustlines.GetSyncIn(session.Datagram)
     if err != nil {
-        fmt.Printf("Error getting counter_in: %v\n", err)
+        fmt.Printf("Error getting sync_in: %v\n", err)
         return
     }
 
@@ -58,7 +58,7 @@ func SetTrustline(session main.Session) {
         }
         fmt.Println("trustline_in, sync_in and timestamp updated successfully.")
 
-        // Retrieve the counter_in value using the new getter
+        // Retrieve the counter_out value using the getter
         counterOut, err := db_trustlines.GetCounterOut(session.Datagram)
         if err != nil {
             fmt.Printf("Error getting counter_out: %v\n", err)
