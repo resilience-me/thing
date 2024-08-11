@@ -74,3 +74,19 @@ func validateAndParseClientDatagram(buf []byte) (*Datagram, string, error) {
     // Return the parsed datagram if everything is successful
     return dg, "", nil
 }
+
+func validateAndParseServerDatagram(buf []byte) (*Datagram, error) {
+    dg := parseDatagram(buf)
+
+    secretKey, err := loadServerSecretKey(dg)
+    if err != nil {
+        
+        return nil, fmt.Printf("Error loading server secret key: %v\n", err)
+    }
+
+    if !verifyHMAC(buf, secretKey) {
+        
+        return nil, fmt.Printf("Error verifying HMAC for server datagram\n")
+    }
+    return dg, nil
+}
