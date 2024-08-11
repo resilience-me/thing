@@ -20,6 +20,16 @@ func loadSecretKeyFromDir(dir string) ([]byte, error) {
     return secretKey, nil
 }
 
+func loadSecretKey(dg *Datagram) ([]byte, error) {
+    var keyDir string
+    if dg.Command & 0x80 == 0 {
+        keyDir = GetAccountDir(dg)
+    } else {
+        keyDir = GetPeerDir(dg)
+    }
+    return loadSecretKeyFromDir(keyDir)
+}
+
 // verifyHMAC checks the integrity and authenticity of the received buffer
 func verifyHMAC(buf []byte, key []byte) bool {
     // The signature is the last 32 bytes of the buffer
@@ -31,36 +41,13 @@ func verifyHMAC(buf []byte, key []byte) bool {
     return hmac.Equal(signature, expectedMAC)
 }
 
-func loadSecretKey(dg *Datagram) ([]byte, error) {
-    var keyDir string
-    if dg.Command & 0x80 == 0 {
-        keyDir = GetAccountDir(dg)
-    } else {
-        keyDir = GetPeerDir(dg)
-    }
-    return loadSecretKeyFromDir(keyDir)
-}
-
-func checkAccountsExist(dg *Datagram) error {
-    if err := checkAccountExists(dg); err != nil {
-        return fmt.Errorf("error checking account existence: %v", err)
-    }
-    if err := checkPeerExists(dg); err != nil {
-        return fmt.Errorf("error checking peer existence: %v", err)
-    }
-}
-
-func validateAndParseDatagram(buf []byte) (*Datagram, error) {
-    dg := parseDatagram(buf)
-    if err := checkAccountsExist(dg); err != nil {
-        return err
-    }
+func authenticateDatagram(dg) error {
     secretKey, err := loadSecretKey(dg)
     if err != nil {
-        return nil, err
+        return err
     }
     if !verifyHMAC(buf, secretKey) {
-        return nil, errors.New("error verifying HMAC")
+        return errors.New("error verifying HMAC")
     }
-    return dg, nil
+    return nil
 }
