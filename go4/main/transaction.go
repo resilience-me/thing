@@ -54,20 +54,25 @@ func verifyTransaction(pubKey *ecdsa.PublicKey, data []byte, rBytes, sBytes []by
 	return ecdsa.Verify(pubKey, data, r, s)
 }
 
-// HashAndSignTransaction hashes the input data, signs it, and returns the concatenated signature.
-func HashAndSignTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, error) {
-    // Hash the data using SHA-256
-    hash := sha256.Sum256(data)
+// HashAndSignTransaction hashes the provided data, signs it using the given private key,
+// and returns the raw data with the appended signature.
+func HashAndSignTransaction(privKey *ecdsa.PrivateKey, rawTransaction []byte) ([]byte, error) {
+    // Hash the transaction data using SHA-256
+    hash := sha256.Sum256(rawTransaction)
 
-    // Sign the hash
-    r, s, err := signTransaction(privKey, hash[:])
+    // Sign the hash using ECDSA
+    r, s, err := ecdsa.Sign(rand.Reader, privKey, hash[:])
     if err != nil {
-        return nil, err
+        return nil, fmt.Errorf("failed to sign transaction: %v", err)
     }
 
-    // Concatenate r and s to form the complete signature
-    signature := append(r, s...)
-    return signature, nil
+    // Combine r and s into a single byte slice as the signature
+    signature := append(r.Bytes(), s.Bytes()...)
+
+    // Append the signature to the raw transaction
+    signedTransaction := append(rawTransaction, signature...)
+
+    return signedTransaction, nil
 }
 
 func writeRawTransactionToFile(data []byte, filename string) error {
