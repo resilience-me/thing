@@ -106,6 +106,30 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     m.sessionCh <- session
 }
 
+func (m *SessionManager) shutdownHandler(listener net.Listener) {
+	interruptCount := 0 // Scoped to this function
+
+	// Channel to capture OS signals
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+
+	for range signals {
+		interruptCount++
+		if interruptCount >= 9 {
+			fmt.Println("Force quitting after 9 interrupts...")
+			os.Exit(1) // Force exit after receiving 9 interrupts
+		}
+		if interruptCount == 1 {
+			fmt.Println("Interrupt received, initiating graceful shutdown...")
+			close(manager.shutdown)  // Signal to shutdown the manager and other components
+			listener.Close()         // Close the listener to stop accepting new connections
+			close(manager.sessionCh) // Close sessionCh to signal no more sessions will be sent
+		} else {
+			fmt.Printf("Interrupt received (%d/9), press Ctrl+C again to force quit...\n", interruptCount)
+		}
+	}
+}
+
 // Main function with inlined server logic
 func main() {
     manager := &SessionManager{
@@ -122,18 +146,9 @@ func main() {
         fmt.Printf("Error starting TCP server: %v\n", err)
         os.Exit(1)
     }
-    defer listener.Close()
-
-    // Setup for capturing OS signals for graceful shutdown
-    signals := make(chan os.Signal, 1)
-    signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 
     // Goroutine to handle shutdown
-    go func() {
-        <-signals
-        close(manager.shutdown)  // Signal to shutdown the manager and other components
-        listener.Close()  // Close the listener to trigger 'Accept' to return an error
-    }()
+    go manager.shutdownHandler(listener)
 
     fmt.Println("Listening on port 2012...")
     // Loop to handle connections with a select for shutdown
