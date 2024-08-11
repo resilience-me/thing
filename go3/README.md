@@ -16,7 +16,7 @@ The command is one byte, allowing 256 commands. The first 128 commands are clien
 
 ### Handling trustlines
 
-A number of counters keep track of state of trustlines. There is `counter`, that tracks an account's most recent update to their trustline to another acount. There is `counter_out` and `counter_in` that track trustline related commands in server-to-server exchanges between an account and a peer. Then, there is also `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. The timestamp is never exchanged and there is no need for consensus on time, the platform does not use timestamps as counters or "nonces".
+A number of counters keep track of state of trustlines. There is `counter`, that prevents replays of commands from client to server. There is `counter_out` and `counter_in` that prevent replay of commands in server-to-server exchanges between an account and a peer. Then there is also "sync counter", that tracks how many times the trustline has been updated. And, `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `sync_counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. The timestamp is never exchanged and there is no need for consensus on time, the platform does not use timestamps as counters or "nonces".
 
 ### Path finding
 
