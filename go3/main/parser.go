@@ -13,9 +13,9 @@ func parseDatagram(buf []byte) *Datagram {
     // Assuming buf is already confirmed to be of the correct length via io.ReadFull
     datagram := &Datagram{
         Command:           buf[0],
-        Username:          trimRightZeroes(buf[1:33]),
-        PeerUsername:      trimRightZeroes(buf[33:65]),
-        PeerServerAddress: trimRightZeroes(buf[65:97]),
+        Username:          bytesToTrimmedString(buf[1:33]),
+        PeerUsername:      bytesToTrimmedString(buf[33:65]),
+        PeerServerAddress: bytesToTrimmedString(buf[65:97]),
         Arguments:         [256]byte{},
         Counter:           binary.BigEndian.Uint32(buf[353:357]),  // Directly initializing the Counter
         Signature:         [32]byte{},
