@@ -30,7 +30,7 @@ func trimRightZeroes(data []byte) string {
     return string(bytes.TrimRight(data, "\x00"))
 }
 
-// checkUserAndPeerExist checks for the existence of user and peer directories.
+// checkUserAndPeerExist checks for the existence of user and peer directories
 // It returns an error message string (empty if successful) and an error object for detailed information if an error occurs.
 func checkUserAndPeerExist(dg *Datagram) (string, error) {
     exists, err := database.CheckAccountExists(dg)
@@ -50,26 +50,22 @@ func checkUserAndPeerExist(dg *Datagram) (string, error) {
     return "", nil // No error, directories exist
 }
 
-// validateClientDatagram validates the client datagram.
+// validateClientDatagram validates the client datagram
 func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
-    // Check user and peer existence
     errorMessage, err := checkUserAndPeerExist(dg)
     if err != nil {
-        return errorMessage, fmt.Errorf("validation failed during user and peer existence check: %w", err)
+        return errorMessage, fmt.Errorf("user and peer existence check failed: %w", err)
     }
 
-    // Load client secret key
     secretKey, err := loadClientSecretKey(dg)
     if err != nil {
-        return "Error loading client secret key", fmt.Errorf("validation failed during secret key loading: %w", err)
+        return "Error loading client secret key", fmt.Errorf("loading client secret key failed: %w", err)
     }
 
-    // Verify HMAC
     if !verifyHMAC(buf, secretKey) {
-        return "Error verifying HMAC", errors.New("validation failed: HMAC verification")
+        return "Error verifying HMAC", errors.New("HMAC verification failed")
     }
 
-    // Return the parsed datagram if everything is successful
     return "", nil
 }
 
@@ -77,11 +73,11 @@ func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
 func validateServerDatagram(buf []byte, dg *Datagram) error {
     secretKey, err := loadServerSecretKey(dg)
     if err != nil {
-        return fmt.Errorf("error loading server secret key: %w", err)
+        return fmt.Errorf("loading server secret key failed: %w", err)
     }
 
     if !verifyHMAC(buf, secretKey) {
-        return errors.New("error verifying HMAC for server datagram")
+        return errors.New("HMAC verification failed")
     }
 
     return nil
