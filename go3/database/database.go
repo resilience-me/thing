@@ -5,10 +5,9 @@ import (
     "path/filepath"
 )
 
-var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
-
 // GetAccountDir constructs the account directory path from the datagram
 func GetAccountDir(dg *Datagram) string {
+    datadir := main.GetDataDir()
     return filepath.Join(datadir, "accounts", dg.Username)
 }
 
