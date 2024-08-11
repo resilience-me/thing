@@ -51,20 +51,14 @@ func SetTrustline(session main.Session) {
             return
         }
     
-        // Write the Unix timestamp using the setter
-        if err := db_trustlines.SetTimestamp(session.Datagram, time.Now().Unix()); err != nil {
-            fmt.Printf("Error writing timestamp to file: %v\n", err)
-            return
-        }
-    
-        fmt.Println("Trustline, sync_in, and timestamp updated successfully.")
+        fmt.Println("trustline_in and sync_in updated successfully.")
     
         // Prepare the datagram to send back to the peer
         dg := main.Datagram{
             Command:        main.ServerTrustlines_SetSyncOut,
-            XUsername:      session.Datagram.YUsername,       // Reverse the usernames for response
-            YUsername:      session.Datagram.XUsername,
-            YServerAddress: main.GetServerAddress(),      // Use the server's address
+            Username:      session.Datagram.PeerUsername,       // Reverse the usernames for response
+            PeerUsername:      session.Datagram.Username,
+            PeerServerAddress: main.GetServerAddress(),      // Use the server's address
             Counter:        counter,                        // Directly using the uint32 counter
         }
     
@@ -77,4 +71,11 @@ func SetTrustline(session main.Session) {
         // Add a success message indicating all operations were successful
         fmt.Println("Trustline update and datagram sending completed successfully.")
     }
+
+    // Write the Unix timestamp using the setter
+    if err := db_trustlines.SetTimestamp(session.Datagram, time.Now().Unix()); err != nil {
+        fmt.Printf("Error writing timestamp to file: %v\n", err)
+        return
+    }
+
 }
