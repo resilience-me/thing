@@ -121,6 +121,7 @@ func (m *SessionManager) shutdownHandler(listener net.Listener) {
         interruptCount++
         if interruptCount == 1 {
             fmt.Println("Interrupt received, initiating graceful shutdown...")
+            fmt.Println("Press Ctrl+C up to 9 times in total to force quit immediately.")
             close(m.shutdown)  // Signal to shutdown the manager and other components
             listener.Close()   // Close the listener to stop accepting new connections
             continue // Skip to the next iteration
