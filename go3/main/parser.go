@@ -28,11 +28,6 @@ func parseDatagram(buf []byte) *Datagram {
     return datagram
 }
 
-// Helper function to trim null characters from byte slices for proper string conversion
-func trimRightZeroes(data []byte) string {
-    return string(bytes.TrimRight(data, "\x00"))
-}
-
 // checkUserAndPeerExist checks for the existence of user and peer directories
 // It returns an error message string (empty if successful) and an error object for detailed information if an error occurs.
 func checkUserAndPeerExist(dg *Datagram) (string, error) {
