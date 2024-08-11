@@ -79,7 +79,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     dg := parseDatagram(buf)
     isClientSession := dg.Command & 0x80 == 0
 
-    if errorCode, err := CheckUserAndPeerExist(dg); err != nil {
+    if errorCode, err := checkUserAndPeerExist(dg); err != nil {
         if errorCode != 0 && isClientSession {
             conn.Write([]byte{errorCode}) // No error check here
         }
@@ -88,10 +88,9 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Authenticate and parse the datagram
-    dg, err := validateAndParseDatagram(buf)
-    if err != nil {
-        fmt.Printf("Error processing incoming datagram: %v\n", err)
+    // Authenticate the datagram
+    if err := authenticateDatagram(buf, dg); err != nil {
+        fmt.Printf("Error authenticating incoming datagram: %v\n", err)
         conn.Close()
         return
     }
