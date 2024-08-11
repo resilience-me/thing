@@ -47,7 +47,7 @@ func SetTrustline(session Session) {
     fmt.Println("Trustline and counter updated successfully.")
 
     // Send success response
-    if err := main.SendSuccessResponse("Trustline updated successfully.", session.Conn); err != nil {
+    if err := main.SendSuccessResponse([]byte("Trustline updated successfully."), session.Conn); err != nil {
         fmt.Printf("Failed to send success response: %v\n", err) // Log detailed error if any
         return
     }
