@@ -2,10 +2,11 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/binary"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"fmt"
-	"os"
+	"math/big"
 )
 
 const (
@@ -31,13 +32,7 @@ type Transaction struct {
 
 package main
 
-import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
-	"fmt"
-	"math/big"
-)
+
 
 func signTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, []byte, error) {
 	r, s, err := ecdsa.Sign(rand.Reader, privKey, data)
