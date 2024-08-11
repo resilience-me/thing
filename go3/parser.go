@@ -50,7 +50,7 @@ func checkUserAndPeerExist(dg *Datagram) (string, error) {
     return "", nil // No error, directories exist
 }
 
-// validateClientDatagram validates the datagram and returns a parsed Datagram, an error message if any, and an error object.
+// validateClientDatagram validates the client datagram.
 func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
     // Check user and peer existence
     errorMessage, err := checkUserAndPeerExist(dg)
@@ -73,7 +73,7 @@ func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
     return "", nil
 }
 
-// validateServerDatagram validates the server datagram and returns a parsed Datagram and an error if any.
+// validateServerDatagram validates the server datagram
 func validateServerDatagram(buf []byte, dg *Datagram) error {
     secretKey, err := loadServerSecretKey(dg)
     if err != nil {
