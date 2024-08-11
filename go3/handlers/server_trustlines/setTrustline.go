@@ -80,7 +80,7 @@ func SetTrustline(session main.Session) {
             Counter:        counterOut,
         }
     
-        handlers.CreateSignedDatagram(&dg)
+        buf := handlers.CreateSignedDatagram(session, &dg)
 
         // Replace explicit signing and sending with the centralized function call
         if err := handlers.SendDatagram(session, &dg); err != nil {
