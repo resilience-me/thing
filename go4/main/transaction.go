@@ -10,13 +10,15 @@ import (
 
 // Transaction struct definition
 type Transaction struct {
-	TransactionNumber [4]byte // Optional transaction number to track order
-	Validator         [32]byte // Public key or identifier of the validator
-	From              [32]byte // Initiating user's identifier
-	To                [32]byte // Receiving user's identifier
-	Data              [256]byte // The first byte here represents the Command
-	PreviousHash      [32]byte // Hash of the previous transaction in the chain
-	Signature         [64]byte // Digital signature using the validator's private key
+    TransactionNumber [4]byte // Optional transaction number to track order
+    Validator         [32]byte // Public key or identifier of the validator
+    FromUsername      [32]byte // Initiating user's identifier
+    FromServerAddress [64]byte // Address of the initiating user's server
+    ToUsername        [32]byte // Receiving user's identifier
+    ToServerAddress   [64]byte // Address of the receiving user's server
+    Data              [256]byte // The first byte here represents the Command
+    PreviousHash      [32]byte // Hash of the previous transaction in the chain
+    Signature         [64]byte // Digital signature using the validator's private key
 }
 
 // fetchLastTransaction retrieves the raw bytes of the last transaction from the file.
