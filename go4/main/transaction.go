@@ -43,3 +43,20 @@ func verifyTransaction(pubKey *ecdsa.PublicKey, data []byte, rBytes, sBytes []by
 	s := new(big.Int).SetBytes(sBytes)
 	return ecdsa.Verify(pubKey, data, r, s)
 }
+
+func readRawTransactionFromFile(index int, filename string) ([]byte, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	offset := int64(index * LengthTransaction)
+	data := make([]byte, LengthTransaction)
+	_, err = file.ReadAt(data, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
