@@ -1,3 +1,5 @@
+package handlers
+
 import (
     "fmt"            // For formatted I/O
     "ripple/main"    // For the main package, which includes the Session and Datagram types
