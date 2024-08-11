@@ -23,8 +23,14 @@ func CalculateHash(tx Transaction) [32]byte {
 	// Create a new SHA-256 hash
 	hash := sha256.New()
 
-	// Write the transaction data to the hash
-	hash.Write(tx[:]) // Convert the struct to bytes and write
+	// Create a buffer to hold the transaction bytes
+	var buffer bytes.Buffer
+
+	// Write the transaction data to the buffer
+	binary.Write(&buffer, binary.LittleEndian, tx)
+
+	// Write the buffer content to the hash
+	hash.Write(buffer.Bytes())
 
 	// Return the computed hash
 	var hashArray [32]byte
