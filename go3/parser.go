@@ -3,7 +3,10 @@ package main
 import (
     "bytes"        // For trimming null characters from byte slices
     "encoding/binary"
-    "ripple/database"
+    "errors"       // For creating error messages
+    "fmt"          // For formatted I/O
+
+    "ripple/database"  // Custom package, assuming it exists in your project
 )
 
 func parseDatagram(buf []byte) *Datagram {
