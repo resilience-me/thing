@@ -40,3 +40,14 @@ func verifyHMAC(buf []byte, key []byte) bool {
     expectedMAC := mac.Sum(nil)
     return hmac.Equal(signature, expectedMAC)
 }
+
+// GenerateHMAC generates an HMAC signature for the given data using the provided key.
+func GenerateHMAC(data []byte, secret []byte) ([]byte, error) {
+    h := hmac.New(sha256.New, secret)
+    _, err := h.Write(data)
+    if err != nil {
+        return nil, fmt.Errorf("failed to write data to HMAC: %w", err)
+    }
+    signature := h.Sum(nil) // Get the raw byte slice of the HMAC
+    return signature, nil    // Return the signature as a byte slice
+}
