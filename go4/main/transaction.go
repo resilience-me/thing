@@ -105,22 +105,22 @@ func GetLatestTransaction(filename string) ([]byte, error) {
 	return transaction, nil
 }
 
-// GetTransactionChainHeight returns the number of transactions stored in the file.
-func GetTransactionChainHeight(filename string) (int, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return 0, err
-	}
-	defer file.Close()
+// GetTransactionChainHeight returns the number of transactions stored in the file
+func GetTransactionChainHeight(filename string) (uint32, error) {
+    file, err := os.Open(filename)
+    if err != nil {
+        return 0, err
+    }
+    defer file.Close()
 
-	info, err := file.Stat()
-	if err != nil {
-		return 0, err
-	}
+    info, err := file.Stat()
+    if err != nil {
+        return 0, err
+    }
 
-	// Calculate the number of transactions
-	transactionCount := int(info.Size() / int64(SizeTransaction))
-	return transactionCount, nil
+    // Calculate the number of transactions
+    transactionCount := uint32(info.Size() / int64(SizeTransaction))
+    return transactionCount, nil
 }
 
 // ExtractParentHash extracts the ParentHash from the transaction bytes.
