@@ -115,18 +115,19 @@ func (m *SessionManager) shutdownHandler(listener net.Listener) {
 
 	for range signals {
 		interruptCount++
-		if interruptCount >= 9 {
-			fmt.Println("Force quitting after 9 interrupts...")
-			os.Exit(1) // Force exit after receiving 9 interrupts
-		}
 		if interruptCount == 1 {
 			fmt.Println("Interrupt received, initiating graceful shutdown...")
 			close(manager.shutdown)  // Signal to shutdown the manager and other components
 			listener.Close()         // Close the listener to stop accepting new connections
-			close(manager.sessionCh) // Close sessionCh to signal no more sessions will be sent
-		} else {
-			fmt.Printf("Interrupt received (%d/9), press Ctrl+C again to force quit...\n", interruptCount)
+			continue // Skip to the next iteration
 		}
+
+		if interruptCount >= 9 {
+			fmt.Println("Force quitting after 9 interrupts...")
+			os.Exit(1) // Force exit after receiving 9 interrupts
+		}
+
+		fmt.Printf("Interrupt received (%d/9), press Ctrl+C again to force quit...\n", interruptCount)
 	}
 }
 
