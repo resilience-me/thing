@@ -35,3 +35,35 @@ func AppendTransaction(filePath string, tx Transaction) error {
 	return nil
 }
 
+// ReadTransactions reads all transactions from the specified file
+func ReadTransactions(filePath string) ([]Transaction, error) {
+	// Open the file for reading
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// Read the entire file content
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	fileSize := fileInfo.Size()
+	numTransactions := fileSize / int64(binary.Size(Transaction{})) // Calculate the number of transactions
+
+	transactions := make([]Transaction, numTransactions)
+
+	// Read each transaction
+	for i := 0; i < int(numTransactions); i++ {
+		var tx Transaction
+		err := binary.Read(file, binary.LittleEndian, &tx)
+		if err != nil {
+			return nil, err
+		}
+		transactions[i] = tx
+	}
+
+	return transactions, nil
+}
