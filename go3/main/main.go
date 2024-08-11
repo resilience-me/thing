@@ -29,7 +29,6 @@ func (m *SessionManager) run() {
         select {
         case session := <-m.sessionCh:
             username := session.Datagram.Username
-	    m.wg.Add(1)
             if !m.activeHandlers[username] {
                 m.activeHandlers[username] = true
                 go m.handleSession(session)
@@ -76,6 +75,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     if err != nil {
         fmt.Printf("Error reading datagram: %v\n", err)
         conn.Close()
+	m.wg.Done()
         return
     }
 
@@ -89,16 +89,17 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
             SendErrorResponse(errorMessage, conn)
             fmt.Printf("Error during datagram validation: %v\n", err)
             conn.Close()
+	    m.wg.Done()
             return
         }
         session.Conn = conn // Prepare session with connection for clients
     } else { // Server session
+        conn.Close() // Close the connection directly
         if err := validateServerDatagram(buf, dg); err != nil {
             fmt.Printf("Error validating server datagram: %v\n", err)
-            conn.Close() // Close the connection directly after processing
+	    m.wg.Done()
             return
         }
-        conn.Close() // Close the connection directly after processing
     }
 
     // Send the session to the session channel for further processing
@@ -148,6 +149,7 @@ func main() {
                 fmt.Printf("Error accepting connection: %v\n", err)
                 continue // Directly continue in case of error
             }
+	    manager.wg.Add(1)
             go manager.handleConnection(conn)
         }
     }
