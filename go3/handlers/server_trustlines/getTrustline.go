@@ -32,9 +32,9 @@ func GetTrustline(session main.Session) {
 }
 
 func sendSyncTimestamp(session main.Session) {
-    syncCounterOut, err := db_trustlines.GetSyncCounterOut(session.Datagram)
+    counterOut, err := db_trustlines.GetCounterOut(session.Datagram)
     if err != nil {
-        log.Printf("Error getting sync_counter_out for user %s: %v", session.Datagram.Username, err)
+        log.Printf("Error getting counter_out for user %s: %v", session.Datagram.Username, err)
         return
     }
 
@@ -44,7 +44,7 @@ func sendSyncTimestamp(session main.Session) {
         PeerUsername:      session.Datagram.Username,
         PeerServerAddress: main.GetServerAddress(),
     }
-    binary.BigEndian.PutUint32(dg.Counter[:], syncCounterOut)
+    binary.BigEndian.PutUint32(dg.Counter[:], counterOut)
 
     if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
         log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
