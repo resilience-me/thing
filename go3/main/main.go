@@ -36,6 +36,7 @@ func (m *SessionManager) run() {
             } else {
                 m.queues[username] = append(m.queues[username], session)
             }
+	    m.wg.Add(1)
 
         case username := <-m.closedCh:
             if queue, exists := m.queues[username]; exists && len(queue) > 0 {
@@ -45,6 +46,7 @@ func (m *SessionManager) run() {
             } else {
                 delete(m.activeHandlers, username)
             }
+	    m.wg.Done()
         }
     }
 }
