@@ -59,11 +59,3 @@ func initConfig() error {
     log.Println("Configuration initialized successfully.")
     return nil
 }
-
-// main is the entry point of the application.
-func main() {
-    if err := initConfig(); err != nil {
-        log.Fatalf("Configuration failed: %v", err)
-    }
-    // Rest of your application logic...
-}
