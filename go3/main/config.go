@@ -8,11 +8,18 @@ import (
     "path/filepath"
 )
 
+var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
+
 var serverAddress string // Store the server address as a string
 
 // GetServerAddress returns the server address as a string
 func GetServerAddress() string {
     return serverAddress
+}
+
+// GetDataDir returns the datadir as a string
+func GetDataDir() string {
+    return datadir
 }
 
 // loadServerAddress reads the server address from the configuration file.
