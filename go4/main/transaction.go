@@ -72,3 +72,26 @@ func readRawTransactionFromFile(index int, filename string) ([]byte, error) {
 
 	return data, nil
 }
+
+// GetLatestTransaction retrieves the raw bytes of the latest transaction in the file.
+func GetLatestTransaction(filename string) ([]byte, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// Calculate the offset for the last transaction
+	info, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	lastTransactionOffset := info.Size() - int64(LengthTransaction)
+	transaction := make([]byte, LengthTransaction)
+	_, err = file.ReadAt(transaction, lastTransactionOffset)
+	if err != nil {
+		return nil, err
+	}
+
+	return transaction, nil
+}
