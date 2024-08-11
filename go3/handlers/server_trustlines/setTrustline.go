@@ -41,7 +41,7 @@ func SetTrustline(session main.Session) {
     if syncIn > prevSyncIn {
         handleTrustlineUpdate(session, trustlineAmount, syncInBytes, syncIn)
     } else {
-        handleSyncOnly(session, syncInBytes)
+        handleTimestampOnly(session, syncInBytes)
     }
 }
 
@@ -87,7 +87,7 @@ func handleTrustlineUpdate(session main.Session, trustlineAmount uint32, syncInB
     log.Printf("Trustline update and datagram sent successfully for user %s.", session.Datagram.Username)
 }
 
-func handleSyncOnly(session main.Session, syncInBytes []byte) {
+func handleTimestampOnly(session main.Session, syncInBytes []byte) {
     log.Printf("Sync_in is synchronized with the peer's most recent trustline_out for user %s.", session.Datagram.Username)
 
     if err := db_trustlines.SetTimestamp(session.Datagram, time.Now().Unix()); err != nil {
