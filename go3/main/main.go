@@ -29,14 +29,13 @@ func (m *SessionManager) run() {
         select {
         case session := <-m.sessionCh:
             username := session.Datagram.Username
-
+	    m.wg.Add(1)
             if !m.activeHandlers[username] {
                 m.activeHandlers[username] = true
                 go m.handleSession(session)
             } else {
                 m.queues[username] = append(m.queues[username], session)
             }
-	    m.wg.Add(1)
 
         case username := <-m.closedCh:
             if queue, exists := m.queues[username]; exists && len(queue) > 0 {
