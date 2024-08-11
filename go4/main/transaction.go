@@ -17,7 +17,7 @@ const (
     OffsetData         	= OffsetTo + 32
     OffsetParentHash    = OffsetData + 256
     OffsetSignature     = OffsetParentHash + 32
-    LengthTransaction   = OffsetSignature + 32
+    LengthTransaction   = OffsetSignature + 64
 )
 
 type Transaction struct {
@@ -27,7 +27,7 @@ type Transaction struct {
     To	              [32]byte
     Data              [256]byte
     ParentHash        [32]byte
-    Signature         [32]byte
+    Signature         [64]byte
 }
 
 func signTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, []byte, error) {
