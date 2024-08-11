@@ -97,17 +97,15 @@ func (m *SessionManager) handleClientConnection(conn net.Conn, buf []byte) {
 // handleServerConnection processes a connection from another server.
 func (m *SessionManager) handleServerConnection(buf []byte) {
     dg := parseDatagram(buf)
+
     secretKey, err := loadServerSecretKey(dg)
     if err != nil {
-        return err
-    }
-    if !verifyHMAC(buf, secretKey) {
-        return errors.New("error verifying HMAC")
+        fmt.Printf("Error loading server secret key: %v\n", err)
+        return
     }
 
-    // Authenticate the datagram
-    if err := authenticateDatagram(buf, dg); err != nil {
-        fmt.Printf("Error authenticating incoming datagram: %v\n", err)
+    if !verifyHMAC(buf, secretKey) {
+        fmt.Printf("Error verifying HMAC for server datagram\n")
         return
     }
 
