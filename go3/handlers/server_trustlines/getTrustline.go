@@ -24,52 +24,50 @@ func GetTrustline(session main.Session) {
         return
     }
 
-    if counter == syncOut {
-        sendSyncTimestamp(session)
-    } else {
-        sendTrustline(session, counter)
-    }
-}
-
-func sendSyncTimestamp(session main.Session) {
+    // Retrieve the counter_out value
     counterOut, err := db_trustlines.GetCounterOut(session.Datagram)
     if err != nil {
         log.Printf("Error getting counter_out for user %s: %v", session.Datagram.Username, err)
         return
     }
 
+    // Initialize common Datagram fields
     dg := main.Datagram{
-        Command:           main.Server_SetTrustlineSyncTimestamp,
         Username:          session.Datagram.PeerUsername,
         PeerUsername:      session.Datagram.Username,
         PeerServerAddress: main.GetServerAddress(),
+        Counter:           counterOut,
     }
-    binary.BigEndian.PutUint32(dg.Counter[:], counterOut)
 
-    if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
+    if counter == syncOut {
+        sendSyncTimestamp(session, &dg)
+    } else {
+        sendTrustline(session, &dg, counter)
+    }
+}
+
+func sendSyncTimestamp(session main.Session, dg *main.Datagram) {
+    dg.Command = main.Server_SetTrustlineSyncTimestamp
+
+    if err := handlers.SignAndSendDatagram(session, dg); err != nil {
         log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
         return
     }
     log.Printf("SetTrustlineSyncTimestamp command sent successfully for user %s.", session.Datagram.Username)
 }
 
-func sendTrustline(session main.Session, counter uint32) {
+func sendTrustline(session main.Session, dg *main.Datagram, counter uint32) {
     trustline, err := db_trustlines.GetTrustlineOut(session.Datagram)
     if err != nil {
         log.Printf("Error getting trustline for user %s: %v", session.Datagram.Username, err)
         return
     }
 
-    dg := main.Datagram{
-        Command:           main.Server_SetTrustline,
-        Username:          session.Datagram.PeerUsername,
-        PeerUsername:      session.Datagram.Username,
-        PeerServerAddress: main.GetServerAddress(),
-    }
+    dg.Command = main.Server_SetTrustline
     binary.BigEndian.PutUint32(dg.Arguments[:4], trustline)
-    binary.BigEndian.PutUint32(dg.Counter[:], counter)
+    binary.BigEndian.PutUint32(dg.Arguments[4:8], counter)
 
-    if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
+    if err := handlers.SignAndSendDatagram(session, dg); err != nil {
         log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
         return
     }
