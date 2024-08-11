@@ -146,7 +146,7 @@ func PrepareAndStoreTransaction(filename string, rawTransaction []byte) error {
     }
 
     // Set the transaction number in the raw bytes
-    binary.BigEndian.PutUint32(rawTransaction[:4], chainHeight)
+    binary.BigEndian.PutUint32(rawTransaction[:SizeNumber], chainHeight)
 
     // Retrieve the latest transaction to get the ParentHash
     latestTransaction, err := readRawTransactionFromFile(chainHeight-1, filename)
