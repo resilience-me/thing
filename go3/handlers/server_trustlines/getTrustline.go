@@ -47,7 +47,7 @@ func GetTrustline(session main.Session) {
 }
 
 func sendSyncTimestamp(session main.Session, dg *main.Datagram) {
-    dg.Command = main.Server_SetTrustlineSyncTimestamp
+    dg.Command = main.ServerTrustlines_SetTimestamp
 
     if err := handlers.SignAndSendDatagram(session, dg); err != nil {
         log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
@@ -63,7 +63,7 @@ func sendTrustline(session main.Session, dg *main.Datagram, counter uint32) {
         return
     }
 
-    dg.Command = main.Server_SetTrustline
+    dg.Command = main.ServerTrustlines_SetTrustline
     binary.BigEndian.PutUint32(dg.Arguments[:4], trustline)
     binary.BigEndian.PutUint32(dg.Arguments[4:8], counter)
 
