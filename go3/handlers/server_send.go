@@ -60,3 +60,19 @@ func SendDatagram(session main.Session, data []byte) error {
 
     return nil // Successfully sent the datagram
 }
+
+// SignAndSendDatagram creates a signed datagram and sends it over the network.
+func SignAndSendDatagram(session main.Session, dg *main.Datagram) error {
+    // Create the signed datagram
+    serializedData, err := CreateSignedDatagram(session, dg)
+    if err != nil {
+        return fmt.Errorf("failed to create signed datagram: %w", err)
+    }
+
+    // Send the signed datagram over the network
+    if err := SendDatagram(session, serializedData); err != nil {
+        return fmt.Errorf("failed to send datagram: %w", err)
+    }
+
+    return nil // Successfully signed and sent
+}
