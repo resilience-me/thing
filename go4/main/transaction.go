@@ -186,7 +186,7 @@ func ValidatedLatestBlock(filename string, accountID []byte) (bool, error) {
 }
 
 // PrepareAndStoreTransaction prepares a transaction from raw bytes with Number and ParentHash, signs it, and stores it.
-func PrepareAndStoreTransaction(filename string, rawTransaction []byte) error {
+func PrepareAndStoreTransaction(filename string, rawTransaction []byte, privateKey *ecdsa.PrivateKey) error {
     chainHeight, err := GetTransactionChainHeight(filename)
     if err != nil {
         return err
@@ -206,14 +206,12 @@ func PrepareAndStoreTransaction(filename string, rawTransaction []byte) error {
     copy(rawTransaction[OffsetParentHash:], parentHash)
 
     // Sign the transaction data and set the signature
-    signature, err := HashAndSignTransaction(privateKey, rawTransaction[:OffsetSignature])
+    signedTransaction, err := SignAndInsertSignature(rawTransaction, privateKey)
     if err != nil {
         return fmt.Errorf("failed to sign transaction: %v", err)
     }
 
-    // Copy the signature into the Signature field
-    copy(rawTransaction[OffsetSignature:], signature)
-
     // Store the updated transaction
-    return writeRawTransactionToFile(rawTransaction, filename)
+    return writeRawTransactionToFile(signedTransaction, filename)
 }
+
