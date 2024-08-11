@@ -1,7 +1,7 @@
 package client_trustlines
 
 import (
-    "fmt"
+    "log"
     "ripple/database/db_trustlines" // Updated to match your import structure
     "ripple/main"                   // Updated to match your import structure
 )
@@ -11,7 +11,7 @@ func GetTrustlineOut(session main.Session) {
     // Fetch the outbound trustline
     trustline, err := db_trustlines.GetTrustlineOut(session.Datagram)
     if err != nil {
-        fmt.Printf("Error reading outbound trustline: %v\n", err) // Log the error
+        log.Printf("Error reading outbound trustline for user %s: %v", session.Datagram.Username, err) // Log the error with context
         _ = main.SendErrorResponse([]byte("Error reading outbound trustline."), session.Conn)
         return
     }
@@ -21,9 +21,9 @@ func GetTrustlineOut(session main.Session) {
 
     // Send the success response back to the client
     if err := main.SendSuccessResponse(responseData, session.Conn); err != nil {
-        fmt.Printf("Error sending success response: %v\n", err) // Log the error
+        log.Printf("Error sending success response to user %s: %v", session.Datagram.Username, err) // Log the error with context
         return
     }
 
-    fmt.Printf("Outbound trustline sent successfully.\n")
+    log.Printf("Outbound trustline sent successfully to user %s.", session.Datagram.Username) // Log successful operation
 }
