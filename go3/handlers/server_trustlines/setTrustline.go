@@ -1,7 +1,6 @@
 package server_trustlines
 
 import (
-    "encoding/binary"
     "fmt"
     "time"
     "ripple/main"                    // Updated to match your import structure
@@ -19,7 +18,7 @@ func SetTrustline(session main.Session) {
     }
 
     // Check the counter
-    counter := binary.BigEndian.Uint32(session.Datagram.Counter[:])
+    counter := session.Datagram.Counter // Directly using the uint32 counter
     if counter <= syncIn {
         fmt.Println("Received counter is not greater than sync_in. Potential replay attack.")
         return
@@ -54,7 +53,7 @@ func SetTrustline(session main.Session) {
         XUsername:      session.Datagram.YUsername,       // Reverse the usernames for response
         YUsername:      session.Datagram.XUsername,
         YServerAddress: main.GetServerAddress(),      // Use the server's address
-        Counter:        session.Datagram.Counter,         // Copy the existing counter directly
+        Counter:        counter,                        // Directly using the uint32 counter
     }
 
     // Replace explicit signing and sending with the centralized function call
