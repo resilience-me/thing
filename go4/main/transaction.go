@@ -12,12 +12,13 @@ const (
     OffsetTransactionNumber = 0
     OffsetValidator         = OffsetTransactionNumber + 4
     OffsetFromUsername      = OffsetValidator + 32
-    OffsetFromServerAddress  = OffsetFromUsername + 32
-    OffsetToUsername        = OffsetFromServerAddress + 64
+    OffsetFromServerAddress = OffsetFromUsername + 32
+    OffsetToUsername        = OffsetFromServerAddress + 32
     OffsetToServerAddress   = OffsetToUsername + 32
-    OffsetData              = OffsetToServerAddress + 64
+    OffsetData              = OffsetToServerAddress + 32
     OffsetPreviousHash      = OffsetData + 256
     OffsetSignature         = OffsetPreviousHash + 32
+    LengthTransaction       = OffsetSignature + 32
 )
 
 // Transaction struct definition
@@ -25,12 +26,12 @@ type Transaction struct {
     TransactionNumber [4]byte // Optional transaction number to track order
     Validator         [32]byte // Public key or identifier of the validator
     FromUsername      [32]byte // Initiating user's identifier
-    FromServerAddress [64]byte // Address of the initiating user's server
+    FromServerAddress [32]byte // Address of the initiating user's server
     ToUsername        [32]byte // Receiving user's identifier
-    ToServerAddress   [64]byte // Address of the receiving user's server
+    ToServerAddress   [32]byte // Address of the receiving user's server
     Data              [256]byte // The first byte here represents the Command
     PreviousHash      [32]byte // Hash of the previous transaction in the chain
-    Signature         [64]byte // Digital signature using the validator's private key
+    Signature         [32]byte // Digital signature using the validator's private key
 }
 
 // fetchLastTransaction retrieves the raw bytes of the last transaction from the file.
