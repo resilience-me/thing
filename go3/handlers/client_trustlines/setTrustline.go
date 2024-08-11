@@ -7,7 +7,7 @@ import (
     "ripple/handlers" // Import the handlers package
 )
 
-// Assuming the Session and Datagram structures are defined as per your latest setup
+// SetTrustline updates the trustline based on the given session.
 func SetTrustline(session Session) {
     // We assume session.Datagram is directly accessible and correctly initialized
     datagram := session.Datagram
@@ -20,7 +20,7 @@ func SetTrustline(session Session) {
         return
     }
 
-    // Check the counter directly as it is already a uint32
+    // Check if the counter is valid
     if datagram.Counter <= prevCounter {
         fmt.Println("Received counter is not greater than previous counter. Potential replay attack.")
         _ = handlers.SendErrorResponse("Received counter is not valid.", session.Conn) // Send simpler error message
@@ -46,6 +46,7 @@ func SetTrustline(session Session) {
 
     fmt.Println("Trustline and counter updated successfully.")
 
+    // Send success response
     if err := handlers.SendSuccessResponse("Trustline updated successfully.", session.Conn); err != nil {
         fmt.Printf("Failed to send success response: %v\n", err) // Log detailed error if any
         return
