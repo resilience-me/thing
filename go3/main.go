@@ -76,6 +76,21 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
+    dg := parseDatagram(buf)
+    isClientSession := dg.Command & 0x80 == 0
+
+    if errorCode, err := CheckUserAndPeerExist(dg); err != nil {
+        if errorCode != 0 && isClientSession {
+            _, writeErr := conn.Write([]byte{errorCode})
+            if writeErr != nil {
+                fmt.Printf("Failed to send error code to client: %v\n", writeErr)
+            }
+        }
+        fmt.Printf("Error during user and peer check: %v\n", err)
+        conn.Close()
+        return
+    }
+
     // Authenticate and parse the datagram
     dg, err := validateAndParseDatagram(buf)
     if err != nil {
@@ -88,7 +103,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     session := Session{Datagram: dg} // Conn is nil by default
 
     // Determine whether it's a client or server session based on the most significant bit of dg.Command
-    if dg.Command & 0x80 == 0 { // Check if the most significant bit is 0 (client)
+    if isClientSession { // Check if the most significant bit is 0 (client)
         session.Conn = conn // Maintain the connection open for client sessions
     } else { // Most significant bit is 1 (server)
         conn.Close() // Close the connection for server sessions
