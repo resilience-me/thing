@@ -6,26 +6,6 @@ import (
     "ripple/database"
 )
 
-// checkUserAndPeerExist checks for the existence of user and peer directories.
-// It returns an error message string (empty if successful) and an error object for detailed information if an error occurs.
-func checkUserAndPeerExist(dg *Datagram) (string, error) {
-    exists, err := database.CheckAccountExists(dg)
-    if err != nil {
-        return "Error checking account existence", fmt.Errorf("error checking account existence for user '%s': %v", dg.Username, err)
-    } else if !exists {
-        return "User account does not exist", fmt.Errorf("account directory does not exist for user '%s'", dg.Username)
-    }
-
-    exists, err = database.CheckPeerExists(dg)
-    if err != nil {
-        return "Error checking peer existence", fmt.Errorf("error checking peer existence for server '%s' and user '%s': %v", dg.PeerServerAddress, dg.PeerUsername, err)
-    } else if !exists {
-        return "Peer account does not exist", fmt.Errorf("peer directory does not exist for server '%s' and user '%s'", dg.PeerServerAddress, dg.PeerUsername)
-    }
-
-    return "", nil // No error, directories exist
-}
-
 func parseDatagram(buf []byte) *Datagram {
     // Assuming buf is already confirmed to be of the correct length via io.ReadFull
     datagram := &Datagram{
@@ -48,4 +28,49 @@ func parseDatagram(buf []byte) *Datagram {
 // Helper function to trim null characters from byte slices for proper string conversion
 func trimRightZeroes(data []byte) string {
     return string(bytes.TrimRight(data, "\x00"))
+}
+
+// checkUserAndPeerExist checks for the existence of user and peer directories.
+// It returns an error message string (empty if successful) and an error object for detailed information if an error occurs.
+func checkUserAndPeerExist(dg *Datagram) (string, error) {
+    exists, err := database.CheckAccountExists(dg)
+    if err != nil {
+        return "Error checking account existence", fmt.Errorf("error checking account existence for user '%s': %v", dg.Username, err)
+    } else if !exists {
+        return "User account does not exist", fmt.Errorf("account directory does not exist for user '%s'", dg.Username)
+    }
+
+    exists, err = database.CheckPeerExists(dg)
+    if err != nil {
+        return "Error checking peer existence", fmt.Errorf("error checking peer existence for server '%s' and user '%s': %v", dg.PeerServerAddress, dg.PeerUsername, err)
+    } else if !exists {
+        return "Peer account does not exist", fmt.Errorf("peer directory does not exist for server '%s' and user '%s'", dg.PeerServerAddress, dg.PeerUsername)
+    }
+
+    return "", nil // No error, directories exist
+}
+
+// validateAndParseClientDatagram validates the datagram and returns a parsed Datagram, an error message if any, and an error object.
+func validateAndParseClientDatagram(buf []byte) (*Datagram, string, error) {
+    dg := parseDatagram(buf)
+
+    // Check user and peer existence
+    errorMessage, err := checkUserAndPeerExist(dg)
+    if err != nil {
+        return nil, errorMessage, err
+    }
+
+    // Load client secret key
+    secretKey, err := loadClientSecretKey(dg)
+    if err != nil {
+        return nil, "Error loading client secret key", err
+    }
+
+    // Verify HMAC
+    if !verifyHMAC(buf, secretKey) {
+        return nil, "Error verifying HMAC", errors.New("HMAC verification failed")
+    }
+
+    // Return the parsed datagram if everything is successful
+    return dg, "", nil
 }
