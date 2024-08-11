@@ -53,21 +53,23 @@ func CheckPeerExists(dg *Datagram) (bool, error) {
     return checkDirExists(peerDir)
 }
 
-// checkUserAndPeerExist checks if both account and peer directories exist for the given datagram.
-func CheckUserAndPeerExist(dg *Datagram) (bool, error) {
-    // Check if account directory exists
+// CheckUserAndPeerExist checks for the existence of user and peer directories and directly communicates with the client.
+func CheckUserAndPeerExist(dg *Datagram, conn net.Conn) error {
     if exists, err := CheckAccountExists(dg); err != nil {
-        return false, fmt.Errorf("error checking account existence for user '%s': %v", dg.Username, err)
+        conn.Write([]byte(ErrCheckExistence))
+        return fmt.Errorf("error checking account existence for user '%s': %v", dg.Username, err)
     } else if !exists {
-        return false, fmt.Errorf("account directory does not exist for user '%s'", dg.Username)
+        conn.Write([]byte(ErrAccountNotExist))
+        return fmt.Errorf("account directory does not exist for user '%s'", dg.Username)
     }
 
-    // Check if peer directory exists
     if exists, err = CheckPeerExists(dg); err != nil {
-        return false, fmt.Errorf("error checking peer existence for server '%s' and user '%s': %v", dg.PeerServerAddress, dg.PeerUsername, err)
+        conn.Write([]byte(ErrCheckExistence))
+        return fmt.Errorf("error checking peer existence for server '%s' and user '%s': %v", dg.PeerServerAddress, dg.PeerUsername, err)
     } else if !exists {
-        return false, fmt.Errorf("peer directory does not exist for server '%s' and user '%s'", dg.PeerServerAddress, dg.PeerUsername)
+        conn.Write([]byte(ErrPeerNotExist))
+        return fmt.Errorf("peer directory does not exist for server '%s' and user '%s'", dg.PeerServerAddress, dg.PeerUsername)
     }
 
-    return true, nil
+    return nil
 }
