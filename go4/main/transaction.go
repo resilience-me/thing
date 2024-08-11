@@ -44,6 +44,18 @@ func verifyTransaction(pubKey *ecdsa.PublicKey, data []byte, rBytes, sBytes []by
 	return ecdsa.Verify(pubKey, data, r, s)
 }
 
+func writeRawTransactionToFile(data []byte, filename string) error {
+
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(data)
+	return err
+}
+
 func readRawTransactionFromFile(index int, filename string) ([]byte, error) {
 	file, err := os.Open(filename)
 	if err != nil {
