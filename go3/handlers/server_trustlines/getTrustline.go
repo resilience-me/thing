@@ -10,10 +10,10 @@ import (
 
 // GetTrustline handles the request to get the current trustline amount from another server
 func GetTrustline(session main.Session) {
-    // Retrieve the current counter value
-    counter, err := db_trustlines.GetCounter(session.Datagram)
+    // Retrieve the current sync_counter value
+    syncCounter, err := db_trustlines.GetSyncCounter(session.Datagram)
     if err != nil {
-        log.Printf("Error getting counter for user %s: %v", session.Datagram.Username, err)
+        log.Printf("Error getting sync_counter for user %s: %v", session.Datagram.Username, err)
         return
     }
 
@@ -39,10 +39,10 @@ func GetTrustline(session main.Session) {
         Counter:           counterOut,
     }
 
-    if counter == syncOut {
+    if syncCounter == syncOut {
         sendSyncTimestamp(session, &dg)
     } else {
-        sendTrustline(session, &dg, counter)
+        sendTrustline(session, &dg, syncCounter)
     }
 }
 
@@ -56,7 +56,7 @@ func sendSyncTimestamp(session main.Session, dg *main.Datagram) {
     log.Printf("SetTrustlineSyncTimestamp command sent successfully for user %s.", session.Datagram.Username)
 }
 
-func sendTrustline(session main.Session, dg *main.Datagram, counter uint32) {
+func sendTrustline(session main.Session, dg *main.Datagram, syncCounter uint32) {
     trustline, err := db_trustlines.GetTrustlineOut(session.Datagram)
     if err != nil {
         log.Printf("Error getting trustline for user %s: %v", session.Datagram.Username, err)
@@ -65,7 +65,7 @@ func sendTrustline(session main.Session, dg *main.Datagram, counter uint32) {
 
     dg.Command = main.ServerTrustlines_SetTrustline
     binary.BigEndian.PutUint32(dg.Arguments[:4], trustline)
-    binary.BigEndian.PutUint32(dg.Arguments[4:8], counter)
+    binary.BigEndian.PutUint32(dg.Arguments[4:8], syncCounter)
 
     if err := handlers.SignAndSendDatagram(session, dg); err != nil {
         log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
