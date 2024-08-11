@@ -72,6 +72,24 @@ func HashAndSignTransaction(privKey *ecdsa.PrivateKey, rawTransaction []byte) ([
     return signature, nil
 }
 
+// SignAndInsertSignature hashes the raw transaction data (excluding the signature),
+// signs it, and then inserts the signature into the correct position within the raw transaction.
+func SignAndInsertSignature(rawTransaction []byte, privKey *ecdsa.PrivateKey) ([]byte, error) {
+    // Determine the length of the raw transaction data excluding the signature
+    signatureOffset := len(rawTransaction) - SizeSignature
+
+    // Hash and sign the transaction data excluding the signature field
+    signature, err := HashAndSignTransaction(privKey, rawTransaction[:signatureOffset])
+    if err != nil {
+        return nil, err
+    }
+
+    // Copy the signature into the raw transaction at the correct offset
+    copy(rawTransaction[signatureOffset:], signature)
+
+    return rawTransaction, nil
+}
+
 func writeRawTransactionToFile(data []byte, filename string) error {
 
 	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
