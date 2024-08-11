@@ -119,14 +119,28 @@ func main() {
     }
     defer listener.Close()
 
+    // Goroutine to monitor for shutdown signals
+    go func() {
+        <-manager.shutdown
+        listener.Close()  // Close the listener to unblock Accept
+    }()
+
     fmt.Println("Listening on port 2012...")
 
+    // Loop to handle connections with a select for shutdown
     for {
-        conn, err := listener.Accept()
-        if err != nil {
-            fmt.Printf("Error accepting connection: %v\n", err)
-            continue
+        select {
+        case <-manager.shutdown:
+            fmt.Println("Server is shutting down...")
+            return // Exit the main loop and function
+
+        default:
+            conn, err := listener.Accept()
+            if err != nil {
+                fmt.Printf("Error accepting connection: %v\n", err)
+                continue // Directly continue in case of error
+            }
+            go manager.handleConnection(conn)
         }
-        go manager.handleConnection(conn)
     }
 }
