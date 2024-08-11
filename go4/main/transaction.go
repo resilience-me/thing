@@ -153,8 +153,8 @@ func FetchLatestValidator(filename string) ([]byte, error) {
     return validator, nil
 }
 
-// IsValidator checks if the given account is the current validator.
-func IsValidator(filename string, accountID []byte) (bool, error) {
+// ValidatedLatestBlock checks if the given account validated the latest block
+func ValidatedLatestBlock(filename string, accountID []byte) (bool, error) {
     // Fetch the most recent validator
     latestValidator, err := FetchLatestValidator(filename)
     if err != nil {
