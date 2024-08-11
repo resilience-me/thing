@@ -6,22 +6,24 @@ import (
     "ripple/database"
 )
 
-// CheckUserAndPeerExist checks for the existence of user and peer directories.
-// It returns an appropriate error code and an error object for detailed information if an error occurs.
-func checkUserAndPeerExist(dg *Datagram) (byte, error) {
-    if exists, err := database.CheckAccountExists(dg); err != nil {
-        return ErrCheckExistence, fmt.Errorf("error checking account existence for user '%s': %v", dg.Username, err)
+// checkUserAndPeerExist checks for the existence of user and peer directories.
+// It returns an error message string (empty if successful) and an error object for detailed information if an error occurs.
+func checkUserAndPeerExist(dg *Datagram) (string, error) {
+    exists, err := database.CheckAccountExists(dg)
+    if err != nil {
+        return "Error checking account existence", fmt.Errorf("error checking account existence for user '%s': %v", dg.Username, err)
     } else if !exists {
-        return ErrAccountNotExist, fmt.Errorf("account directory does not exist for user '%s'", dg.Username)
+        return "User account does not exist", fmt.Errorf("account directory does not exist for user '%s'", dg.Username)
     }
 
-    if exists, err = database.CheckPeerExists(dg); err != nil {
-        return ErrCheckExistence, fmt.Errorf("error checking peer existence for server '%s' and user '%s': %v", dg.PeerServerAddress, dg.PeerUsername, err)
+    exists, err = database.CheckPeerExists(dg)
+    if err != nil {
+        return "Error checking peer existence", fmt.Errorf("error checking peer existence for server '%s' and user '%s': %v", dg.PeerServerAddress, dg.PeerUsername, err)
     } else if !exists {
-        return ErrPeerNotExist, fmt.Errorf("peer directory does not exist for server '%s' and user '%s'", dg.PeerServerAddress, dg.PeerUsername)
+        return "Peer account does not exist", fmt.Errorf("peer directory does not exist for server '%s' and user '%s'", dg.PeerServerAddress, dg.PeerUsername)
     }
 
-    return 0, nil // No error, directories exist
+    return "", nil // No error, directories exist
 }
 
 func parseDatagram(buf []byte) *Datagram {
