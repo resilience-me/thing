@@ -1,6 +1,7 @@
 package main
 
 import (
+    "bytes"        // For trimming null characters from byte slices
     "encoding/binary"
 )
 
@@ -11,7 +12,7 @@ func uint32ToBytes(value uint32) []byte {
     return responseData
 }
 
-// Helper function to trim null characters from byte slices for proper string conversion
+// trimRightZeroes trims null characters from byte slices for proper string conversion.
 func trimRightZeroes(data []byte) string {
     return string(bytes.TrimRight(data, "\x00"))
 }
