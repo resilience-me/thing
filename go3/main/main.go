@@ -15,10 +15,12 @@ type Session struct {
 
 // SessionManager manages the processing of sessions
 type SessionManager struct {
-    sessionCh      chan Session
-    closedCh       chan string
-    activeHandlers map[string]bool
-    queues         map[string][]Session
+	sessionCh      chan Session
+	closedCh       chan string
+	activeHandlers map[string]bool
+	queues         map[string][]Session
+	shutdown       chan struct{}
+	wg             sync.WaitGroup // WaitGroup to track active handlers and queued sessions
 }
 
 // run method for the SessionManager
