@@ -8,6 +8,18 @@ import (
 	"os"
 )
 
+const (
+    OffsetTransactionNumber = 0
+    OffsetValidator         = OffsetTransactionNumber + 4
+    OffsetFromUsername      = OffsetValidator + 32
+    OffsetFromServerAddress  = OffsetFromUsername + 32
+    OffsetToUsername        = OffsetFromServerAddress + 64
+    OffsetToServerAddress   = OffsetToUsername + 32
+    OffsetData              = OffsetToServerAddress + 64
+    OffsetPreviousHash      = OffsetData + 256
+    OffsetSignature         = OffsetPreviousHash + 32
+)
+
 // Transaction struct definition
 type Transaction struct {
     TransactionNumber [4]byte // Optional transaction number to track order
