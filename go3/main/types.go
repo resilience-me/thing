@@ -12,6 +12,12 @@ func Uint32ToBytes(value uint32) []byte {
     return responseData
 }
 
+// BytesToUint32 converts a byte slice to a uint32 value.
+// It assumes the byte slice has at least 4 bytes.
+func BytesToUint32(data []byte) uint32 {
+    return binary.BigEndian.Uint32(data[:4])
+}
+
 // bytesToTrimmedString trims null characters from byte slices for proper string conversion.
 func bytesToTrimmedString(data []byte) string {
     return string(bytes.TrimRight(data, "\x00"))
