@@ -118,24 +118,44 @@ func GetTransactionChainHeight(filename string) (uint32, error) {
 
 // GetLatestTransaction retrieves the raw bytes of the latest transaction in the file.
 func GetLatestTransaction(filename string) ([]byte, error) {
-    // Get the height of the transaction chain which will also be the new transaction's number
+    // Get the height of the transaction chain
     chainHeight, err := GetTransactionChainHeight(filename)
     if err != nil {
-        return _, err
+        return nil, err
     }
 
-    // Retrieve the latest transaction to get the ParentHash
+    // Retrieve the latest transaction
     latestTransaction, err := readRawTransactionFromFile(chainHeight-1, filename)
     if err != nil {
-        return _, err
+        return nil, err
     }
 
-    return transaction, nil
+    return latestTransaction, nil
 }
 
 // ExtractParentHash extracts the ParentHash from the transaction bytes and returns it as a []byte.
 func ExtractParentHash(transaction []byte) []byte {
     return transaction[OffsetParentHash : OffsetParentHash+SizeParentHash]
+}
+
+// FetchLatestValidator retrieves the Validator from the most recent transaction in the file.
+func FetchLatestValidator(filename string) ([]byte, error) {
+    // Get the current transaction height
+    chainHeight, err := GetTransactionChainHeight(filename)
+    if err != nil {
+        return nil, err
+    }
+
+    // Retrieve the most recent transaction using the height
+    latestTransaction, err := readRawTransactionFromFile(chainHeight-1, filename)
+    if err != nil {
+        return nil, err
+    }
+
+    // Extract the Validator from the transaction bytes
+    validator := latestTransaction[OffsetValidator : OffsetValidator+SizeValidator]
+
+    return validator, nil
 }
 
 // PrepareAndStoreTransaction prepares a transaction from raw bytes with Number and ParentHash, signs it, and stores it.
