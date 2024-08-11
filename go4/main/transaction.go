@@ -6,6 +6,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"fmt"
+	"bytes"
 	"math/big"
 )
 
@@ -150,6 +151,18 @@ func FetchLatestValidator(filename string) ([]byte, error) {
     validator := latestTransaction[OffsetValidator : OffsetValidator+SizeValidator]
 
     return validator, nil
+}
+
+// IsValidator checks if the given account is the current validator.
+func IsValidator(filename string, accountID []byte) (bool, error) {
+    // Fetch the most recent validator
+    latestValidator, err := FetchLatestValidator(filename)
+    if err != nil {
+        return false, err
+    }
+
+    // Compare the latest validator with the account's ID using bytes.Equal
+    return bytes.Equal(latestValidator, accountID), nil
 }
 
 // PrepareAndStoreTransaction prepares a transaction from raw bytes with Number and ParentHash, signs it, and stores it.
