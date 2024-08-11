@@ -140,14 +140,8 @@ func ExtractParentHash(transaction []byte) []byte {
 
 // FetchLatestValidator retrieves the Validator from the most recent transaction in the file.
 func FetchLatestValidator(filename string) ([]byte, error) {
-    // Get the current transaction height
-    chainHeight, err := GetTransactionChainHeight(filename)
-    if err != nil {
-        return nil, err
-    }
-
-    // Retrieve the most recent transaction using the height
-    latestTransaction, err := readRawTransactionFromFile(chainHeight-1, filename)
+    // Retrieve the latest transaction using the GetLatestTransaction wrapper
+    latestTransaction, err := GetLatestTransaction(filename)
     if err != nil {
         return nil, err
     }
