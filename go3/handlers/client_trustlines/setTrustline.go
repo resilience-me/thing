@@ -47,10 +47,12 @@ func SetTrustline(session Session) {
     fmt.Println("Trustline and counter updated successfully.")
 
     // Prepare success response
-    successMessage := []byte("Trustline updated successfully.")
-    if err := handlers.SendSuccessResponse(session, successMessage); err != nil {
+    response := append([]byte{0}, []byte("Trustline updated successfully.")...) // Combine success indicator and message
+    
+    if _, err := session.Conn.Write(response); err != nil { // Send combined response
         fmt.Printf("Error sending success response: %v\n", err) // Log detailed error
         return
     }
-    fmt.Println("Sent success response to client.")
+    session.Conn.Close() // Close the connection without error check
+    fmt.Println("Sent success response to client and closed connection.")
 }
