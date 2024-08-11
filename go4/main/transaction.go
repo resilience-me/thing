@@ -19,19 +19,6 @@ type Transaction struct {
 	Signature         [64]byte // Digital signature using the validator's private key
 }
 
-// Serialize serializes the Transaction struct to a byte slice
-func (tx *Transaction) Serialize() []byte {
-	data := make([]byte, 0)
-	data = append(data, tx.TransactionNumber[:]...)
-	data = append(data, tx.Validator[:]...)
-	data = append(data, tx.From[:]...)
-	data = append(data, tx.To[:]...)
-	data = append(data, tx.Data[:]...)
-	data = append(data, tx.PreviousHash[:]...)
-	data = append(data, tx.Signature[:]...)
-	return data
-}
-
 // fetchLastTransaction retrieves the raw bytes of the last transaction from the file.
 func fetchLastTransaction(filename string) ([]byte, error) {
     file, err := os.Open(filename)
