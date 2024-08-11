@@ -53,9 +53,9 @@ func CheckPeerExists(dg *Datagram) (bool, error) {
     return checkDirExists(peerDir)
 }
 
-// checkAccountsExist checks if both account and peer directories exist for the given datagram.
+// checkUserAndPeerExist checks if both account and peer directories exist for the given datagram.
 // It returns an error that includes all necessary details if any checks fail.
-func checkAccountsExist(dg *Datagram) (bool, error) {
+func checkUserAndPeerExist(dg *Datagram) (bool, error) {
     // Check if account directory exists
     if exists, err := CheckAccountExists(dg); err != nil {
         return false, fmt.Errorf("error checking account existence for user '%s': %v", dg.Username, err)
