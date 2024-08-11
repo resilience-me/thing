@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
     "io"
     "log"
     "os"
@@ -19,36 +20,43 @@ func loadServerAddress() error {
     addressPath := filepath.Join(datadir, "server_address.txt")
     address, err := os.ReadFile(addressPath)
     if err != nil {
-        // Log the error with details rather than returning it with fmt.Errorf
-        log.Printf("Error loading server address from %s: %v", addressPath, err)
-        return err
+        return fmt.Errorf("error loading server address from %s: %w", addressPath, err)
     }
     serverAddress = string(address)
     log.Printf("Loaded server address: %s", serverAddress) // Log that the address was loaded
     return nil
 }
 
-func setupLogger() {
-    // Create or open a log file
+// setupLogger initializes the logging configuration.
+func setupLogger() error {
     logFile, err := os.OpenFile("ripple.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
     if err != nil {
-        log.Fatalf("Failed to open log file: %v", err) // log.Fatalf logs to stderr and exits the program
+        return fmt.Errorf("failed to open log file: %w", err)
     }
     log.SetOutput(logFile)
     log.SetFlags(log.LstdFlags | log.Lshortfile)
+    return nil
 }
 
-// InitConfig initializes the configuration
+// initConfig initializes the configuration by setting up the logger and loading the server address.
 func initConfig() error {
-    setupLogger()
+    if err := setupLogger(); err != nil {
+        return fmt.Errorf("initializing logger: %w", err)
+    }
     log.Println("Logger setup completed, initializing configuration...")
 
-    // Load server address, handle its error
     if err := loadServerAddress(); err != nil {
-        log.Printf("Failed to load server address: %v", err)
-        return err
+        return fmt.Errorf("initializing configuration by loading server address: %w", err)
     }
 
     log.Println("Configuration initialized successfully.")
     return nil
+}
+
+// main is the entry point of the application.
+func main() {
+    if err := initConfig(); err != nil {
+        log.Fatalf("Configuration failed: %v", err)
+    }
+    // Rest of your application logic...
 }
