@@ -72,8 +72,8 @@ func readRawTransactionFromFile(index int, filename string) ([]byte, error) {
 	}
 	defer file.Close()
 
-	offset := int64(index * LengthTransaction)
-	data := make([]byte, LengthTransaction)
+	offset := int64(index * SizeTransaction)
+	data := make([]byte, SizeTransaction)
 	_, err = file.ReadAt(data, offset)
 	if err != nil {
 		return nil, err
@@ -95,8 +95,8 @@ func GetLatestTransaction(filename string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	lastTransactionOffset := info.Size() - int64(LengthTransaction)
-	transaction := make([]byte, LengthTransaction)
+	lastTransactionOffset := info.Size() - int64(SizeTransaction)
+	transaction := make([]byte, SizeTransaction)
 	_, err = file.ReadAt(transaction, lastTransactionOffset)
 	if err != nil {
 		return nil, err
