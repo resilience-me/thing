@@ -24,9 +24,6 @@ func SetTrustline(session main.Session) {
         return
     }
 
-    // Retrieve the trustline amount from the Datagram
-    trustlineAmount := main.BytesToUint32(session.Datagram.Arguments[:4])
-
     // Retrieve the sync_in value using the new getter
     prevSyncIn, err := db_trustlines.GetSyncIn(session.Datagram)
     if err != nil {
@@ -39,13 +36,16 @@ func SetTrustline(session main.Session) {
     syncIn := main.BytesToUint32(syncInBytes)
 
     if syncIn > prevSyncIn {
-        handleTrustlineUpdate(session, trustlineAmount, syncInBytes, syncIn)
+        handleTrustlineUpdate(session, syncInBytes, syncIn)
     } else {
         handleTimestampOnly(session)
     }
 }
 
-func handleTrustlineUpdate(session main.Session, trustlineAmount uint32, syncInBytes []byte, syncIn uint32) {
+func handleTrustlineUpdate(session main.Session, syncInBytes []byte, syncIn uint32) {
+    // Retrieve the trustline amount from the Datagram
+    trustlineAmount := main.BytesToUint32(session.Datagram.Arguments[:4])
+
     if err := db_trustlines.SetTrustlineIn(session.Datagram, trustlineAmount); err != nil {
         log.Printf("Error writing trustline to file for user %s: %v", session.Datagram.Username, err)
         return
