@@ -76,11 +76,12 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    var session Session
-
+    dg := parseDatagram(buf)
+    session := Session{Datagram: dg}
+    
     // Determine whether it's a client or server session
-    if buf[0]&0x80 == 0 { // Client session if MSB is 0
-        dg, errorMessage, err := validateAndParseClientDatagram(buf)
+    if dg.Command & 0x80 == 0 { // Client session if MSB is 0
+        errorMessage, err := validateClientDatagram(buf, dg)
         if err != nil {
             conn.Write([]byte{1})                      // Indicate error with '1'
             conn.Write([]byte(errorMessage))           // Send the specific error message
@@ -88,15 +89,13 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
             conn.Close()
             return
         }
-        session = Session{Datagram: dg, Conn: conn} // Prepare session with connection for clients
+        session.Conn = conn // Prepare session with connection for clients
     } else { // Server session
-        dg, err := validateAndParseServerDatagram(buf)
-        if err != nil {
+        if err := validateServerDatagram(buf, dg); err != nil {
             fmt.Printf("Error validating server datagram: %v\n", err)
             conn.Close() // Close the connection directly after processing
             return
         }
-        session = Session{Datagram: dg} // Prepare session without connection for servers
         conn.Close() // Close the connection directly after processing
     }
 
