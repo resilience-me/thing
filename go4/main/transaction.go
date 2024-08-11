@@ -10,14 +10,23 @@ import (
 )
 
 const (
-    OffsetNumber 	= 0
-    OffsetValidator    	= OffsetNumber + 4
-    OffsetFrom      	= OffsetValidator + 32
-    OffsetTo        	= OffsetFrom + 32
-    OffsetData         	= OffsetTo + 32
-    OffsetParentHash    = OffsetData + 256
-    OffsetSignature     = OffsetParentHash + 32
-    LengthTransaction   = OffsetSignature + 64
+    SizeNumber      = 4
+    SizeValidator   = 32
+    SizeFrom        = 32
+    SizeTo          = 32
+    SizeData        = 256
+    SizeParentHash  = 32
+    SizeSignature   = 64
+
+    SizeTransaction = 452
+
+    OffsetNumber    = 0
+    OffsetValidator = OffsetNumber + SizeNumber
+    OffsetFrom      = OffsetValidator + SizeValidator
+    OffsetTo        = OffsetFrom + SizeFrom
+    OffsetData      = OffsetTo + SizeTo
+    OffsetParentHash = OffsetData + SizeData
+    OffsetSignature = OffsetParentHash + SizeParentHash
 )
 
 type Transaction struct {
