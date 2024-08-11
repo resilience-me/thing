@@ -19,6 +19,6 @@ func BytesToUint32(data []byte) uint32 {
 }
 
 // bytesToTrimmedString trims null characters from byte slices for proper string conversion.
-func bytesToTrimmedString(data []byte) string {
+func bytesToString(data []byte) string {
     return string(bytes.TrimRight(data, "\x00"))
 }
