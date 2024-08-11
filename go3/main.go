@@ -66,32 +66,6 @@ func (m *SessionManager) handleSession(session Session) {
     handler(session)
 }
 
-// handleClientConnection processes a connection from a client.
-func (m *SessionManager) handleClientConnection(conn net.Conn, buf []byte) {
-    dg, errorMessage, err := validateAndParseClientDatagram(buf)
-    if err != nil {
-        conn.Write([]byte{1})                      // Indicate error with '1'
-        conn.Write([]byte(errorMessage))           // Send the specific error message
-        fmt.Printf("Error during datagram validation: %v\n", err)
-        conn.Close()
-        return
-    }
-    // Send the session to the session channel for further processing
-    m.sessionCh <- Session{Datagram: dg, Conn: conn} // Client sessions keep the connection open
-}
-
-// handleServerConnection processes a connection from another server.
-func (m *SessionManager) handleServerConnection(buf []byte) {
-    dg, err := validateAndParseServerDatagram(buf)
-    if err != nil {
-        fmt.Printf("Error validating server datagram: %v\n", err)
-        return
-    }
-
-    // Send the session to the session channel for further processing
-    m.sessionCh <- Session{Datagram: dg} // Conn is nil for server sessions
-}
-
 // handleConnection reads datagrams from the connection and decides whether to handle a client or server connection.
 func (m *SessionManager) handleConnection(conn net.Conn) {
     buf := make([]byte, 389) // Adjust the buffer size according to your actual data size
@@ -102,13 +76,32 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         return
     }
 
-    // Determine whether it's a client or server session and handle accordingly
+    var session Session
+
+    // Determine whether it's a client or server session
     if buf[0]&0x80 == 0 { // Client session if MSB is 0
-        m.handleClientConnection(conn, buf)
+        dg, errorMessage, err := validateAndParseClientDatagram(buf)
+        if err != nil {
+            conn.Write([]byte{1})                      // Indicate error with '1'
+            conn.Write([]byte(errorMessage))           // Send the specific error message
+            fmt.Printf("Error during datagram validation: %v\n", err)
+            conn.Close()
+            return
+        }
+        session = Session{Datagram: dg, Conn: conn} // Prepare session with connection for clients
     } else { // Server session
-        m.handleServerConnection(buf)
+        dg, err := validateAndParseServerDatagram(buf)
+        if err != nil {
+            fmt.Printf("Error validating server datagram: %v\n", err)
+            conn.Close() // Close the connection directly after processing
+            return
+        }
+        session = Session{Datagram: dg} // Prepare session without connection for servers
         conn.Close() // Close the connection directly after processing
     }
+
+    // Send the session to the session channel for further processing
+    m.sessionCh <- session
 }
 
 // Main function with inlined server logic
