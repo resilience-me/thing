@@ -3,9 +3,9 @@ package server_trustlines
 import (
     "fmt"
     "time"
-    "ripple/main"                    // Updated to match your import structure
-    "ripple/handlers"                // Updated to match your import structure
-    "ripple/database/db_trustlines"  // Updated to match your import structure
+    "ripple/main"
+    "ripple/handlers"
+    "ripple/database/db_trustlines"
 )
 
 // SetTrustline handles setting or updating a trustline from another server's perspective
@@ -66,12 +66,12 @@ func SetTrustline(session main.Session) {
 
         // Prepare the datagram to send back to the peer
         dg := main.Datagram{
-            Command:        main.ServerTrustlines_SetSyncOut,
-            Username:      session.Datagram.PeerUsername,       // Reverse the usernames for response
+            Command:           main.ServerTrustlines_SetSyncOut,
+            Username:          session.Datagram.PeerUsername,
             PeerUsername:      session.Datagram.Username,
             PeerServerAddress: main.GetServerAddress(),      // Use the server's address
-            Arguments:     syncInBytes,
-            Counter:        counterOut,
+            Arguments:         syncInBytes,
+            Counter:           counterOut,
         }
     
         if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
