@@ -37,15 +37,7 @@ func SetTrustline(session main.Session) {
     // Retrieve the syncIn counter from the Datagram
     syncInBytes := session.Datagram.Arguments[4:8]
     syncIn := main.BytesToUint32(syncInBytes)
-    if syncIn <= prevSyncIn {
-        fmt.Println("The local sync_in value is synchronized with the peers most recent trustline_out update.")
-        // Write the Unix timestamp using the setter
-        if err := db_trustlines.SetTimestamp(session.Datagram, time.Now().Unix()); err != nil {
-            fmt.Printf("Error writing timestamp to file: %v\n", err)
-            return
-        }
-        fmt.Println("The local trustline_in synchronization timestamp updated successfully.")
-    } else {
+    if syncIn > prevSyncIn {
         // Write the new trustline amount using the setter
         if err := db_trustlines.SetTrustlineIn(session.Datagram, trustlineAmount); err != nil {
             fmt.Printf("Error writing trustline to file: %v\n", err)
@@ -89,5 +81,13 @@ func SetTrustline(session main.Session) {
 
         // Add a success message indicating all operations were successful
         fmt.Println("Trustline update and datagram sending completed successfully.")
-    }
+    } else {
+        fmt.Println("The local sync_in value is synchronized with the peers most recent trustline_out update.")
+        // Write the Unix timestamp using the setter
+        if err := db_trustlines.SetTimestamp(session.Datagram, time.Now().Unix()); err != nil {
+            fmt.Printf("Error writing timestamp to file: %v\n", err)
+            return
+        }
+        fmt.Println("The local trustline_in synchronization timestamp updated successfully.")
+    } 
 }
