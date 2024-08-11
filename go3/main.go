@@ -81,7 +81,7 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
 
     if errorCode, err := CheckUserAndPeerExist(dg); err != nil {
         if errorCode != 0 && isClientSession {
-            conn.Write([]byte{errorCode})
+            conn.Write([]byte{errorCode}) // No error check here
         }
         fmt.Printf("Error during user and peer check: %v\n", err)
         conn.Close()
