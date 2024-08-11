@@ -1,7 +1,7 @@
 package db_trustlines
 
 import (
-	"resilience/database"
+	"ripple/database"
 )
 
 // SetTrustlineOut sets the outbound trustline amount.
