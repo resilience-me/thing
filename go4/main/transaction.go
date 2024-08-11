@@ -16,24 +16,34 @@ type Transaction struct {
     Signature         [64]byte // Digital signature using the validator's private key
 }
 
-// Encode encodes a Transaction into a JSON byte array.
-func (t *Transaction) Encode() ([]byte, error) {
-    return json.Marshal(t)
-}
+// AppendTransaction appends a new transaction to the JSON file
+func appendTransaction(accountUsername, peerUsername string, transaction Transaction) error {
+    relationshipFilePath := filepath.Join("data", "accounts", accountUsername, "peers", peerUsername, "relationship.json")
 
-// Decode decodes a JSON byte array into a Transaction.
-func Decode(data []byte) (*Transaction, error) {
-    var t Transaction
-    err := json.Unmarshal(data, &t)
+    // Open the file for appending
+    file, err := os.OpenFile(relationshipFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     if err != nil {
-        return nil, err
+        return err
     }
-    return &t, nil
-}
+    defer file.Close()
 
-// Key generates a unique key for LevelDB based on the TransactionNumber.
-func (t *Transaction) Key() []byte {
-    key := make([]byte, 4)
-    binary.BigEndian.PutUint32(key, binary.BigEndian.Uint32(t.TransactionNumber[:]))
-    return key
+    // Not the first entry; append a comma for JSON array
+    _, err := file.WriteString(",")
+    if err != nil {
+        return err
+    }
+
+    // Marshal the new transaction to JSON
+    transactionJSON, err := json.Marshal(transaction)
+    if err != nil {
+        return err
+    }
+
+    // Write the new transaction to the file
+    _, err = file.Write(transactionJSON)
+    if err != nil {
+        return err
+    }
+
+    return nil
 }
