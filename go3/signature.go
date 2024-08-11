@@ -1,13 +1,13 @@
 package main
 
 import (
-    "bytes"
     "crypto/hmac"
     "crypto/sha256"
-    "encoding/binary"
     "fmt"
     "os"
     "path/filepath"
+
+    "ripple/database"
 )
 
 // loadSecretKey loads the secret key from the specified directory.
@@ -21,12 +21,12 @@ func loadSecretKeyFromDir(dir string) ([]byte, error) {
 }
 
 func loadClientSecretKey(dg *Datagram) ([]byte, error) {
-    keyDir := GetAccountDir(dg)
+    keyDir := database.GetAccountDir(dg)
     return loadSecretKeyFromDir(keyDir)
 }
 
 func loadServerSecretKey(dg *Datagram) ([]byte, error) {
-    keyDir := GetPeerDir(dg)
+    keyDir := database.GetPeerDir(dg)
     return loadSecretKeyFromDir(keyDir)
 }
 
