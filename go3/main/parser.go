@@ -22,11 +22,6 @@ func SerializeDatagram(dg *Datagram) ([]byte, error) {
     // Write the Counter
     binary.BigEndian.PutUint32(data[353:], dg.Counter)
 
-    // If there's a signature, copy it as well
-    if len(dg.Signature) > 0 {
-        copy(data[totalSize-4:], dg.Signature[:])
-    }
-
     return data, nil
 }
 
