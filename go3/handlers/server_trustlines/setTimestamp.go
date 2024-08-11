@@ -22,13 +22,13 @@ func SetTimestamp(session main.Session) {
     counter := binary.BigEndian.Uint32(session.Datagram.Counter[:])
 
     // Check if the new counter is greater than the previous counter_in
-    if counter <= counterIn {
+    if counter <= prevCounterIn {
         log.Printf("Received counter (%d) is not greater than previous counter_in (%d) for user %s. Potential replay attack.",
             counter, prevCounterIn, session.Datagram.Username)
         return
     }
 
-    // Write the new sync_counter_in value
+    // Write the new counter_in value
     if err := db_trustlines.SetCounterIn(session.Datagram, counter); err != nil {
         log.Printf("Error writing counter_in for user %s: %v", session.Datagram.Username, err)
         return
