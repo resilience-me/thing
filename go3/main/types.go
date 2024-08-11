@@ -10,3 +10,8 @@ func uint32ToBytes(value uint32) []byte {
     binary.BigEndian.PutUint32(responseData, value) // Convert the uint32 to bytes
     return responseData
 }
+
+// Helper function to trim null characters from byte slices for proper string conversion
+func trimRightZeroes(data []byte) string {
+    return string(bytes.TrimRight(data, "\x00"))
+}
