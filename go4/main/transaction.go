@@ -124,16 +124,15 @@ func ExtractParentHash(transaction []byte) ([32]byte, error) {
 	return parentHash, nil
 }
 
-// PrepareAndStoreTransaction prepares a transaction with Number and ParentHash and stores it.
-func PrepareAndStoreTransaction(filename string, t *Transaction) error {
-    // Get the height of the transaction chain which will also be the new transaction's number
+// PrepareAndStoreTransaction prepares a transaction from raw bytes with Number and ParentHash, signs it, and stores it.
+func PrepareAndStoreTransaction(filename string, rawTransaction []byte) error {
     chainHeight, err := GetTransactionChainHeight(filename)
     if err != nil {
         return err
     }
 
-    // Set the transaction number to the current height of the chain
-    binary.BigEndian.PutUint32(t.Number[:], chainHeight)
+    // Set the transaction number in the raw bytes
+    binary.BigEndian.PutUint32(rawTransaction[:4], chainHeight)
 
     // Retrieve the latest transaction to get the ParentHash
     latestTransaction, err := readRawTransactionFromFile(chainHeight-1, filename)
@@ -141,13 +140,19 @@ func PrepareAndStoreTransaction(filename string, t *Transaction) error {
         return err
     }
 
-    // Extract ParentHash from the latest transaction
+    // Extract and set the ParentHash in the raw bytes
     parentHash, err := ExtractParentHash(latestTransaction)
     if err != nil {
         return err
     }
-    copy(t.ParentHash[:], parentHash[:])
+    copy(rawTransaction[OffsetParentHash:], parentHash[:])
+
+    // Sign the transaction
+    err = signTransactionData(rawTransaction)
+    if err != nil {
+        return fmt.Errorf("failed to sign transaction: %v", err)
+    }
 
     // Store the updated transaction
-    return WriteTransactionToFile(t, filename)
+    return writeRawTransactionToFile(rawTransaction, filename)
 }
