@@ -30,10 +30,6 @@ type Transaction struct {
     Signature         [32]byte
 }
 
-package main
-
-
-
 func signTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, []byte, error) {
 	r, s, err := ecdsa.Sign(rand.Reader, privKey, data)
 	if err != nil {
