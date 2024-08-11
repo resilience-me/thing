@@ -8,6 +8,28 @@ import (
     "ripple/database"  // Custom package, assuming it exists in your project
 )
 
+// SerializeDatagram converts a Datagram struct to a byte slice.
+func SerializeDatagram(dg *Datagram) ([]byte, error) {
+    // Create the byte slice
+    data := make([]byte, 389)
+    data[0] = dg.Command // First byte is the Command
+
+    // Copy Usernames and Server Address
+    copy(data[1:], dg.Username)
+    copy(data[33:], dg.PeerUsername)
+    copy(data[65:], dg.PeerServerAddress)
+
+    // Write the Counter
+    binary.BigEndian.PutUint32(data[353:], dg.Counter)
+
+    // If there's a signature, copy it as well
+    if len(dg.Signature) > 0 {
+        copy(data[totalSize-4:], dg.Signature[:])
+    }
+
+    return data, nil
+}
+
 func parseDatagram(buf []byte) *Datagram {
     // Assuming buf is already confirmed to be of the correct length via io.ReadFull
     datagram := &Datagram{
