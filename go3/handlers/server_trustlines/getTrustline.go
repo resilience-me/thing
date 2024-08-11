@@ -13,14 +13,14 @@ func GetTrustline(session main.Session) {
     // Retrieve the current counter value
     counter, err := db_trustlines.GetCounter(session.Datagram)
     if err != nil {
-        log.Printf("Error getting counter: %v", err)
+        log.Printf("Error getting counter for user %s: %v", session.Datagram.Username, err)
         return
     }
 
     // Retrieve the current sync_out value
     syncOut, err := db_trustlines.GetSyncOut(session.Datagram)
     if err != nil {
-        log.Printf("Error getting sync_out: %v", err)
+        log.Printf("Error getting sync_out for user %s: %v", session.Datagram.Username, err)
         return
     }
 
@@ -34,7 +34,7 @@ func GetTrustline(session main.Session) {
 func sendSyncTimestamp(session main.Session) {
     syncCounterOut, err := db_trustlines.GetSyncCounterOut(session.Datagram)
     if err != nil {
-        log.Printf("Error getting sync_counter_out: %v", err)
+        log.Printf("Error getting sync_counter_out for user %s: %v", session.Datagram.Username, err)
         return
     }
 
@@ -47,16 +47,16 @@ func sendSyncTimestamp(session main.Session) {
     binary.BigEndian.PutUint32(dg.Counter[:], syncCounterOut)
 
     if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
-        log.Printf("Failed to sign and send datagram: %v", err)
+        log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
         return
     }
-    log.Println("SetTrustlineSyncTimestamp command sent successfully.")
+    log.Printf("SetTrustlineSyncTimestamp command sent successfully for user %s.", session.Datagram.Username)
 }
 
 func sendTrustline(session main.Session, counter uint32) {
     trustline, err := db_trustlines.GetTrustlineOut(session.Datagram)
     if err != nil {
-        log.Printf("Error getting trustline: %v", err)
+        log.Printf("Error getting trustline for user %s: %v", session.Datagram.Username, err)
         return
     }
 
@@ -70,8 +70,8 @@ func sendTrustline(session main.Session, counter uint32) {
     binary.BigEndian.PutUint32(dg.Counter[:], counter)
 
     if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
-        log.Printf("Failed to sign and send datagram: %v", err)
+        log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
         return
     }
-    log.Println("SetTrustline command sent successfully.")
+    log.Printf("SetTrustline command sent successfully for user %s.", session.Datagram.Username)
 }
