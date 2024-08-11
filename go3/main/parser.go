@@ -1,7 +1,6 @@
 package main
 
 import (
-    "bytes"        // For trimming null characters from byte slices
     "encoding/binary"
     "errors"       // For creating error messages
     "fmt"          // For formatted I/O
