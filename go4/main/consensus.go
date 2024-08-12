@@ -23,3 +23,21 @@ func HandleTransactionRequest(filename string, request TransactionRequest, valid
 
     return nil
 }
+
+// ConvertTransactionRequestToTransaction converts a TransactionRequest to a Transaction by populating the fields.
+func ConvertTransactionRequestToTransaction(request TransactionRequest) ([]byte, error) {
+    // Create a byte slice to hold the transaction
+    rawTransaction := make([]byte, LengthTransaction)
+
+    // Copy the entire TransactionRequest data into the rawTransaction starting at OffsetFrom
+    copy(rawTransaction[OffsetFrom:], request[:SizeRequest])
+
+    // Initialize the other fields to default values
+    var defaultValidator [32]byte // or set this to a specific value
+    copy(rawTransaction[OffsetValidator:], defaultValidator[:])
+    binary.BigEndian.PutUint32(rawTransaction[OffsetNumber:], 0) // Initial transaction number
+    copy(rawTransaction[OffsetParentHash:], [32]byte{})          // Zeroed ParentHash
+    copy(rawTransaction[OffsetSignature:], [64]byte{})           // Zeroed Signature
+
+    return rawTransaction, nil
+}
