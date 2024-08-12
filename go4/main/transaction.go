@@ -10,44 +10,6 @@ import (
 	"math/big"
 )
 
-const (
-    SizeNumber      = 4
-    SizeValidator   = 32
-    SizeFrom        = 32
-    SizeTo          = 32
-    SizeData        = 256
-    SizeParentHash  = 32
-    SizeSignature   = 64
-
-    SizeTransaction = 452
-    SizeRequest     = 384
-
-    OffsetNumber    = 0
-    OffsetValidator = OffsetNumber + SizeNumber
-    OffsetFrom      = OffsetValidator + SizeValidator
-    OffsetTo        = OffsetFrom + SizeFrom
-    OffsetData      = OffsetTo + SizeTo
-    OffsetParentHash = OffsetData + SizeData
-    OffsetSignature = OffsetParentHash + SizeParentHash
-)
-
-type Transaction struct {
-    Number            [4]byte
-    Validator         [32]byte
-    From              [32]byte
-    To	              [32]byte
-    Data              [256]byte
-    ParentHash        [32]byte
-    Signature         [64]byte
-}
-
-type TransactionRequest struct {
-    From      [32]byte
-    To        [32]byte
-    Data      [256]byte
-    Signature [64]byte
-}
-
 func VerifyTransaction(pubKey *ecdsa.PublicKey, data []byte, rBytes, sBytes []byte) bool {
 	r := new(big.Int).SetBytes(rBytes)
 	s := new(big.Int).SetBytes(sBytes)
