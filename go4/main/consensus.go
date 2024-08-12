@@ -1,11 +1,23 @@
+package main
+
+import (
+    "crypto/ecdsa"
+    "crypto/rand"
+    "crypto/sha256"
+    "encoding/binary"
+    "fmt"
+    "io"
+    "golang.org/x/crypto/curve25519" // If you are using Curve25519 for ECDH (optional)
+)
+
 // HandleTransactionRequest processes a transaction request from the non-validator.
 func HandleTransactionRequest(filename string, request []byte, validatorID []byte) error {
     // Ensure that this account is the current validator
-    ValidatedLatestBlock, err := IsValidator(filename, validatorID)
+    validatedLatestBlock, err := ValidatedLatestBlock(filename, validatorID)
     if err != nil {
         return err
     }
-    if ValidatedLatestBlock {
+    if validatedLatestBlock {
         return fmt.Errorf("this account is not the current validator")
     }
 
@@ -17,9 +29,7 @@ func HandleTransactionRequest(filename string, request []byte, validatorID []byt
 
     copy(rawTransaction[OffsetValidator:], validatorID[:SizeValidator])
 
-
-    err := PrepareAndStoreTransaction("transactions.dat", rawTransaction, privateKey)
-    if err != nil {
+    if err := PrepareAndStoreTransaction("transactions.dat", rawTransaction, privateKey); err != nil {
         return err
     }
 
