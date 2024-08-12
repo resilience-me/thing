@@ -55,8 +55,8 @@ func CreateDatagram(tx []byte, sharedKey []byte) (Datagram, error) {
 
 	// Create the Datagram
 	var datagram Datagram
-	copy(datagram.Identifier[:], identifier[:])
-	copy(datagram.Ciphertext[:], ciphertext[:])
+	copy(datagram.Identifier[:], identifier)
+	copy(datagram.Ciphertext[:], ciphertext)
 
 	return datagram, nil
 }
