@@ -57,18 +57,13 @@ func DecryptTransactionRequest(ciphertext, sharedKey []byte) ([]byte, error) {
 
 // VerifyTransactionRequest verifies the signature of the transaction request.
 func VerifyTransactionRequest(request []byte, pubKey *ecdsa.PublicKey) bool {
-    // Serialize the request data to be verified
-    dataToVerify := append(request[:32], request[32:64]...) // From and To
-    dataToVerify = append(dataToVerify, request[64:320]...) // Data
-
-    // Hash the data
-    hash := sha256.Sum256(dataToVerify)
+    // Hash the relevant data from the request directly
+    hash := sha256.Sum256(request[:SizeRequest-SizeSignature]) // Exclude the signature
 
     // Extract r and s from the signature
-    r := new(big.Int).SetBytes(request[320:352])
-    s := new(big.Int).SetBytes(request[352:384])
+    r := new(big.Int).SetBytes(request[SizeRequest-SizeSignature : SizeRequest-SizeSignature+32])
+    s := new(big.Int).SetBytes(request[SizeRequest-SizeSignature+32 : SizeRequest])
 
     // Verify the signature
     return ecdsa.Verify(pubKey, hash[:], r, s)
 }
-
