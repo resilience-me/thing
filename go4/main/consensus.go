@@ -1,13 +1,14 @@
 package main
 
 import (
+    "crypto/aes"
+    "crypto/cipher"
     "crypto/ecdsa"
     "crypto/rand"
     "crypto/sha256"
     "encoding/binary"
     "fmt"
     "io"
-    "golang.org/x/crypto/curve25519" // If you are using Curve25519 for ECDH (optional)
 )
 
 // HandleTransactionRequest processes a transaction request from the non-validator.
