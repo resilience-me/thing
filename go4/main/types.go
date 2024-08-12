@@ -47,6 +47,11 @@ type Datagram struct {
     Ciphertext	[360]byte
 }
 
+type SyncPacket struct {
+    Identifier  [20]byte
+    Ciphertext	[416]byte
+}
+
 // GenerateAddress generates an address using SHA-256 from an ECDSA public key, skipping the prefix.
 func GenerateAddress(pubKey *ecdsa.PublicKey) []byte {
     // Get the uncompressed public key bytes
