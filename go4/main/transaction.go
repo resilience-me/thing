@@ -55,32 +55,30 @@ func VerifyTransaction(pubKey *ecdsa.PublicKey, data []byte, rBytes, sBytes []by
 }
 
 func HashAndVerifyTransaction(pubKey *ecdsa.PublicKey, data, rBytes, sBytes []byte) bool {
-    // Hash the transaction data using SHA-256
-    hash := sha256.Sum256(data)
-    return VerifyTransaction(pubKey, hash, rBytes, sBytes)
+	// Hash the transaction data using SHA-256
+	hash := sha256.Sum256(data)
+	return VerifyTransaction(pubKey, hash[:], rBytes, sBytes)
 }
 
 // StripSignatureAndVerify verifies the signature of the transaction.
 func StripSignatureAndVerify(rawTransaction []byte, pubKey *ecdsa.PublicKey) bool {
-    // Determine the length of the data
-    dataLen := len(data)// Exclude the signature
-    data := rawTransaction[:dataLen-SizeSignature]
+	// Determine the length of the data
+	dataLen := len(rawTransaction)
 
-    // Define the starting index for the signature
-    signatureStart := dataLen - SizeSignature
+	// Define the starting index for the signature
+	signatureStart := dataLen - SizeSignature
 
-    // Define the size of r and s values
-    const rsValues = SizeSignature / 2
-    // Define the starting index for the signature
-    signatureStart := dataLen - SizeSignature
+	data := rawTransaction[:signatureStart]
 
-    // Define the size of r and s values
-    const rsValues = SizeSignature / 2
-request[signatureStart : signatureStart+rsValues]
-request[signatureStart+rsValues : dataLen]
+	// Define the size of r and s values
+	const rsValues = SizeSignature / 2
 
-    // Verify the signature
-    return HashAndVerifyTransaction()
+	// Extract r and s values from the rawTransaction
+	rBytes := rawTransaction[signatureStart : signatureStart+rsValues]
+	sBytes := rawTransaction[signatureStart+rsValues : dataLen]
+
+	// Verify the signature
+	return HashAndVerifyTransaction(pubKey, data, rBytes, sBytes)
 }
 
 func SignTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, error) {
