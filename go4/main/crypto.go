@@ -8,7 +8,6 @@ import (
     "crypto/sha256"
     "fmt"
     "io"
-    "math/big"
 )
 
 // GenerateSharedKey generates a shared symmetric key using ECDH key exchange.
