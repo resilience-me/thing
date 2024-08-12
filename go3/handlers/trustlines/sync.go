@@ -7,8 +7,8 @@ import (
     "ripple/database/db_trustlines"
 )
 
-// PrepareDatagramForSync prepares the datagram for synchronization based on the sync status.
-func PrepareDatagramForSync(datagram *main.Datagram) (*main.Datagram, error) {
+// SetTrustlineOrSetTimestamp prepares the datagram for synchronization based on the sync status.
+func SetTrustlineOrSetTimestamp(datagram *main.Datagram) (*main.Datagram, error) {
     // Retrieve the syncCounter and sync status
     syncCounter, isSynced, err := GetSyncStatus(datagram)
     if err != nil {
