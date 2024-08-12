@@ -1,7 +1,6 @@
 package server_trustlines
 
 import (
-    "encoding/binary"
     "log"
     "ripple/main"
     "ripple/handlers"
@@ -30,19 +29,11 @@ func GetTrustline(session main.Session) {
     // Extract sync_in value from the datagram's Arguments[0:4]
     syncIn := main.BytesToUint32(datagram.Arguments[:4])
 
-    // Retrieve and increment the counter_out value
-    counterOut, err := trustlines.GetAndIncrementCounterOut(datagram)
+    // Initialize the datagram
+    dg, err := trustlines.InitializeDatagram(datagram)
     if err != nil {
-        log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
+        log.Printf("%v", err)
         return
-    }
-
-    // Initialize common Datagram fields for response
-    dg := main.Datagram{
-        Username:          datagram.PeerUsername,
-        PeerUsername:      datagram.Username,
-        PeerServerAddress: main.GetServerAddress(),
-        Counter:           counterOut,
     }
 
     // Logic to determine the correct response
@@ -71,7 +62,8 @@ func GetTrustline(session main.Session) {
         }
     }
 
-    if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
+    // Send the prepared datagram
+    if err := handlers.SignAndSendDatagram(session, dg); err != nil {
         log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
         return
     }
@@ -83,6 +75,5 @@ func GetTrustline(session main.Session) {
         return
     }
 
-    // Final log message to confirm the successful completion of the GetTrustline operation
     log.Printf("GetTrustline operation completed successfully for user %s.", datagram.Username)
 }
