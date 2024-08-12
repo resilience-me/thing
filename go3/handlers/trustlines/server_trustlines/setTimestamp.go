@@ -1,46 +1,38 @@
 package server_trustlines
 
 import (
-    "encoding/binary"
     "log"
     "time"
     "ripple/main"
-    "ripple/database/db_trustlines"
+    "ripple/trustlines"             // Import the trustlines package for counter validation
+    "ripple/database/db_trustlines" // Handles database-related operations
 )
 
 // SetTimestamp handles updating the sync timestamp for trustlines
 func SetTimestamp(session main.Session) {
-    // Retrieve the previous counter_in value
-    prevCounterIn, err := db_trustlines.GetCounterIn(session.Datagram)
-    if err != nil {
-        log.Printf("Error getting previous counter_in for user %s: %v", session.Datagram.Username, err)
-        return
-    }
+    datagram := session.Datagram
 
-    // Get the new counter value from the datagram
-    counter := binary.BigEndian.Uint32(session.Datagram.Counter[:])
-
-    // Check if the new counter is greater than the previous counter_in
-    if counter <= prevCounterIn {
-        log.Printf("Received counter (%d) is not greater than previous counter_in (%d) for user %s. Potential replay attack.",
-            counter, prevCounterIn, session.Datagram.Username)
-        return
-    }
-
-    // Write the new counter_in value
-    if err := db_trustlines.SetCounterIn(session.Datagram, counter); err != nil {
-        log.Printf("Error writing counter_in for user %s: %v", session.Datagram.Username, err)
+    // Validate the counter_in using the ValidateCounterIn function from trustlines package
+    if err := trustlines.ValidateCounterIn(datagram); err != nil {
+        log.Printf("Counter_in validation failed for user %s: %v", datagram.Username, err)
         return
     }
 
     // Retrieve the current timestamp
     timestamp := time.Now().Unix()
 
-    // Write the new timestamp
-    if err := db_trustlines.SetTimestamp(session.Datagram, timestamp); err != nil {
-        log.Printf("Error writing timestamp for user %s: %v", session.Datagram.Username, err)
+    // Write the new timestamp using the setter in db_trustlines
+    if err := db_trustlines.SetTimestamp(datagram, timestamp); err != nil {
+        log.Printf("Error writing timestamp for user %s: %v", datagram.Username, err)
         return
     }
 
-    log.Printf("counter_in and timestamp updated successfully for user %s.", session.Datagram.Username)
+    // After successfully updating the timestamp, update the counter_in
+    if err := db_trustlines.SetCounterIn(datagram, datagram.Counter); err != nil {
+        log.Printf("Error updating counter_in for user %s: %v", datagram.Username, err)
+        return
+    }
+
+    // Log success
+    log.Printf("Timestamp and counter_in updated successfully for user %s.", datagram.Username)
 }
