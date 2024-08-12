@@ -71,16 +71,15 @@ func GetTrustline(session main.Session) {
         }
     }
 
-    if err := handlers.SignAndSendDatagram(session, dg); err != nil {
+    if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
         log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
         return
     }
-    log.Printf("SetTrustlineSyncTimestamp command sent successfully for user %s.", session.Datagram.Username)
+    log.Printf("Datagram command %d sent successfully for user %s.", dg.Command, session.Datagram.Username)
 
     // Update the counter_in after successfully processing the request
     if err := db_trustlines.SetCounterIn(datagram, datagram.Counter); err != nil {
         log.Printf("Error updating counter_in for user %s: %v", datagram.Username, err)
         return
     }
-
 }
