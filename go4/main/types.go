@@ -4,6 +4,16 @@ import (
 	"crypto/sha256"
 )
 
+type Transaction struct {
+    Number            [4]byte
+    Validator         [20]byte
+    From              [20]byte
+    To	              [20]byte
+    Data              [256]byte
+    ParentHash        [32]byte
+    Signature         [64]byte
+}
+
 // GenerateAddress generates an address using SHA-256 from an ECDSA public key, skipping the prefix.
 func GenerateAddress(pubKey *ecdsa.PublicKey) []byte {
     // Get the uncompressed public key bytes
