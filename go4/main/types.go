@@ -63,3 +63,12 @@ func GenerateIdentifier(myAddress, otherAddress []byte) []byte {
     combined := append(myAddress, otherAddress...)
     return hashAndTruncateToAddress(combined)
 }
+
+// XORBytes takes two byte slices and returns their XOR combination.
+func XORBytes(a, b []byte) []byte {
+	result := make([]byte, len(a))
+	for i := range a {
+		result[i] = a[i] ^ b[i]
+	}
+	return result
+}
