@@ -4,6 +4,27 @@ import (
     "crypto/sha256"
 )
 
+const (
+    SizeNumber      = 4
+    SizeValidator   = 20
+    SizeFrom        = 20
+    SizeTo          = 20
+    SizeData        = 256
+    SizeParentHash  = 32
+    SizeSignature   = 64
+
+    SizeTransaction = 416
+    SizeRequest     = 360
+
+    OffsetNumber    = 0
+    OffsetValidator = OffsetNumber + SizeNumber
+    OffsetFrom      = OffsetValidator + SizeValidator
+    OffsetTo        = OffsetFrom + SizeFrom
+    OffsetData      = OffsetTo + SizeTo
+    OffsetParentHash = OffsetData + SizeData
+    OffsetSignature = OffsetParentHash + SizeParentHash
+)
+
 type Transaction struct {
     Number            [4]byte
     Validator         [20]byte
