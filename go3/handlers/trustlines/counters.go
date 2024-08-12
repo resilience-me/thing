@@ -75,18 +75,18 @@ func IncrementSyncCounter(datagram *main.Datagram) error {
 }
 
 // GetSyncStatus retrieves the syncCounter and syncOut values and returns whether they are equal.
-func GetSyncStatus(datagram *main.Datagram) (bool, error) {
+func GetSyncStatus(datagram *main.Datagram) (uint32, bool, error) {
     // Retrieve the current syncCounter value
     syncCounter, err := db_trustlines.GetSyncCounter(datagram)
     if err != nil {
-        return false, fmt.Errorf("Error getting syncCounter for user %s: %v", datagram.Username, err)
+        return 0, false, fmt.Errorf("Error getting syncCounter for user %s: %v", datagram.Username, err)
     }
 
     // Retrieve the current syncOut value
     syncOut, err := db_trustlines.GetSyncOut(datagram)
     if err != nil {
-        return false, fmt.Errorf("Error getting syncOut for user %s: %v", datagram.Username, err)
+        return 0, false, fmt.Errorf("Error getting syncOut for user %s: %v", datagram.Username, err)
     }
 
-    return syncOut == syncCounter, nil
+    return syncCounter, syncOut == syncCounter, nil
 }
