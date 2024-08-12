@@ -32,7 +32,7 @@ func EncryptTransactionRequest(request []byte, sharedKey []byte) ([]byte, error)
 
 
 // DecryptTransactionRequest decrypts the transaction request with the shared symmetric key.
-func DecryptTransactionRequest(ciphertext, sharedKey []byte) (*TransactionRequest, error) {
+func DecryptTransactionRequest(ciphertext, sharedKey []byte) ([]byte, error) {
     block, err := aes.NewCipher(sharedKey)
     if err != nil {
         return nil, fmt.Errorf("failed to create cipher: %v", err)
@@ -51,15 +51,9 @@ func DecryptTransactionRequest(ciphertext, sharedKey []byte) (*TransactionReques
         return nil, fmt.Errorf("failed to decrypt data: %v", err)
     }
 
-    // Deserialize the decrypted data into a TransactionRequest
-    var request TransactionRequest
-    copy(request.From[:], decryptedData[:32])
-    copy(request.To[:], decryptedData[32:64])
-    copy(request.Data[:], decryptedData[64:320])
-    request.Signature = decryptedData[320:]
-
-    return &request, nil
+    return decryptedData, nil
 }
+
 
 // VerifyTransactionRequest verifies the signature of the transaction request.
 func VerifyTransactionRequest(request *TransactionRequest, pubKey *ecdsa.PublicKey) bool {
