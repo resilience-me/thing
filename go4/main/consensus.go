@@ -1,14 +1,7 @@
 package main
 
 import (
-    "crypto/aes"
-    "crypto/cipher"
-    "crypto/ecdsa"
-    "crypto/rand"
-    "crypto/sha256"
-    "encoding/binary"
     "fmt"
-    "io"
 )
 
 // HandleTransactionRequest processes a transaction request from the non-validator.
