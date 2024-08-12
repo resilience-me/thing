@@ -2,7 +2,6 @@ package trustlines
 
 import (
     "fmt"
-    "log"
     "ripple/main"
 )
 
@@ -16,7 +15,6 @@ func ValidateCounter(datagram *main.Datagram) error {
 
     // Check if the incoming counter is valid (greater than the stored counter)
     if datagram.Counter <= prevCounter {
-        log.Printf("Received counter (%d) is not greater than stored counter (%d) for user %s. Potential replay attack.", datagram.Counter, prevCounter, datagram.Username)
         return fmt.Errorf("counter validation failed for user %s", datagram.Username)
     }
 
@@ -33,7 +31,6 @@ func ValidateCounterIn(datagram *main.Datagram) error {
 
     // Check if the incoming counter is valid (greater than the stored counter_in)
     if datagram.Counter <= prevCounterIn {
-        log.Printf("Received counter (%d) is not greater than stored counter_in (%d) for user %s. Potential replay attack.", datagram.Counter, prevCounterIn, datagram.Username)
         return fmt.Errorf("counter_in validation failed for user %s", datagram.Username)
     }
 
