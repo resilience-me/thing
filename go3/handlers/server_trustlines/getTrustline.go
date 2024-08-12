@@ -5,6 +5,7 @@ import (
     "log"
     "ripple/main"
     "ripple/handlers"
+    "ripple/trustlines"
     "ripple/database/db_trustlines"
 )
 
@@ -12,16 +13,9 @@ import (
 func GetTrustline(session main.Session) {
     datagram := session.Datagram
 
-    // Retrieve and validate the current counter_in value
-    prevCounterIn, err := db_trustlines.GetCounterIn(datagram)
-    if err != nil {
-        log.Printf("Error getting counter_in for user %s: %v", datagram.Username, err)
-        return
-    }
-
-    // Check if the incoming counter is valid (prevents replay attacks)
-    if datagram.Counter <= prevCounterIn {
-        log.Printf("Received counter (%d) is not greater than previous counter_in (%d) for user %s. Potential replay attack.", datagram.Counter, prevCounterIn, datagram.Username)
+    // Validate the counter_in to ensure the request is not a replay
+    if err := trustlines.ValidateCounterIn(datagram); err != nil {
+        log.Printf("Counter_in validation failed for user %s: %v", datagram.Username, err)
         return
     }
 
@@ -46,7 +40,7 @@ func GetTrustline(session main.Session) {
         return
     }
 
-    // Initialize common Datagram fields
+    // Initialize common Datagram fields for response
     dg := main.Datagram{
         Username:          datagram.PeerUsername,
         PeerUsername:      datagram.Username,
@@ -54,7 +48,7 @@ func GetTrustline(session main.Session) {
         Counter:           counterOut,
     }
 
-    // Send the appropriate response based on sync status
+    // Determine whether to send a sync timestamp or trustline based on sync status
     if syncCounter == syncOut {
         sendSyncTimestamp(session, &dg)
     } else {
