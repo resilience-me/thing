@@ -40,12 +40,14 @@ type Transaction struct {
     Signature         [64]byte
 }
 
-func SignTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, []byte, error) {
+func SignTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, error) {
 	r, s, err := ecdsa.Sign(rand.Reader, privKey, data)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return r.Bytes(), s.Bytes(), nil
+	// Combine r and s into a single byte slice as the signature
+	signature := append(r.Bytes(), s.Bytes()...)
+	return signature, nil
 }
 
 func verifyTransaction(pubKey *ecdsa.PublicKey, data []byte, rBytes, sBytes []byte) bool {
@@ -61,13 +63,10 @@ func HashAndSignTransaction(privKey *ecdsa.PrivateKey, rawTransaction []byte) ([
     hash := sha256.Sum256(rawTransaction)
 
     // Sign the hash using ECDSA
-    r, s, err := SignTransaction(privKey, hash[:])
+    signature, err := SignTransaction(privKey, hash[:])
     if err != nil {
         return nil, fmt.Errorf("failed to sign transaction: %v", err)
     }
-
-    // Combine r and s into a single byte slice as the signature
-    signature := append(r.Bytes(), s.Bytes()...)
 
     return signature, nil
 }
