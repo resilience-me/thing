@@ -1,7 +1,6 @@
 package server_trustlines
 
 import (
-    "encoding/binary"
     "log"
     "ripple/main"
     "ripple/trustlines"             // Import the trustlines package for counter validation
@@ -19,7 +18,7 @@ func SetSyncOut(session main.Session) {
     }
 
     // Load the new sync_out value from the Arguments in the Datagram
-    syncOut := binary.BigEndian.Uint32(datagram.Arguments[:4])
+    syncOut := main.BytesToUint32(datagram.Arguments[:4])
 
     // Retrieve the previous sync_out value
     prevSyncOut, err := db_trustlines.GetSyncOut(datagram)
