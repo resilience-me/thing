@@ -15,6 +15,8 @@ func HandleTransactionRequest(filename string, request []byte, validatorID []byt
         return fmt.Errorf("failed to convert request to transaction: %v", err)
     }
 
+    copy(rawTransaction[OffsetValidator:], validatorID[:SizeValidator])
+
     // Convert the request into a full transaction
     rawTransaction, err := PrepareTransaction(filename, request, validatorID)
     if err != nil {
