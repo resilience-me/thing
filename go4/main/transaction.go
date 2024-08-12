@@ -40,6 +40,13 @@ type Transaction struct {
     Signature         [64]byte
 }
 
+type TransactionRequest struct {
+    From      [32]byte
+    To        [32]byte
+    Data      [256]byte
+    Signature [64]byte
+}
+
 func verifyTransaction(pubKey *ecdsa.PublicKey, data []byte, rBytes, sBytes []byte) bool {
 	r := new(big.Int).SetBytes(rBytes)
 	s := new(big.Int).SetBytes(sBytes)
