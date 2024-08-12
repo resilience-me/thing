@@ -5,22 +5,15 @@ import (
     "time"
     "ripple/main"
     "ripple/handlers"
+    "ripple/trustlines"
     "ripple/database/db_trustlines"
 )
 
 // SetTrustline handles setting or updating a trustline from another server's perspective
 func SetTrustline(session main.Session) {
-    // Retrieve the counter_in value using the new getter
-    counterIn, err := db_trustlines.GetCounterIn(session.Datagram)
-    if err != nil {
-        log.Printf("Error getting counter_in for user %s: %v", session.Datagram.Username, err)
-        return
-    }
-
-    // Check the counter
-    counter := session.Datagram.Counter
-    if counter <= counterIn {
-        log.Printf("Potential replay attack: received counter (%d) is not greater than counter_in (%d) for user %s.", counter, counterIn, session.Datagram.Username)
+    // Validate the counter_in using the new ValidateCounterIn function
+    if err := trustlines.ValidateCounterIn(session.Datagram); err != nil {
+        log.Printf("Counter_in validation failed for user %s: %v", session.Datagram.Username, err)
         return
     }
 
