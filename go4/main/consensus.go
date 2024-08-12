@@ -51,7 +51,7 @@ func CreateDatagram(tx []byte, sharedKey []byte) (Datagram, error) {
 	}
 
 	// Generate the identifier based on the From and To addresses
-	identifier := generateIdentifier(tx[0:20], tx[20:40])
+	identifier := GenerateIdentifier(tx[0:20], tx[20:40])
 
 	// Create the Datagram
 	var datagram Datagram
