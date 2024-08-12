@@ -19,24 +19,16 @@ func SyncTrustlineOut(session main.Session) {
         return
     }
 
-    // Retrieve the current syncCounter value
-    syncCounter, err := db_trustlines.GetSyncCounter(datagram)
+    // Retrieve the sync status
+    isSynced, err := trustlines.GetSyncStatus(datagram)
     if err != nil {
-        log.Printf("Error getting syncCounter for user %s: %v", datagram.Username, err)
-        main.SendErrorResponse("Failed to retrieve sync counter.", session.Conn)
-        return
-    }
-
-    // Retrieve the current syncOut value
-    syncOut, err := db_trustlines.GetSyncOut(datagram)
-    if err != nil {
-        log.Printf("Error getting syncOut for user %s: %v", datagram.Username, err)
-        main.SendErrorResponse("Failed to retrieve sync out value.", session.Conn)
+        log.Printf("Failed to retrieve sync status for user %s: %v", datagram.Username, err)
+        main.SendErrorResponse("Failed to retrieve sync status.", session.Conn)
         return
     }
 
     // Check if the trustline is already synced
-    if syncCounter == syncOut {
+    if isSynced {
         // Trustline is already synced, so send a SetTimestamp command instead
         sendSyncTimestamp(session)
     } else {
