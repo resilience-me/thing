@@ -27,7 +27,7 @@ func GetTrustline(session main.Session) {
     }
 
     // Extract sync_in value from the datagram's Arguments[0:4]
-    syncIn := binary.BigEndian.Uint32(datagram.Arguments[:4])
+    syncIn := main.BytesToUint32(datagram.Arguments[:4])
 
     // Retrieve the current sync_out value
     syncOut, err := db_trustlines.GetSyncOut(datagram)
