@@ -14,6 +14,18 @@ type Transaction struct {
     Signature         [64]byte
 }
 
+type TransactionRequest struct {
+    From      [20]byte
+    To        [20]byte
+    Data      [256]byte
+    Signature [64]byte
+}
+
+type Datagram struct {
+    Identifier  [20]byte
+    Payload	[360]byte
+}
+
 func hashAndTruncateToAddress() []byte {
     hash := sha256.Sum256(combined)
     return hash[:20]  // Use the first 20 bytes of the hash
