@@ -47,5 +47,5 @@ func SetSyncOut(session main.Session) {
         return
     }
 
-    log.Printf("Sync_out and counter_in updated successfully for user %s.", datagram.Username)
+    log.Printf("Sync_out updated successfully for user %s.", datagram.Username)
 }
