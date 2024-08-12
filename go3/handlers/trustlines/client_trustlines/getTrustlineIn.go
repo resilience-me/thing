@@ -2,25 +2,18 @@ package client_trustlines
 
 import (
     "log"
-    "ripple/database/db_trustlines" // Updated to match your import structure
-    "ripple/main"                   // Updated to match your import structure
+    "ripple/database/db_trustlines" // Handles database-related operations
+    "ripple/main"                   // Main package for session and communication utilities
+    "ripple/trustlines"             // Import the trustlines package for counter validation
 )
 
 // GetTrustlineIn handles fetching the inbound trustline information
 func GetTrustlineIn(session main.Session) {
     datagram := session.Datagram
 
-    // Retrieve the previous client-side counter value using the getter
-    prevCounter, err := db_trustlines.GetCounter(datagram)
-    if err != nil {
-        log.Printf("Error getting previous counter for user %s: %v", datagram.Username, err)
-        main.SendErrorResponse("Failed to read counter file.", session.Conn)
-        return
-    }
-
-    // Check if the client-side counter is valid (prevents replay attacks)
-    if datagram.Counter <= prevCounter {
-        log.Printf("Received counter is not greater than previous counter for user %s. Potential replay attack.", datagram.Username)
+    // Validate the counter using the ValidateCounter function from trustlines package
+    if err := trustlines.ValidateCounter(datagram); err != nil {
+        log.Printf("Counter validation failed for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Received counter is not valid.", session.Conn)
         return
     }
@@ -41,7 +34,7 @@ func GetTrustlineIn(session main.Session) {
     }
 
     // Prepare success response
-    responseData := uint32ToBytes(trustline)
+    responseData := main.Uint32ToBytes(trustline)
 
     // Send the success response back to the client
     if err := main.SendSuccessResponse(responseData, session.Conn); err != nil {
