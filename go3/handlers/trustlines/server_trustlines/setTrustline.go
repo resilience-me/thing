@@ -5,7 +5,7 @@ import (
     "time"
     "ripple/main"
     "ripple/handlers"
-    "ripple/trustlines"
+    "ripple/handlers/trustlines"
     "ripple/database/db_trustlines"
 )
 
