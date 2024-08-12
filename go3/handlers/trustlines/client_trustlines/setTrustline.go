@@ -5,24 +5,16 @@ import (
     "log"
     "ripple/database/db_trustlines"
     "ripple/main"
+    "ripple/trustlines" // Import the trustlines package for counter validation
 )
 
 // SetTrustline updates the trustline based on the given session.
 func SetTrustline(session main.Session) {
-    // We assume session.Datagram is directly accessible and correctly initialized
     datagram := session.Datagram
 
-    // Retrieve the previous client-side counter value using the getter
-    prevCounter, err := db_trustlines.GetCounter(datagram)
-    if err != nil {
-        log.Printf("Error getting previous counter for user %s: %v", datagram.Username, err)
-        main.SendErrorResponse("Failed to read counter file.", session.Conn)
-        return
-    }
-
-    // Check if the client-side counter is valid
-    if datagram.Counter <= prevCounter {
-        log.Printf("Received counter is not greater than previous counter for user %s. Potential replay attack.", datagram.Username)
+    // Validate the counter using the new ValidateCounter function
+    if err := trustlines.ValidateCounter(datagram); err != nil {
+        log.Printf("Counter validation failed for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Received counter is not valid.", session.Conn)
         return
     }
@@ -30,21 +22,21 @@ func SetTrustline(session main.Session) {
     // Retrieve the trustline amount from the Datagram
     trustlineAmount := binary.BigEndian.Uint32(datagram.Arguments[:4])
 
-    // Write the new trustline amount using the setter
+    // Write the new trustline amount using the setter in db_trustlines
     if err := db_trustlines.SetTrustlineOut(datagram, trustlineAmount); err != nil {
         log.Printf("Error writing trustline to file for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Failed to write trustline.", session.Conn)
         return
     }
 
-    // Increment the sync_counter without needing to return the value
-    if err := db_trustlines.IncrementSyncCounter(datagram); err != nil {
+    // Increment the sync_counter using the function in db_trustlines
+    if err := trustlines.IncrementSyncCounter(datagram); err != nil {
         log.Printf("Error incrementing sync_counter for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Failed to update sync counter.", session.Conn)
         return
     }
 
-    // Write the new client-side counter value using the setter
+    // Write the new client-side counter value using the setter in db_trustlines
     if err := db_trustlines.SetCounter(datagram, datagram.Counter); err != nil {
         log.Printf("Error writing counter to file for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Failed to write counter.", session.Conn)
