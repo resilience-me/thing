@@ -20,6 +20,7 @@ const (
     SizeSignature   = 64
 
     SizeTransaction = 452
+    SizeRequest     = 384
 
     OffsetNumber    = 0
     OffsetValidator = OffsetNumber + SizeNumber
