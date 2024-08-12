@@ -5,14 +5,14 @@ import (
     "log"
     "ripple/database/db_trustlines"
     "ripple/main"
-    "ripple/trustlines" // Import the trustlines package for counter validation
+    "ripple/trustlines" // Import the trustlines package for counter validation and incrementing sync counter
 )
 
 // SetTrustline updates the trustline based on the given session.
 func SetTrustline(session main.Session) {
     datagram := session.Datagram
 
-    // Validate the counter using the new ValidateCounter function
+    // Validate the counter using the ValidateCounter function from trustlines package
     if err := trustlines.ValidateCounter(datagram); err != nil {
         log.Printf("Counter validation failed for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Received counter is not valid.", session.Conn)
@@ -29,7 +29,7 @@ func SetTrustline(session main.Session) {
         return
     }
 
-    // Increment the sync_counter using the function in db_trustlines
+    // Increment the sync_counter using the function in trustlines package
     if err := trustlines.IncrementSyncCounter(datagram); err != nil {
         log.Printf("Error incrementing sync_counter for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Failed to update sync counter.", session.Conn)
