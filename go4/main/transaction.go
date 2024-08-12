@@ -40,7 +40,7 @@ type Transaction struct {
     Signature         [64]byte
 }
 
-func signTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, []byte, error) {
+func SignTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, []byte, error) {
 	r, s, err := ecdsa.Sign(rand.Reader, privKey, data)
 	if err != nil {
 		return nil, nil, err
@@ -61,7 +61,7 @@ func HashAndSignTransaction(privKey *ecdsa.PrivateKey, rawTransaction []byte) ([
     hash := sha256.Sum256(rawTransaction)
 
     // Sign the hash using ECDSA
-    r, s, err := ecdsa.Sign(rand.Reader, privKey, hash[:])
+    r, s, err := SignTransaction(privKey, hash[:])
     if err != nil {
         return nil, fmt.Errorf("failed to sign transaction: %v", err)
     }
@@ -74,20 +74,20 @@ func HashAndSignTransaction(privKey *ecdsa.PrivateKey, rawTransaction []byte) ([
 
 // SignAndInsertSignature hashes the raw transaction data (excluding the signature),
 // signs it, and then inserts the signature into the correct position within the raw transaction.
-func SignAndInsertSignature(rawTransaction []byte, privKey *ecdsa.PrivateKey) ([]byte, error) {
+func SignAndInsertSignature(rawTransaction []byte, privKey *ecdsa.PrivateKey) error {
     // Determine the length of the raw transaction data excluding the signature
     signatureOffset := len(rawTransaction) - SizeSignature
 
     // Hash and sign the transaction data excluding the signature field
     signature, err := HashAndSignTransaction(privKey, rawTransaction[:signatureOffset])
     if err != nil {
-        return nil, err
+        return err
     }
 
     // Copy the signature into the raw transaction at the correct offset
     copy(rawTransaction[signatureOffset:], signature)
 
-    return rawTransaction, nil
+    return nil
 }
 
 func writeRawTransactionToFile(data []byte, filename string) error {
