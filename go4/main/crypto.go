@@ -1,3 +1,16 @@
+package main
+
+import (
+    "crypto/aes"
+    "crypto/cipher"
+    "crypto/ecdsa"
+    "crypto/rand"
+    "crypto/sha256"
+    "fmt"
+    "io"
+    "math/big"
+)
+
 // GenerateSharedKey generates a shared symmetric key using ECDH key exchange.
 func GenerateSharedKey(privKey *ecdsa.PrivateKey, pubKey *ecdsa.PublicKey) ([]byte, error) {
     // Perform ECDH key exchange
