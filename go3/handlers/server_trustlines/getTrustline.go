@@ -34,7 +34,7 @@ func GetTrustline(session main.Session) {
     }
 
     // Retrieve and increment the counter_out value
-    counterOut, err := db_trustlines.GetAndIncrementCounterOut(datagram)
+    counterOut, err := trustlines.GetAndIncrementCounterOut(datagram)
     if err != nil {
         log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
         return
