@@ -63,7 +63,13 @@ func GetTrustline(session main.Session) {
         sendSyncTimestamp(session, &dg)
     } else if remoteSyncStatus && !localSyncStatus {
         // The peer is synced, but the local server is not aware
-        sendTrustline(session, &dg, syncCounter)
+        // Update the local sync_out to match the sync_counter
+        if err := db_trustlines.SetSyncOut(datagram, syncCounter); err != nil {
+            log.Printf("Error updating sync_out for user %s: %v", datagram.Username, err)
+            return
+        }
+        // Send a SetTimestamp command to the peer to acknowledge synchronization
+        sendSyncTimestamp(session, &dg)
     } else if !remoteSyncStatus {
         // The peer is not synced, send trustline data to synchronize
         sendTrustline(session, &dg, syncCounter)
