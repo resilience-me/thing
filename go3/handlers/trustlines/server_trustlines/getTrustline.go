@@ -21,7 +21,7 @@ func GetTrustline(session main.Session) {
     // Retrieve the syncCounter and local sync status
     syncCounter, isSyncedLocally, err := trustlines.GetSyncStatus(datagram)
     if err != nil {
-        log.Printf("Failed to retrieve sync status for user %s: %v", datagram.Username, err)
+        log.Printf("Failed to retrieve sync status in GetTrustline for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Failed to retrieve sync status.", session.Conn)
         return
     }
@@ -36,14 +36,13 @@ func GetTrustline(session main.Session) {
         return
     }
 
-    // Logic to determine the correct response
     if syncIn < syncCounter {
         // The peer is not synced, prepare to send trustline data to synchronize
         dg.Command = main.ServerTrustlines_SetTrustline
 
         trustline, err := db_trustlines.GetTrustlineOut(session.Datagram)
         if err != nil {
-            log.Printf("Error getting trustline for user %s: %v", session.Datagram.Username, err)
+            log.Printf("Error getting trustline for user %s in GetTrustline: %v", session.Datagram.Username, err)
             return
         }
     
@@ -56,7 +55,7 @@ func GetTrustline(session main.Session) {
             // The peer is synced, but the local server is not aware
             // Update the local sync_out to match the sync_counter
             if err := db_trustlines.SetSyncOut(datagram, syncCounter); err != nil {
-                log.Printf("Error updating sync_out for user %s: %v", datagram.Username, err)
+                log.Printf("Error updating sync_out in GetTrustline for user %s: %v", datagram.Username, err)
                 return
             }
         }
@@ -64,14 +63,14 @@ func GetTrustline(session main.Session) {
 
     // Send the prepared datagram
     if err := handlers.SignAndSendDatagram(session, dg); err != nil {
-        log.Printf("Failed to sign and send datagram for user %s: %v", session.Datagram.Username, err)
+        log.Printf("Failed to sign and send datagram in GetTrustline for user %s: %v", session.Datagram.Username, err)
         return
     }
-    log.Printf("Datagram command %d sent successfully for user %s.", dg.Command, session.Datagram.Username)
+    log.Printf("Datagram command %d sent successfully in GetTrustline for user %s.", dg.Command, session.Datagram.Username)
 
     // Update the counter_in after successfully processing the request
     if err := db_trustlines.SetCounterIn(datagram, datagram.Counter); err != nil {
-        log.Printf("Error updating counter_in for user %s: %v", datagram.Username, err)
+        log.Printf("Error updating counter_in in GetTrustline for user %s: %v", datagram.Username, err)
         return
     }
 
