@@ -40,6 +40,7 @@ The path-finding optimizes for never going too deep. It is bidirectional, reduci
     type AccountNode struct {
         Username       string
         LastModified   time.Time
+        PathEntry      *PathEntry
         Next           *AccountNode
     }
 
