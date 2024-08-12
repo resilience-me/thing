@@ -68,6 +68,7 @@ func StripSignatureAndVerify(rawTransaction []byte, pubKey *ecdsa.PublicKey) boo
 	// Define the starting index for the signature
 	signatureStart := dataLen - SizeSignature
 
+	// Extract data excluding the signature
 	data := rawTransaction[:signatureStart]
 
 	// Define the size of r and s values
