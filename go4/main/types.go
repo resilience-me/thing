@@ -43,13 +43,9 @@ type TransactionRequest struct {
 }
 
 type Datagram struct {
+    Type        byte
     Identifier  [20]byte
-    Ciphertext	[360]byte
-}
-
-type SyncPacket struct {
-    Identifier  [20]byte
-    Ciphertext	[416]byte
+    Ciphertext	[]byte
 }
 
 // GenerateAddress generates an address using SHA-256 from an ECDSA public key, skipping the prefix.
