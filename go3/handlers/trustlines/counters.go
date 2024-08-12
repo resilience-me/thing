@@ -74,7 +74,7 @@ func IncrementSyncCounter(datagram *main.Datagram) error {
     return nil
 }
 
-// GetSyncStatus retrieves the syncCounter and syncOut values and returns whether they are equal.
+// GetSyncStatus retrieves the syncCounter and syncOut values and returns the syncCounter and whether they are equal.
 func GetSyncStatus(datagram *main.Datagram) (uint32, bool, error) {
     // Retrieve the current syncCounter value
     syncCounter, err := db_trustlines.GetSyncCounter(datagram)
