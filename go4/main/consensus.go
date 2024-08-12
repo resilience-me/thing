@@ -24,13 +24,13 @@ func HandleTransactionRequest(filename string, request TransactionRequest, valid
     return nil
 }
 
-// ConvertTransactionRequestToTransaction converts a TransactionRequest to a Transaction by populating the fields.
-func ConvertTransactionRequestToTransaction(request TransactionRequest) ([]byte, error) {
+// ConvertRawBytesToTransaction converts raw bytes of a TransactionRequest to a Transaction by populating the fields.
+func ConvertRawBytesToTransaction(request []byte) ([]byte, error) {
     // Create a byte slice to hold the transaction
     rawTransaction := make([]byte, LengthTransaction)
 
     // Copy the entire TransactionRequest data into the rawTransaction starting at OffsetFrom
-    copy(rawTransaction[OffsetFrom:], request[:SizeRequest])
+    copy(rawTransaction[OffsetFrom:], request[:SizeRequest-SizeSignature])
 
     // Initialize the other fields to default values
     var defaultValidator [32]byte // or set this to a specific value
