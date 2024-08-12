@@ -47,13 +47,13 @@ func verifyTransaction(pubKey *ecdsa.PublicKey, data []byte, rBytes, sBytes []by
 }
 
 func SignTransaction(privKey *ecdsa.PrivateKey, data []byte) ([]byte, error) {
-	r, s, err := ecdsa.Sign(rand.Reader, privKey, data)
-	if err != nil {
-		return nil, err
-	}
-	// Combine r and s into a single byte slice as the signature
-	signature := append(r.Bytes(), s.Bytes()...)
-	return signature, nil
+    r, s, err := ecdsa.Sign(rand.Reader, privKey, data)
+    if err != nil {
+        return nil, err
+    }
+    // Combine r and s into a single byte slice as the signature
+    signature := append(r.Bytes(), s.Bytes()...)
+    return signature, nil
 }
 
 // HashAndSignTransaction hashes the provided data and signs it using the given private key.
