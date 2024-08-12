@@ -9,12 +9,7 @@ func GenerateSharedKey(privKey *ecdsa.PrivateKey, pubKey *ecdsa.PublicKey) ([]by
 }
 
 // EncryptTransactionRequest encrypts the signed transaction request with the shared symmetric key.
-func EncryptTransactionRequest(request *TransactionRequest, sharedKey []byte) ([]byte, error) {
-    // Serialize the signed transaction request
-    data := append(request.From[:], request.To[:]...)
-    data = append(data, request.Data[:]...)
-    data = append(data, request.Signature...)
-
+func EncryptTransactionRequest(request []byte, sharedKey []byte) ([]byte, error) {
     // Encrypt the data using AES-GCM for confidentiality and integrity
     block, err := aes.NewCipher(sharedKey)
     if err != nil {
@@ -31,9 +26,10 @@ func EncryptTransactionRequest(request *TransactionRequest, sharedKey []byte) ([
         return nil, fmt.Errorf("failed to generate nonce: %v", err)
     }
 
-    ciphertext := gcm.Seal(nonce, nonce, data, nil)
+    ciphertext := gcm.Seal(nonce, nonce, request, nil)
     return ciphertext, nil
 }
+
 
 // DecryptTransactionRequest decrypts the transaction request with the shared symmetric key.
 func DecryptTransactionRequest(ciphertext, sharedKey []byte) (*TransactionRequest, error) {
