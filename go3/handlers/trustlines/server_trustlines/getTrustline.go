@@ -19,22 +19,16 @@ func GetTrustline(session main.Session) {
         return
     }
 
-    // Retrieve the current sync_counter value
-    syncCounter, err := db_trustlines.GetSyncCounter(datagram)
+    // Retrieve the syncCounter and local sync status
+    syncCounter, isSyncedLocally, err := trustlines.GetSyncStatus(datagram)
     if err != nil {
-        log.Printf("Error getting sync_counter for user %s: %v", datagram.Username, err)
+        log.Printf("Failed to retrieve sync status for user %s: %v", datagram.Username, err)
+        main.SendErrorResponse("Failed to retrieve sync status.", session.Conn)
         return
     }
 
     // Extract sync_in value from the datagram's Arguments[0:4]
     syncIn := main.BytesToUint32(datagram.Arguments[:4])
-
-    // Retrieve the current sync_out value
-    syncOut, err := db_trustlines.GetSyncOut(datagram)
-    if err != nil {
-        log.Printf("Error getting sync_out for user %s: %v", datagram.Username, err)
-        return
-    }
 
     // Retrieve and increment the counter_out value
     counterOut, err := trustlines.GetAndIncrementCounterOut(datagram)
@@ -67,7 +61,7 @@ func GetTrustline(session main.Session) {
     } else {
         // Use the SetTimestamp command to the peer to acknowledge synchronization
         dg.Command = main.ServerTrustlines_SetTimestamp
-        if syncOut < syncCounter {
+        if !isSyncedLocally {
             // The peer is synced, but the local server is not aware
             // Update the local sync_out to match the sync_counter
             if err := db_trustlines.SetSyncOut(datagram, syncCounter); err != nil {
