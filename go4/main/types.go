@@ -1,7 +1,7 @@
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/sha256"
+    "crypto/ecdsa"
+    "crypto/elliptic"
+    "crypto/sha256"
 )
 
 type Transaction struct {
