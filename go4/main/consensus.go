@@ -1,5 +1,5 @@
 // HandleTransactionRequest processes a transaction request from the non-validator.
-func HandleTransactionRequest(filename string, request TransactionRequest, validatorID []byte) error {
+func HandleTransactionRequest(filename string, request []byte, validatorID []byte) error {
     // Ensure that this account is the current validator
     ValidatedLatestBlock, err := IsValidator(filename, validatorID)
     if err != nil {
@@ -7,6 +7,12 @@ func HandleTransactionRequest(filename string, request TransactionRequest, valid
     }
     if ValidatedLatestBlock {
         return fmt.Errorf("this account is not the current validator")
+    }
+
+    // Convert the request into a full transaction
+    rawTransaction, err := ConvertRawBytesToTransaction(request)
+    if err != nil {
+        return fmt.Errorf("failed to convert request to transaction: %v", err)
     }
 
     // Convert the request into a full transaction
