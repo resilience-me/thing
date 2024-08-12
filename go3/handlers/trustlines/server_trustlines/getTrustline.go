@@ -82,4 +82,7 @@ func GetTrustline(session main.Session) {
         log.Printf("Error updating counter_in for user %s: %v", datagram.Username, err)
         return
     }
+
+    // Final log message to confirm the successful completion of the GetTrustline operation
+    log.Printf("GetTrustline operation completed successfully for user %s.", datagram.Username)
 }
