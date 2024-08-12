@@ -6,6 +6,7 @@ import (
     "ripple/handlers"
     "ripple/trustlines"             // Import the trustlines package for counter validation
     "ripple/database/db_trustlines" // Handles database-related operations
+    "encoding/binary"
 )
 
 // SyncTrustlineIn handles the client request to sync the inbound trustline from the peer server.
@@ -16,6 +17,14 @@ func SyncTrustlineIn(session main.Session) {
     if err := trustlines.ValidateCounter(datagram); err != nil {
         log.Printf("Counter validation failed for user %s: %v", datagram.Username, err)
         main.SendErrorResponse("Received counter is not valid.", session.Conn)
+        return
+    }
+
+    // Retrieve the current sync_in value
+    syncIn, err := db_trustlines.GetSyncIn(datagram)
+    if err != nil {
+        log.Printf("Error getting sync_in for user %s: %v", datagram.Username, err)
+        main.SendErrorResponse("Failed to read sync_in value.", session.Conn)
         return
     }
 
@@ -30,7 +39,7 @@ func SyncTrustlineIn(session main.Session) {
     // Fetch the server's address
     serverAddress := main.GetServerAddress()
 
-    // Create the datagram to request the trustline from the peer
+    // Create the datagram to request the trustline from the peer, including the sync_in value
     dg := main.Datagram{
         Command:           main.ServerTrustlines_GetTrustline,
         Username:          datagram.PeerUsername,      // Switch places: this is the peer's username
@@ -38,6 +47,9 @@ func SyncTrustlineIn(session main.Session) {
         PeerServerAddress: serverAddress,              // Your server's address
         Counter:           counterOut,                 // Use the incremented counter_out value
     }
+
+    // Include the sync_in value in the datagram's Arguments[0:4]
+    binary.BigEndian.PutUint32(dg.Arguments[0:4], syncIn)
 
     // Send the GetTrustline command to the peer server
     if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
