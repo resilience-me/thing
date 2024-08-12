@@ -37,8 +37,8 @@ func GenerateAddress(pubKey *ecdsa.PublicKey) []byte {
     // The address is the first 20 bytes of the hash
     return hashAndTruncateToAddress(pubKeyBytes[1:])
 }
-// generateIdentifier creates a unique identifier using the first 20 bytes of a SHA-256 hash of the combined addresses.
-func generateIdentifier(myAddress, otherAddress []byte) []byte {
+// GenerateIdentifier creates a unique identifier using the first 20 bytes of a SHA-256 hash of the combined addresses.
+func GenerateIdentifier(myAddress, otherAddress []byte) []byte {
     combined := append(myAddress, otherAddress...)
     return hashAndTruncateToAddress(combined)
 }
