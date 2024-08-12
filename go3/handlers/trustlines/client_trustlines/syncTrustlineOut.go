@@ -1,12 +1,10 @@
 package client_trustlines
 
 import (
-    "encoding/binary"
     "log"
     "ripple/database/db_trustlines"
-    "ripple/handlers"
     "ripple/main"
-    "ripple/trustlines" // Import the trustlines package for counter validation
+    "ripple/trustlines"
 )
 
 // SyncTrustlineOut handles the client request to sync the outbound trustline to the peer server.
@@ -28,19 +26,11 @@ func SyncTrustlineOut(session main.Session) {
         return
     }
 
-    // Retrieve and increment the counter_out value
-    counterOut, err := trustlines.GetAndIncrementCounterOut(datagram)
+    // Initialize the datagram
+    dg, err := trustlines.InitializeDatagram(datagram)
     if err != nil {
-        log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
+        log.Printf("%v", err)
         return
-    }
-
-    // Initialize common Datagram fields for response
-    dg := main.Datagram{
-        Username:          datagram.PeerUsername,
-        PeerUsername:      datagram.Username,
-        PeerServerAddress: datagram.PeerServerAddress,
-        Counter:           counterOut,
     }
 
     if isSynced {
@@ -60,9 +50,8 @@ func SyncTrustlineOut(session main.Session) {
     }
 
     // Send the prepared datagram
-    if err := handlers.SignAndSendDatagram(session, &dg); err != nil {
+    if err := handlers.SignAndSendDatagram(session, dg); err != nil {
         log.Printf("Failed to send datagram for user %s: %v", datagram.Username, err)
-        main.SendErrorResponse("Failed to send datagram.", session.Conn)
         return
     }
 
