@@ -23,7 +23,7 @@ type TransactionRequest struct {
 
 type Datagram struct {
     Identifier  [20]byte
-    Payload	[360]byte
+    Ciphertext	[360]byte
 }
 
 func hashAndTruncateToAddress() []byte {
