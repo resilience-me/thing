@@ -12,7 +12,7 @@ func LoadSharedKey(datadir string, identifier [20]byte) ([]byte, error) {
 	identifierStr := fmt.Sprintf("%x", identifier)
 
 	// Construct the file path in datadir/keys/ with the identifier as the filename and .key extension
-	filePath := filepath.Join(datadir, "keys", identifierStr+".key")
+	filePath := filepath.Join(GetDataDir(), "keys", identifierStr+".key")
 
 	// Read the key from the file
 	key, err := ioutil.ReadFile(filePath)
@@ -29,7 +29,7 @@ func SaveSharedKey(datadir string, identifier [20]byte, key []byte) error {
 	identifierStr := fmt.Sprintf("%x", identifier)
 
 	// Construct the file path in datadir/keys/ with the identifier as the filename and .key extension
-	filePath := filepath.Join(datadir, "keys", identifierStr+".key")
+	filePath := filepath.Join(GetDataDir(), "keys", identifierStr+".key")
 
 	// Write the key to the file
 	err := ioutil.WriteFile(filePath, key, 0600) // 0600 ensures that only the owner can read/write the file
