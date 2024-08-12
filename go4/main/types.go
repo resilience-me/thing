@@ -56,8 +56,8 @@ func GenerateAddress(pubKey *ecdsa.PublicKey) []byte {
     return hash[:20]  // Use the first 20 bytes of the hash
 }
 // GenerateIdentifier creates a unique identifier using the first 20 bytes of a SHA-256 hash of the combined addresses.
-func GenerateIdentifier(myAddress, otherAddress []byte) []byte {
-    return XORBytes(myAddress, otherAddress)
+func GenerateIdentifier(fromAddress, toAddress []byte) []byte {
+    return XORBytes(fromAddress, toAddress)
 }
 
 // XORBytes takes two byte slices and returns their XOR combination.
