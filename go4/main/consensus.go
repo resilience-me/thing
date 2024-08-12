@@ -17,16 +17,10 @@ func HandleTransactionRequest(filename string, request []byte, validatorID []byt
 
     copy(rawTransaction[OffsetValidator:], validatorID[:SizeValidator])
 
-    // Convert the request into a full transaction
-    rawTransaction, err := PrepareTransaction(filename, request, validatorID)
-    if err != nil {
-        return fmt.Errorf("failed to prepare transaction: %v", err)
-    }
 
-    // Validate and append the transaction
-    err = SubmitTransaction(filename, rawTransaction, validatorID)
+    err := PrepareAndStoreTransaction("transactions.dat", rawTransaction, privateKey)
     if err != nil {
-        return fmt.Errorf("failed to validate and add transaction: %v", err)
+        return err
     }
 
     return nil
