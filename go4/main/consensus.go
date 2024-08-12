@@ -42,16 +42,16 @@ func ConvertRawBytesToTransaction(request []byte) ([]byte, error) {
 }
 
 // CreateDatagram encrypts the TransactionRequest (provided as a byte slice), generates the identifier, and creates the Datagram.
-func CreateDatagram(tx []byte, sharedKey []byte) (Datagram, error) {
+func CreateDatagram(tx []byte) (Datagram, error) {
+
+	identifier := GenerateIdentifier(tx[0:20], tx[20:40])
+	sharedKey := LoadSharedKey(identifier)
 
 	// Encrypt the TransactionRequest
 	ciphertext, err := Encrypt(tx, sharedKey)
 	if err != nil {
 		return Datagram{}, fmt.Errorf("error encrypting transaction request: %v", err)
 	}
-
-	// Generate the identifier based on the From and To addresses
-	identifier := GenerateIdentifier(tx[0:20], tx[20:40])
 
 	// Create the Datagram
 	var datagram Datagram
