@@ -40,3 +40,25 @@ func ConvertRawBytesToTransaction(request []byte) ([]byte, error) {
 
     return rawTransaction, nil
 }
+
+// CreateDatagram encrypts the TransactionRequest, generates the identifier, and creates the Datagram.
+func CreateDatagram(txRequest TransactionRequest, sharedKey []byte) (Datagram, error) {
+	// Serialize the TransactionRequest
+	txRequestBytes := append(txRequest.From[:], append(txRequest.To[:], append(txRequest.Data[:], txRequest.Signature[:]...)...)...)
+
+	// Encrypt the TransactionRequest
+	encryptedRequest, err := EncryptTransactionRequest(txRequestBytes, sharedKey)
+	if err != nil {
+		return Datagram{}, fmt.Errorf("error encrypting transaction request: %v", err)
+	}
+
+	// Generate the identifier based on the From and To addresses
+	identifier := generateIdentifier(txRequest.From, txRequest.To)
+
+	// Create the Datagram
+	var datagram Datagram
+	copy(datagram.Identifier[:], identifier[:])
+	copy(datagram.Payload[:], encryptedRequest[:])
+
+	return datagram, nil
+}
