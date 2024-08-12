@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
@@ -21,7 +21,7 @@ func LoadSharedKey(datadir string, identifier [20]byte) ([]byte, error) {
 	filePath := getKeyFilePath(datadir, identifier)
 
 	// Read the key from the file
-	key, err := ioutil.ReadFile(filePath)
+	key, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load shared key from file %s: %v", filePath, err)
 	}
@@ -35,7 +35,7 @@ func SaveSharedKey(datadir string, identifier [20]byte, key []byte) error {
 	filePath := getKeyFilePath(datadir, identifier)
 
 	// Write the key to the file
-	err := ioutil.WriteFile(filePath, key, 0600) // 0600 ensures that only the owner can read/write the file
+	err := os.WriteFile(filePath, key, 0600) // 0600 ensures that only the owner can read/write the file
 	if err != nil {
 		return fmt.Errorf("failed to save shared key to file %s: %v", filePath, err)
 	}
