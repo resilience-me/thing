@@ -32,12 +32,5 @@ func ConvertRawBytesToTransaction(request []byte) ([]byte, error) {
     // Copy the entire TransactionRequest data into the rawTransaction starting at OffsetFrom
     copy(rawTransaction[OffsetFrom:], request[:SizeRequest-SizeSignature])
 
-    // Initialize the other fields to default values
-    var defaultValidator [32]byte // or set this to a specific value
-    copy(rawTransaction[OffsetValidator:], defaultValidator[:])
-    binary.BigEndian.PutUint32(rawTransaction[OffsetNumber:], 0) // Initial transaction number
-    copy(rawTransaction[OffsetParentHash:], [32]byte{})          // Zeroed ParentHash
-    copy(rawTransaction[OffsetSignature:], [64]byte{})           // Zeroed Signature
-
     return rawTransaction, nil
 }
