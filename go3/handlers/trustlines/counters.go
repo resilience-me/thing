@@ -73,3 +73,20 @@ func IncrementSyncCounter(datagram *main.Datagram) error {
     // No need to return any value; just indicate success by returning nil.
     return nil
 }
+
+func GetSyncStatus(datagram *main.Datagram) (bool, error) 
+    // Retrieve the current syncCounter value
+    syncCounter, err := db_trustlines.GetSyncCounter(datagram)
+    if err != nil {
+        return false, fmt.Errorf("Error getting syncCounter for user %s: %v", datagram.Username, err)
+    }
+
+    // Retrieve the current syncOut value
+    syncOut, err := db_trustlines.GetSyncOut(datagram)
+    if err != nil {
+        return false, fmt.Errorf("Error getting syncOut for user %s: %v", datagram.Username, err)
+        
+    }
+
+    return syncOut == syncCounter, nil
+}
