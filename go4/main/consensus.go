@@ -45,7 +45,7 @@ func ConvertRawBytesToTransaction(request []byte) ([]byte, error) {
 func CreateDatagram(tx []byte, sharedKey []byte) (Datagram, error) {
 
 	// Encrypt the TransactionRequest
-	payload, err := Encrypt(tx, sharedKey)
+	ciphertext, err := Encrypt(tx, sharedKey)
 	if err != nil {
 		return Datagram{}, fmt.Errorf("error encrypting transaction request: %v", err)
 	}
@@ -56,7 +56,7 @@ func CreateDatagram(tx []byte, sharedKey []byte) (Datagram, error) {
 	// Create the Datagram
 	var datagram Datagram
 	copy(datagram.Identifier[:], identifier[:])
-	copy(datagram.Payload[:], payload[:])
+	copy(datagram.Ciphertext[:], ciphertext[:])
 
 	return datagram, nil
 }
