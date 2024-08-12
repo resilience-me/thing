@@ -29,18 +29,12 @@ func GetTrustline(session main.Session) {
     // Extract sync_in value from the datagram's Arguments[0:4]
     syncIn := binary.BigEndian.Uint32(datagram.Arguments[:4])
 
-    // Determine the peer's sync status
-    remoteSyncStatus := syncIn <= syncCounter
-
     // Retrieve the current sync_out value
     syncOut, err := db_trustlines.GetSyncOut(datagram)
     if err != nil {
         log.Printf("Error getting sync_out for user %s: %v", datagram.Username, err)
         return
     }
-
-    // Determine the local sync status
-    localSyncStatus := syncOut <= syncCounter
 
     // Retrieve and increment the counter_out value
     counterOut, err := trustlines.GetAndIncrementCounterOut(datagram)
@@ -58,21 +52,20 @@ func GetTrustline(session main.Session) {
     }
 
     // Logic to determine the correct response
-    if remoteSyncStatus && localSyncStatus {
-        // Both the peer and the local server are synced
-        sendSyncTimestamp(session, &dg)
-    } else if remoteSyncStatus && !localSyncStatus {
-        // The peer is synced, but the local server is not aware
-        // Update the local sync_out to match the sync_counter
-        if err := db_trustlines.SetSyncOut(datagram, syncCounter); err != nil {
-            log.Printf("Error updating sync_out for user %s: %v", datagram.Username, err)
-            return
+    if syncIn < syncCounter {
+        // The peer is not synced, send trustline data to synchronize
+        sendTrustline(session, &dg, syncCounter)
+    } else {
+        if syncOut < syncCounter {
+            // The peer is synced, but the local server is not aware
+            // Update the local sync_out to match the sync_counter
+            if err := db_trustlines.SetSyncOut(datagram, syncCounter); err != nil {
+                log.Printf("Error updating sync_out for user %s: %v", datagram.Username, err)
+                return
+            }
         }
         // Send a SetTimestamp command to the peer to acknowledge synchronization
         sendSyncTimestamp(session, &dg)
-    } else if !remoteSyncStatus {
-        // The peer is not synced, send trustline data to synchronize
-        sendTrustline(session, &dg, syncCounter)
     }
 
     // Update the counter_in after successfully processing the request
