@@ -23,15 +23,15 @@ type CommandHandler func(session Session)
 
 // CommandHandlers maps command bytes to handler functions
 var commandHandlers = [256]CommandHandler{
-    0:   client_trustlines.SetTrustline,    // Client Command
-    1:   client_trustlines.SyncTrustlineIn, // Client Command
+    0:   client_trustlines.SetTrustline,     // Client Command
+    1:   client_trustlines.SyncTrustlineIn,  // Client Command
     2:   client_trustlines.SyncTrustlineOut, // Client Command
-    3:   client_trustlines.GetTrustlineIn,  // Client Command
-    4:   client_trustlines.GetTrustlineOut, // Client Command
-    127: server_trustlines.SetTrustline,    // Server Command
-    128: server_trustlines.GetTrustline,    // Server Command
-    139: server_trustlines.SetSyncOut,      // Server Command
-    131: server_trustlines.SetTimestamp,    // Server Command
+    3:   client_trustlines.GetTrustlineIn,   // Client Command
+    4:   client_trustlines.GetTrustlineOut,  // Client Command
+    127: server_trustlines.SetTrustline,     // Server Command
+    128: server_trustlines.GetTrustline,     // Server Command
+    139: server_trustlines.SetSyncOut,       // Server Command
+    131: server_trustlines.SetTimestamp,     // Server Command
     // Other indices are nil by default
 }
 
