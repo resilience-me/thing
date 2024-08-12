@@ -32,7 +32,7 @@ func GetTrustline(session main.Session) {
     // Initialize the datagram
     dg, err := trustlines.InitializeDatagram(datagram)
     if err != nil {
-        log.Printf("%v", err)
+        log.Printf("Error initializing datagram in GetTrustline for user %s: %v", datagram.Username, err)
         return
     }
 
