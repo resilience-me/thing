@@ -167,7 +167,7 @@ func main() {
     // Goroutine to handle shutdown
     go manager.shutdownHandler(listener)
 
-    pm := PathManager{}
+    pm := pathfinding.PathManager{}
 
     for {
         select {
