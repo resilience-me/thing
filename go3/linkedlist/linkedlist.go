@@ -17,9 +17,9 @@ type BaseList struct {
 }
 
 // Find finds a node by its identifier, removes expired nodes, and returns the found node.
-func (ll *BaseNode) Find(targetID string, timeout time.Duration) *BaseNode {
+func (bl *BaseList) Find(identifier string, timeout time.Duration) *BaseNode {
     var prev *BaseNode
-    current := ll
+    current := bl.head
     now := time.Now()
 
     for current != nil {
@@ -27,22 +27,22 @@ func (ll *BaseNode) Find(targetID string, timeout time.Duration) *BaseNode {
         if now.Sub(current.Timestamp) > timeout {
             // Remove expired node
             if prev == nil {
-                ll = current.Next.(*BaseNode)
+                bl.head = current.Next
             } else {
                 prev.Next = current.Next
             }
             // If the expired node was the target, return nil
-            if current.Identifier == targetID {
+            if current.Identifier == identifier {
                 return nil
             }
         } else {
             // If the node is the target and not expired, return it
-            if current.Identifier == targetID {
+            if current.Identifier == identifier {
                 return current
             }
             prev = current
         }
-        current = current.Next.(*BaseNode)
+        current = current.Next
     }
     return nil
 }
