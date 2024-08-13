@@ -76,3 +76,7 @@ func (node *AccountNode) Find(identifier string) *PathNode {
     }
     return nil
 }
+
+func (node *AccountNode) Remove(identifier string) {
+    node.PathList.Remove(identifier)
+}
