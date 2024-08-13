@@ -15,7 +15,6 @@ type BaseNode struct {
 // BaseList manages a linked list of BaseNode elements.
 type BaseList struct {
     head *BaseNode // Pointer to the head of the linked list
-    tail *BaseNode // New field to track the last node (tail)
 }
 
 func (bl *BaseList) Add(newNode *BaseNode) {
@@ -24,8 +23,9 @@ func (bl *BaseList) Add(newNode *BaseNode) {
     bl.head = newNode              // Update the head to be the new node
 }
 
-// Find finds a node by its identifier, removes expired nodes, and returns the found node.
-func (bl *BaseList) Find(identifier string) *BaseNode {
+// FindParent searches for the parent of a node by its identifier, removes expired nodes while traversing,
+// and returns the parent node. If the node is the head, parent will be nil.
+func (bl *BaseList) FindParent(identifier string) *BaseNode {
     var prev *BaseNode
     current := bl.head
     now := time.Now()
@@ -39,14 +39,14 @@ func (bl *BaseList) Find(identifier string) *BaseNode {
             } else {
                 prev.Next = current.Next
             }
-            // If the expired node was the target, return nil
+            // If the expired node was the target, return nil (since it's been removed)
             if current.Identifier == identifier {
                 return nil
             }
         } else {
-            // If the node is the target and not expired, return it
+            // If the node is the target and not expired, return its parent
             if current.Identifier == identifier {
-                return current
+                return prev
             }
             prev = current
         }
