@@ -16,18 +16,21 @@ func PathFindingOut(session Session) {
     // Find the account node by username
     accountNode := session.PathManager.FindAccount(username)
 
-    // Check if the accountNode is not nil and then look for the path entry
+    // Check if the accountNode exists
     var pathEntry *PathEntry
     if accountNode != nil {
+        // Account exists, search for the path entry
         pathEntry = accountNode.FindIdentifier(identifier)
     } else {
+        // Create a new account node
         accountNode = session.PathManager.AddAccount(username)
+        fmt.Printf("Created new account node for user %s.\n", username)
     }
 
     // Evaluate the existence of the path entry
     if pathEntry != nil {
-
+        // Path entry exists
     } else {
-
+        // Path entry does not exist
     }
 }
