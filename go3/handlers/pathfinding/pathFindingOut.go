@@ -2,10 +2,11 @@ package pathfinding
 
 import (
     "log"
+    "ripple/main"
 )
 
 // PathFindingOut handles the pathfinding output command for a given session
-func PathFindingOut(session Session) {
+func PathFindingOut(session main.Session) {
     // Extract the username and identifier from the session's datagram
     username := session.Datagram.Username
     var identifier [32]byte
