@@ -38,13 +38,6 @@ func PathFindingOut(session main.Session) {
         return
     }
 
-    // Prepare common datagram fields
-    newDatagram := &main.Datagram{
-        PeerUsername:      username,  // Sender's username
-        PeerServerAddress: config.GetServerAddress(), // Sender's server address
-        Arguments:         session.Datagram.Arguments, // Arguments originally received
-    }
-
     // Send pathfinding requests to all peers, depending on existing counters
     for _, peer := range peers {
 
