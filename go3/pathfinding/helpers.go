@@ -21,11 +21,8 @@ func (pm *PathManager) FindOrAdd(username string) *AccountNode {
     return pm.Add(username)
 }
 
-// ResetPayment safely removes the previous payment and clears the Payment field
+// ResetPayment removes the previous payment and clears the Payment field
 func (pm *PathManager) ResetPayment(accountNode *AccountNode) {
-    // Lock the mutex to ensure thread-safe modification of the AccountNode
-    pm.mu.Lock()
-    defer pm.mu.Unlock()
 
     if accountNode.Payment != nil {
         // Remove the previous payment's PathNode
