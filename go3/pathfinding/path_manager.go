@@ -37,7 +37,7 @@ func (node *AccountNode) Add(identifier string, incoming, outgoing PeerAccount) 
         Incoming: incoming,
         Outgoing: outgoing,
     }
-    node.PathFinding.Add(&newEntry.BaseNode)
+    node.BaseList.Add(&newEntry.BaseNode)
 }
 
 // Find searches for a specific account in the PathManager's linked list and returns it if found.
@@ -57,7 +57,7 @@ func (pm *PathManager) Find(username string) *AccountNode {
 // removes any expired entries based on the configured timeout duration,
 // and returns the PathNode for the identifier if it is found.
 func (node *AccountNode) Find(identifier string) *PathNode {
-    baseNode := node.PathFinding.Find(identifier)
+    baseNode := node.BaseList.Find(identifier)
 
     if baseNode != nil {
         return baseNode.(*PathNode)
