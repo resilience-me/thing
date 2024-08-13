@@ -111,10 +111,10 @@ func (node *AccountNode) AddPathEntry(identifier [32]byte, incoming, outgoing Pe
     node.PathFinding = newEntry
 }
 
-// FindIdentifier checks if the given identifier exists in the PathFinding linked list,
+// FindPathEntry checks if the given identifier exists in the PathFinding linked list,
 // removes any expired entries based on the configured timeout duration,
 // and returns the PathEntry for the identifier if it is found.
-func (node *AccountNode) FindIdentifier(identifier [32]byte) *PathEntry {
+func (node *AccountNode) FindPathEntry(identifier [32]byte) *PathEntry {
     now := time.Now()
     var prev *PathEntry
     current := node.PathFinding
