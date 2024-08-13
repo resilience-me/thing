@@ -54,6 +54,31 @@ func (bl *BaseList) Find(identifier string) *BaseNode {
     return nil
 }
 
+// Find searches for a node by its identifier, removes expired nodes while traversing,
+// and returns the found node.
+func (bl *BaseList) Find(identifier string) *BaseNode {
+    // First, check if the list is empty
+    if bl.head == nil {
+        return nil
+    }
+
+    // If the head is the target node, return it directly
+    if bl.head.Identifier == identifier {
+        return bl.head
+    }
+
+    // Otherwise, find the parent node of the target
+    parent := bl.FindParent(identifier)
+
+    // If the parent is found, return its next node (which should be the target node)
+    if parent != nil {
+        return parent.Next
+    }
+
+    // If the node wasn't found, return nil
+    return nil
+}
+
 // Remove deletes a node by its identifier from the list and returns true if the node was found and removed.
 func (bl *BaseList) Remove(identifier string) bool {
     // Start by traversing the list to find the node and its previous node
