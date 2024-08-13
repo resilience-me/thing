@@ -147,8 +147,3 @@ func (node *AccountNode) FindPathEntry(identifier [32]byte) *PathEntry {
 
     return nil
 }
-
-// HandlePathRequest processes a single hop for either incoming or outgoing path
-func (pm *PathManager) HandlePathRequest(identifier [32]byte, isOutgoing bool, requestOrigin PeerAccount) *PathEntry {
-    return handlePathRequest(pm.head, identifier, isOutgoing, requestOrigin)
-}
