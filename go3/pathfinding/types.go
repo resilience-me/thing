@@ -1,33 +1,42 @@
 package pathfinding
 
 import (
-  "ripple/pathfinding/linkedlist"
+    "sync"
+    "time"
 )
 
-// PeerAccount represents a peer in the network.
+// PeerAccount holds the details about a peer account.
 type PeerAccount struct {
     Username      string
     ServerAddress string
 }
 
-// PathNode represents an entry in the pathfinding linked list.
+// PathNode is the replacement for PathEntry, adapted for use with a map.
 type PathNode struct {
-    linkedlist.BaseNode // Embedding the base struct for shared fields
-    Incoming           PeerAccount
-    Outgoing           PeerAccount
-    CounterIn          int
-    CounterOut         map[string]int
+    Identifier   [32]byte // Using array for fixed-size identifiers.
+    Timestamp    time.Time
+    Incoming     PeerAccount
+    Outgoing     PeerAccount
+    CounterIn    int
+    CounterOut   map[string]int // Map for outgoing counters by username.
 }
 
-// Payment struct to hold details about an ongoing payment.
-type Payment struct {
-    Identifier string // Unique identifier for the payment
-    InOrOut    bool   // True if outgoing (sender), false if incoming (receiver)
-}
-
-// AccountNode struct to represent each node's information in the account linked list.
+// AccountNode holds all pathfinding related nodes and payment information.
 type AccountNode struct {
-    linkedlist.BaseNode           // Embedding the base struct for shared fields
-    linkedlist.BaseList           // Embed BaseList to manage the linked list of BaseNodes
-    Payment          *Payment     // Pointer to a Payment struct if a payment is active
+    Username      string
+    LastModified  time.Time
+    Paths         map[[32]byte]*PathNode // Maps identifiers to PathNode.
+    Payment       *Payment
+}
+
+// Payment structure adapted for use with AccountNode.
+type Payment struct {
+    Identifier string
+    InOrOut    bool // True for outgoing, false for incoming.
+}
+
+// PathManager manages all AccountNodes in a system.
+type PathManager struct {
+    Accounts map[string]*AccountNode // Map usernames to their respective AccountNodes.
+    mu       sync.Mutex // Protects the Accounts map.
 }
