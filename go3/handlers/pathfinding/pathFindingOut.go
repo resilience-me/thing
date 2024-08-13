@@ -33,6 +33,7 @@ func PathFindingOut(session Session) {
 
         counter := session.Datagram.Counter
         if pathEntry.Counter > counter {
+    		log.Println("Received counter is not greater than or equal to pathEntry.Counter. Potential replay attack.")
             return
         }
 
