@@ -42,5 +42,18 @@ func PathFindingOut(session Session) {
         accountNode.AddPathEntry(identifier, incoming, outgoing)
 
         log.Printf("Created new path entry for account %s with identifier %x.\n", username, identifier)
+
+        // Send the PathFindingRecurse command back to the peer
+        responseDatagram := &main.Datagram{
+            Command:           main.ClientPathfinding_PathFindingRecurse,
+            Username:          datagram.PeerUsername,             // Send to the peer username
+            PeerUsername:      datagram.Username,                  // Original sender as PeerUsername
+            PeerServerAddress: config.GetServerAddress(),          // Use config to get the server address
+            Arguments:         datagram.Arguments,                 // Include the original Arguments
+        }
+
+        // Log the sending action
+        log.Printf("Sending PathFindingRecurse command from %s to %s", datagram.PeerUsername, datagram.Username)
+
     }
 }
