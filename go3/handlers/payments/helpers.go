@@ -2,7 +2,6 @@ package payments
 
 import (
     "crypto/sha256"
-    "fmt"
     "ripple/main"
 )
 
