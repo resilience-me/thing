@@ -7,9 +7,11 @@ import (
     "ripple/config"
 )
 
+// AccountNode represents a node in the linked list
 type AccountNode struct {
     Username     string
     LastModified time.Time
+    PathFinding   *PathEntry // Linked list of PathEntry nodes
     Next         *AccountNode
 }
 
@@ -26,8 +28,10 @@ type PathEntry struct {
     Next       *PathEntry
 }
 
+// PathManager manages the linked list of accounts
 type PathManager struct {
     head *AccountNode
+    mu   sync.Mutex // Mutex to protect access to the linked list
 }
 
 // NewPathManager creates a new PathManager with an initial list of accounts
