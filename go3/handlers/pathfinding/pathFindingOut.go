@@ -60,6 +60,7 @@ func PathFindingOut(session main.Session) {
             newDatagram.Command = main.Pathfinding_NewPathFindingOut
         } else {
             newDatagram.Command = main.Pathfinding_PathFindingOut
+            newDatagram.Counter = pathNode.CounterOut[peer.Username]
         }
 
         // Sign and send the datagram to the peer
