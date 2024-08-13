@@ -28,7 +28,7 @@ func (pm *PathManager) Add(username string) *AccountNode {
         Identifier: username,
     }
 
-    pm.BaseList.Add(&newNode.BaseNode) // Correct: Pass pointer to BaseNode
+    pm.BaseList.Add(&newNode.BaseNode)
 
     return newNode // Return the newly created AccountNode
 }
