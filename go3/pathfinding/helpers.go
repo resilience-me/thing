@@ -16,15 +16,26 @@ func (pm *PathManager) FindOrAdd(username string) *AccountNode {
     return pm.Add(username)
 }
 
+// ResetPayment safely removes the previous payment and clears the Payment field
+func (pm *PathManager) ResetPayment(accountNode *AccountNode) {
+    // Lock the mutex to ensure thread-safe modification of the AccountNode
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    if accountNode.Payment != nil {
+        // Remove the previous payment's PathNode
+        accountNode.PathList.Remove(accountNode.Payment.Identifier)
+        accountNode.Payment = nil // Clear the previous payment
+    }
+}
+
 // Shared function to initialize a payment, based on whether it is incoming or outgoing
 func (pm *PathManager) initiatePayment(username, paymentID string, inOrOut bool) error {
     // Step 1: Find or add the AccountNode
     accountNode := pm.FindOrAdd(username)
 
-    // Step 2: Check if a payment is already associated with this AccountNode
-    if accountNode.Payment != nil {
-        accountNode.FindAndRemove(accountNode.Payment)
-    }
+    // Step 2: Safely clear the previous payment using the helper function
+    pm.ResetPayment(accountNode)
 
     // Step 3: Check if a PathNode for this payment already exists
     pathNode := accountNode.Find(paymentID)
