@@ -25,7 +25,7 @@ func (pm *PathManager) Add(username string) *AccountNode {
     defer pm.mu.Unlock()
 
     newNode := &AccountNode{
-        Identifier: username,
+        BaseNode: linkedlist.BaseNode{Identifier: username},
     }
 
     pm.BaseList.Add(&newNode.BaseNode)
