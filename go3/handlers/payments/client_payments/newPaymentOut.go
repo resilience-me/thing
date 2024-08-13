@@ -25,6 +25,7 @@ func NewPaymentOut(session main.Session) {
     // Generate the payment identifier and initiate the outgoing payment
     err := payments.GenerateAndInitiatePaymentOut(session, datagram, username)
     if err != nil {
+        log.Printf("Failed to initiate outgoing payment for user %s: %v", username, err)
         main.SendErrorResponse("Failed to initiate payment.", session.Conn)
         return
     }
