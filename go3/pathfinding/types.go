@@ -10,8 +10,8 @@ type PeerAccount struct {
     ServerAddress string
 }
 
-// PathEntry represents an entry in the pathfinding linked list.
-type PathEntry struct {
+// PathNode represents an entry in the pathfinding linked list.
+type PathNode struct {
     linkedlist.BaseNode // Embedding the base struct for shared fields
     Incoming           PeerAccount
     Outgoing           PeerAccount
