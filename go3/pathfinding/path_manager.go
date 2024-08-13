@@ -4,10 +4,10 @@ import (
     "sync"
 )
 
-// PathManager manages the linked list of accounts
+// PathManager manages all AccountNodes in a system.
 type PathManager struct {
-    linkedlist.BaseList
-    mu sync.Mutex // Mutex to protect access to the linked list
+    Accounts map[string]*AccountNode // Map usernames to their respective AccountNodes.
+    mu       sync.Mutex // Protects the Accounts map.
 }
 
 // NewPathManager initializes and returns a new PathManager instance
