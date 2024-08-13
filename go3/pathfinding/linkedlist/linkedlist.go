@@ -15,6 +15,7 @@ type BaseNode struct {
 // BaseList manages a linked list of BaseNode elements.
 type BaseList struct {
     head *BaseNode // Pointer to the head of the linked list
+    tail *BaseNode // New field to track the last node (tail)
 }
 
 func (bl *BaseList) Add(newNode *BaseNode) {
