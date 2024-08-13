@@ -8,6 +8,7 @@ import (
     "os/signal"
     "sync"
     "syscall"
+    "ripple/config"
 )
 
 // Session struct represents a network session with an optional connection
@@ -139,12 +140,12 @@ func (m *SessionManager) shutdownHandler(listener net.Listener) {
 // Main function with inlined server logic
 func main() {
 
-    if err := initConfig(); err != nil {
+    if err := config.InitConfig(); err != nil {
         log.Fatalf("Configuration failed: %v", err)
     }
 
     // Direct user feedback to stdout, which is suitable for console messages.
-    fmt.Printf("Server is running at address: %s\n", GetServerAddress())
+    fmt.Printf("Server is running at address: %s\n", config.GetServerAddress())
 
     manager := &SessionManager{
         sessionCh:      make(chan Session),
@@ -164,6 +165,8 @@ func main() {
 
     // Goroutine to handle shutdown
     go manager.shutdownHandler(listener)
+
+    pm := PathManager{}
 
     for {
         select {
