@@ -40,5 +40,7 @@ func PathFindingOut(session Session) {
 
         // Use the AddPathEntry method to add the new path entry
         accountNode.AddPathEntry(identifier, incoming, outgoing)
+
+        fmt.Printf("Created new path entry for account %s with identifier %x.\n", username, identifier)
     }
 }
