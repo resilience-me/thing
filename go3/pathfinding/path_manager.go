@@ -34,6 +34,20 @@ func (pm *PathManager) AddAccount(username string) *AccountNode {
     return newNode // Return the newly created AccountNode
 }
 
+// Add adds a new account to the PathManager's linked list and returns the new AccountNode.
+func (pm *PathManager) Add(username string) *AccountNode {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    newNode := &AccountNode{
+        Identifier: username,
+    }
+
+    pm.BaseList.Add(&newNode.BaseNode) // Correct: Pass pointer to BaseNode
+
+    return newNode // Return the newly created AccountNode
+}
+
 // Add adds a new PathNode to the AccountNode's PathFinding linked list.
 func (node *AccountNode) Add(identifier string, incoming, outgoing PeerAccount) {
     newEntry := &PathNode{
