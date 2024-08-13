@@ -53,3 +53,29 @@ func (bl *BaseList) Find(identifier string) *BaseNode {
     }
     return nil
 }
+
+// Remove deletes a node by its identifier from the list and returns true if the node was found and removed.
+func (bl *BaseList) Remove(identifier string) bool {
+    // Start by traversing the list to find the node and its previous node
+    var prev *BaseNode
+    current := bl.head
+
+    for current != nil {
+        if current.Identifier == identifier {
+            // If the node to remove is the head
+            if prev == nil {
+                bl.head = current.Next
+            } else {
+                // Bypass the node to remove it
+                prev.Next = current.Next
+            }
+
+            return true
+        }
+        prev = current
+        current = current.Next
+    }
+
+    // Return false if the node was not found
+    return false
+}
