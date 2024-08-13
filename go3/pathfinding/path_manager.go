@@ -4,6 +4,7 @@ import (
     "crypto/sha256"
     "fmt"
     "time"
+    "ripple/config"
 )
 
 type AccountNode struct {
