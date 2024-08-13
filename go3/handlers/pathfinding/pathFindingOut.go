@@ -76,4 +76,5 @@ func PathFindingOut(session main.Session) {
             continue // Continue with other peers even if one fails
         }
     }
+    fmt.Println("PathFindingOut completed for all peers.")
 }
