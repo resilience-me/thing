@@ -59,7 +59,6 @@ func NewPathFindingOut(session main.Session) {
             PeerUsername:      datagram.Username,                  // Original sender as PeerUsername
             PeerServerAddress: config.GetServerAddress(),          // Use config to get the server address
             Arguments:         datagram.Arguments,                 // Include the original Arguments
-            Counter:           0,
         }
 
         // Log the sending action
