@@ -5,6 +5,15 @@ import (
     "ripple/main"
 )
 
+// PadUserIdentifiers pads and returns the four components needed for identifier generation.
+func PadUserIdentifiers(dg *Datagram) ([]byte, []byte, []byte, []byte) {
+    username := main.PadTo32Bytes(dg.Username)
+    serverAddress := main.PadTo32Bytes(GetServerAddress())
+    peerUsername := main.PadTo32Bytes(dg.PeerUsername)
+    peerServerAddress := main.PadTo32Bytes(dg.PeerServerAddress)
+    return username, serverAddress, peerUsername, peerServerAddress
+}
+
 // generatePaymentIdentifier uses nested append calls to concatenate userX, userY, and Arguments before hashing.
 func generatePaymentIdentifier(userX, userY []byte, arguments []byte) []byte {
     // Concatenate userX, userY, and arguments[0:8] using nested append
