@@ -23,35 +23,40 @@ func (pm *PathManager) ResetPayment(accountNode *AccountNode) {
     }
 }
 
-// Shared function to initialize a payment, based on whether it is incoming or outgoing
-func (pm *PathManager) initiatePayment(username, paymentID string, inOrOut bool) error {
-
-    pm.mu.Lock()
-    defer pm.mu.Unlock()
-
-    // Find or add the AccountNode
-    accountNode := pm.FindOrAdd(username)
-
-    // Check if a PathNode for this payment already exists
-    pathNode := accountNode.Find(paymentID)
-    if pathNode != nil {
-        // If a PathNode already exists for this payment, return an error or handle accordingly
-        return fmt.Errorf("payment with ID %s is already in progress", paymentID)
-    }
-
-    // Safely clear the previous payment using the helper function
-    pm.ResetPayment(accountNode)
-
+func (node *AccountNode) newPayment(paymentID string, inOrOut bool) {
     // Initialize the Payment struct and assign it to the AccountNode
-    accountNode.Payment = &Payment{
+    node.Payment = &Payment{
         Identifier: paymentID,
         InOrOut:    inOrOut, // Set based on whether this is an incoming or outgoing payment
     }
-
     // Create a new path node
-    pathNode = accountNode.Add(paymentID, PeerAccount{}, PeerAccount{})
+    pathNode = node.Add(paymentID, PeerAccount{}, PeerAccount{})
+}
 
-    accountNode.Timestamp = time.Now()
+// Shared function to initialize a payment, based on whether it is incoming or outgoing
+func (pm *PathManager) initiatePayment(username, paymentID string, inOrOut bool) error {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    existingNode := pm.Find(username)
+    if existingNode != nil {
+        // Check if a PathNode for this payment already exists
+        pathNode := accountNode.Find(paymentID)
+        if pathNode != nil {
+            // If a PathNode already exists for this payment, return an error or handle accordingly
+            return fmt.Errorf("payment with ID %s is already in progress", paymentID)
+        }
+        // clear the previous payment using the helper function
+        pm.ResetPayment(accountNode)
+
+        accountNode.Timestamp = time.Now()
+        newPayment(paymentID, inOrOut)
+        
+    } else {
+        // Find or add the AccountNode
+        accountNode := pm.FindOrAdd(username)
+        newPayment(paymentID, inOrOut)
+    }
 
     return nil // Indicate success
 }
