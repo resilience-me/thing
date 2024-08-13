@@ -30,16 +30,6 @@ func (pm *PathManager) Add(username string) *AccountNode {
     return newNode
 }
 
-// Add adds a new PathNode to the AccountNode's PathFinding linked list.
-func (node *AccountNode) Add(identifier string, incoming, outgoing PeerAccount) {
-    newEntry := &PathNode{
-        BaseNode: linkedlist.BaseNode{Identifier: identifier},
-        Incoming: incoming,
-        Outgoing: outgoing,
-    }
-    node.BaseList.Add(&newEntry.BaseNode)
-}
-
 // Find searches for a specific account in the PathManager's linked list and returns it if found.
 func (pm *PathManager) Find(username string) *AccountNode {
     pm.mu.Lock()
@@ -51,6 +41,16 @@ func (pm *PathManager) Find(username string) *AccountNode {
         return baseNode.(*AccountNode)
     }
     return nil
+}
+
+// Add adds a new PathNode to the AccountNode's PathFinding linked list.
+func (node *AccountNode) Add(identifier string, incoming, outgoing PeerAccount) {
+    newEntry := &PathNode{
+        BaseNode: linkedlist.BaseNode{Identifier: identifier},
+        Incoming: incoming,
+        Outgoing: outgoing,
+    }
+    node.BaseList.Add(&newEntry.BaseNode)
 }
 
 // Find checks if the given identifier exists in the PathFinding linked list,
