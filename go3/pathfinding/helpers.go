@@ -6,10 +6,9 @@ import (
 
 // FindOrAdd function finds the account node and resets the timestamp
 func (pm *PathManager) FindOrAdd(username string) *AccountNode {
-    // Use BaseList.Find to locate the base node directly
-    existingNode := pm.BaseList.Find(username)
+    existingNode := pm.Find(username)
     if existingNode != nil {
-        return existingNode.(*AccountNode)  // Type assert only for returning the correct type
+        return existingNode
     }
     // Only reach here if no existing node was found; add a new one
     return pm.Add(username)
