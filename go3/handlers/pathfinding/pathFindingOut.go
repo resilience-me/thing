@@ -38,34 +38,34 @@ func PathFindingOut(session main.Session) {
         return
     }
 
+    // Prepare common datagram fields
+    newDatagram := &main.Datagram{
+        PeerUsername:      username,  // Sender's username
+        PeerServerAddress: config.GetServerAddress(), // Sender's server address
+        Arguments:         session.Datagram.Arguments, // Arguments originally received
+    }
+
     // Send pathfinding requests to all peers, depending on existing counters
     for _, peer := range peers {
+
+        // Prepare common datagram fields
+        newDatagram := &main.Datagram{
+            Username:          peer.Username,
+            PeerUsername:      username,  // Sender's username
+            PeerServerAddress: config.GetServerAddress(), // Sender's server address
+            Arguments:         session.Datagram.Arguments, // Arguments originally received
+        }
+
         if _, exists := pathNode.CounterOut[peer.Username]; !exists {
-            // Send a new pathfinding request if no counter exists for this peer
-            err := SendNewPathFindingOut(peer, datagram.Arguments)
-            if err != nil {
-                log.Printf("Failed to send new pathfinding request to %s: %v", peer.Username, err)
-            }
+            newDatagram.Command = main.Pathfinding_NewPathFindingOut
         } else {
-            // Update or handle existing pathfinding state
-            err := SendPathFindingOut(peer, datagram.Arguments)
-            if err != nil {
-                log.Printf("Failed to update pathfinding request to %s: %v", peer.Username, err)
-            }
+            newDatagram.Command = main.Pathfinding_PathFindingOut
+        }
+
+        // Sign and send the datagram to the peer
+        if err := handlers.SignAndSendDatagram(session, commonDatagram); err != nil {
+            fmt.Printf("Failed to send pathfinding datagram to %s: %v\n", peer.Username, err)
+            continue // Continue with other peers even if one fails
         }
     }
-}
-
-// SendNewPathFindingOut simulates sending a new pathfinding request
-func SendNewPathFindingOut(peer db_pathfinding.PeerAccount, args []byte) error {
-    // Simulated function for sending out pathfinding requests
-    log.Printf("Sending new pathfinding request to %s at %s", peer.Username, peer.ServerAddress)
-    return nil
-}
-
-// SendPathFindingOut simulates sending an updated pathfinding request
-func SendPathFindingOut(peer db_pathfinding.PeerAccount, args []byte) error {
-    // Simulated function for sending out pathfinding requests
-    log.Printf("Updating pathfinding request to %s at %s", peer.Username, peer.ServerAddress)
-    return nil
 }
