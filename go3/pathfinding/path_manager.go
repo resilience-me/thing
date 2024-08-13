@@ -62,6 +62,8 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
     now := time.Now()
 
     for current != nil {
+        isTarget := current.Username == username
+
         if now.Sub(current.LastModified) > accountTimeout {
             // Remove timed-out node, whether it's the target or not
             if prev == nil {
@@ -71,12 +73,12 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
             }
 
             // If the timed-out node was the target, return nil immediately
-            if current.Username == username {
+            if isTarget {
                 return nil
             }
         } else {
             // If it's not timed out, check if it's the target
-            if current.Username == username {
+            if isTarget {
                 return current // Target found and not timed out
             }
             prev = current
@@ -86,6 +88,7 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
     }
     return nil
 }
+
 
 // DisplayAccounts prints out the entire linked list
 func (pm *PathManager) DisplayAccounts() {
