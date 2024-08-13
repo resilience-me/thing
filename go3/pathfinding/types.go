@@ -12,7 +12,7 @@ type PeerAccount struct {
 
 // PathEntry represents an entry in the pathfinding linked list.
 type PathEntry struct {
-    LinkedListNodeBase // Embedding the base struct for shared fields
+    linkedlist.BaseNode // Embedding the base struct for shared fields
     Incoming           PeerAccount
     Outgoing           PeerAccount
     CounterIn          int
@@ -21,6 +21,6 @@ type PathEntry struct {
 
 // AccountNode represents a node in the account linked list.
 type AccountNode struct {
-    LinkedListNodeBase // Embedding the base struct for shared fields
+    linkedlist.BaseNode           // Embedding the base struct for shared fields
     PathFinding        *PathEntry // Linked list of PathEntry nodes
 }
