@@ -5,7 +5,7 @@ import (
 )
 
 // FindOrAdd function finds the account node and resets the timestamp
-func (pm *PathManager) FindOrAdd(username string) *AccountNode {
+func (pm *PathManager) findOrAdd(username string) *AccountNode {
     existingNode := pm.Find(username)
     if existingNode != nil {
         return existingNode
@@ -15,7 +15,7 @@ func (pm *PathManager) FindOrAdd(username string) *AccountNode {
 }
 
 // ResetPayment removes the previous payment and clears the Payment field
-func (pm *PathManager) ResetPayment(accountNode *AccountNode) {
+func (pm *PathManager) resetPayment(accountNode *AccountNode) {
     if accountNode.Payment != nil {
         // Remove the previous payment's PathNode
         accountNode.Remove(accountNode.Payment.Identifier)
