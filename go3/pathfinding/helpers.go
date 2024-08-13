@@ -25,16 +25,13 @@ func (pm *PathManager) initiatePayment(username, paymentID string, inOrOut bool)
     }
 
     // Step 3: If no PathNode exists, create a new one
-    pathNode = accountNode.Add(paymentID, PeerAccount{}, PeerAccount{}) // Empty PeerAccounts since they aren't parameters
+    pathNode = accountNode.Add(paymentID, PeerAccount{}, PeerAccount{})
 
     // Step 4: Initialize the Payment struct and assign it to the AccountNode
     accountNode.Payment = &Payment{
         Identifier: paymentID,
         InOrOut:    inOrOut, // Set based on whether this is an incoming or outgoing payment
-        Deadline:   time.Now().Add(5 * time.Minute), // Assuming a 5-minute deadline for the payment
     }
-
-    accountNode.ActivePaymentPathNode = pathNode // Set the active payment PathNode
 
     return nil // Indicate success
 }
