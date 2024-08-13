@@ -56,7 +56,7 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
     defer pm.mu.Unlock() // Ensure the mutex is unlocked when the function returns
 
     // Use the BaseList's Find method to search for the node
-    baseNode := pm.BaseList.Find(username)
+    baseNode := pm.Find(username)
 
     // Simplified type assertion to AccountNode
     if baseNode != nil {
@@ -70,7 +70,7 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
 // and returns the PathEntry for the identifier if it is found.
 func (node *AccountNode) FindPathEntry(identifier string) *PathEntry {
     // Use the BaseList's Find method to search for the PathEntry
-    baseNode := node.PathFinding.Find(identifier)
+    baseNode := node.Find(identifier)
 
     // Simplified type assertion to PathEntry
     if baseNode != nil {
