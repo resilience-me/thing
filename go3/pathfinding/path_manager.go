@@ -32,13 +32,22 @@ func (pm *PathManager) Add(username string) *AccountNode {
 
 // Find searches for a specific account in the PathManager's linked list and returns it if found.
 func (pm *PathManager) Find(username string) *AccountNode {
+    baseNode := pm.BaseList.Find(username)
+    if baseNode != nil {
+        return baseNode.(*AccountNode)
+    }
+    return nil
+}
+
+// SafeFind searches is wrapper for Find that adds mutex for concurrency safety
+func (pm *PathManager) SafeFind(username string) *AccountNode {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
-    baseNode := pm.BaseList.Find(username)
+    accountNode := pm.Find(username)
 
-    if baseNode != nil {
-        return baseNode.(*AccountNode)
+    if accountNode != nil {
+        return accountNode
     }
     return nil
 }
