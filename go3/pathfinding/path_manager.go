@@ -67,6 +67,9 @@ func (pm *PathManager) AddAccount(username string) {
 // Along the way, any other accounts that have timed out are also removed from the list.
 // The function returns nil if the account is not found or has been removed due to timeout.
 func (pm *PathManager) FindAccount(username string) *AccountNode {
+    pm.mu.Lock()         // Lock the mutex before accessing shared data
+    defer pm.mu.Unlock() // Ensure the mutex is unlocked when the function returns
+
     var prev *AccountNode
     current := pm.head
     now := time.Now()
