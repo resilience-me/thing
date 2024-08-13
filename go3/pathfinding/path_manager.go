@@ -51,8 +51,11 @@ func NewPathManager() *PathManager {
     }
 }
 
-// AddAccount adds a new account to the beginning of the list
+// AddAccount adds a new account to the PathManager's linked list
 func (pm *PathManager) AddAccount(username string) {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
     newNode := &AccountNode{
         Username:     username,
         LastModified: time.Now(),
