@@ -35,18 +35,15 @@ func (pm *PathManager) AddAccount(username string) *AccountNode {
 }
 
 // Add adds a new PathNode to the AccountNode's PathFinding linked list.
-// It takes the incoming and outgoing PeerAccount, as well as a unique identifier.
 func (node *AccountNode) Add(identifier string, incoming, outgoing PeerAccount) {
     newEntry := &PathNode{
         Identifier: identifier,
-        Timestamp:  time.Now(),
         Incoming:   incoming,
         Outgoing:   outgoing,
-        Next:      node.PathFinding, // Insert at the beginning
     }
 
-    // Update the PathFinding list
-    node.PathFinding = newEntry
+    // Use BaseList's Add method to insert the new entry
+    node.PathFinding.Add(&newEntry.BaseNode)
 }
 
 // Find searches for a specific account in the PathManager's linked list
