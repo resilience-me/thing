@@ -40,8 +40,8 @@ func NewPathManager() *PathManager {
     return &PathManager{}
 }
 
-// AddAccount adds a new account to the PathManager's linked list
-func (pm *PathManager) AddAccount(username string) {
+// AddAccount adds a new account to the PathManager's linked list and returns the new AccountNode.
+func (pm *PathManager) AddAccount(username string) *AccountNode {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
@@ -52,6 +52,7 @@ func (pm *PathManager) AddAccount(username string) {
         Next:         pm.head,
     }
     pm.head = newNode
+    return newNode // Return the newly created AccountNode
 }
 
 // FindAccount searches for a specific account in the PathManager's linked list
