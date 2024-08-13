@@ -14,6 +14,13 @@ func NewPaymentOut(session main.Session) {
 
     // Extract username from the datagram
     username := datagram.Username
+
+    // Validate the counter using the ValidateCounter function from payments package
+    if err := payments.ValidateCounter(datagram); err != nil {
+        log.Printf("Counter validation failed for user %s: %v", username, err)
+        main.SendErrorResponse("Received counter is not valid.", session.Conn)
+        return
+    }
     
     // Generate the payment identifier
     paymentIdentifier := payments.GeneratePaymentOutIdentifier(datagram)
@@ -29,6 +36,13 @@ func NewPaymentOut(session main.Session) {
         return
     }
     log.Printf("Payment initialized successfully for user %s.", username)
+
+    // Write the new client-side counter value using the setter in db_payments
+    if err := db_payments.SetCounter(datagram, datagram.Counter); err != nil {
+        log.Printf("Error writing counter to file for user %s: %v", username, err)
+        main.SendErrorResponse("Failed to write counter.", session.Conn)
+        return
+    }
 
     // Send success response
     if err := main.SendSuccessResponse([]byte("Payment initialized successfully."), session.Conn); err != nil {
