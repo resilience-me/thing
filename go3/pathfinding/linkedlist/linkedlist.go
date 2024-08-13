@@ -17,15 +17,10 @@ type BaseList struct {
     head *BaseNode // Pointer to the head of the linked list
 }
 
-// Add creates a new node with the provided identifier and inserts it at the head of the list.
-func (bl *BaseList) Add(identifier string) *BaseNode {
-    newNode := &BaseNode{
-        Timestamp:  time.Now(),
-        Identifier: identifier,
-        Next:       bl.head, // Point the new node's next to the current head
-    }
-    bl.head = newNode // Update the head to be the new node
-    return newNode    // Return the newly created node
+func (bl *BaseList) Add(newNode *BaseNode) {
+    newNode.Timestamp = time.Now() // Set the current time as the timestamp
+    newNode.Next = bl.head         // Point the new node's next to the current head
+    bl.head = newNode              // Update the head to be the new node
 }
 
 // Find finds a node by its identifier, removes expired nodes, and returns the found node.
