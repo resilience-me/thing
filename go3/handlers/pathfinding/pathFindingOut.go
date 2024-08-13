@@ -21,7 +21,7 @@ func PathFindingOut(session Session) {
     if accountNode != nil {
         pathEntry = accountNode.FindIdentifier(identifier)
     } else {
-        session.PathManager.AddAccount(username)
+        accountNode = session.PathManager.AddAccount(username)
     }
 
     // Evaluate the existence of the path entry
