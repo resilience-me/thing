@@ -2,6 +2,7 @@ package linkedlist
 
 import (
     "time"
+    "ripple/config"
 )
 
 // BaseNode serves as a base struct for linked list nodes with a timestamp, identifier, and next pointer.
