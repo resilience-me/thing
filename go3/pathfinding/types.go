@@ -22,5 +22,5 @@ type PathEntry struct {
 // AccountNode represents a node in the account linked list.
 type AccountNode struct {
     linkedlist.BaseNode           // Embedding the base struct for shared fields
-    BaseList   linkedlist.BaseList // Embed BaseList to manage the linked list of BaseNodes
+    linkedlist.BaseList // Embed BaseList to manage the linked list of BaseNodes
 }
