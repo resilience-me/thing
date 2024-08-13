@@ -39,14 +39,15 @@ func PathFindingOut(session Session) {
         return
     }
 
-    // If a path entry exists, decide whether to send NewPathFindingOut or PathFindingOut based on CounterOut
-    peerUsername := session.Datagram.PeerUsername
-    if _, exists := pathEntry.CounterOut[peerUsername]; !exists {
-        // No counter exists for this peer, send NewPathFindingOut command
-        SendNewPathFindingOut(peerUsername, session.Datagram.Arguments)
-    } else {
-        // Counter exists, send PathFindingOut command
-        SendPathFindingOut(peerUsername, session.Datagram.Arguments)
+    // Forward the request to all peers
+    for _, peer := range peers {
+        if _, exists := pathEntry.CounterOut[peer.Username]; !exists {
+            // No counter exists for this peer, send NewPathFindingOut command
+            SendNewPathFindingOut(peer, session.Datagram.Arguments)
+        } else {
+            // Counter exists, send PathFindingOut command
+            SendPathFindingOut(peer, session.Datagram.Arguments)
+        }
     }
 
     // Send the PathFindingRecurse command back to the peer
