@@ -36,7 +36,7 @@ func GeneratePaymentOutIdentifier(dg *Datagram) []byte {
 
 func GeneratePaymentInIdentifier(dg *Datagram) []byte {
     username, serverAddress, peerUsername, peerServerAddress := PadUserIdentifiers(dg)
-    userY := append(username, serverAddress...)
     userX := append(peerUsername, peerServerAddress...)
+    userY := append(username, serverAddress...)
     return generatePaymentIdentifier(userX, userY, dg.Arguments)
 }
