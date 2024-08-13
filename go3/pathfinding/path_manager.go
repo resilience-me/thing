@@ -4,7 +4,6 @@ import (
     "crypto/sha256"
     "fmt"
     "time"
-    "ripple/config"
     "ripple/linkedlist"
 )
 
