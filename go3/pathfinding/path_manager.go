@@ -61,11 +61,10 @@ func (pm *PathManager) AddAccount(username string) {
     pm.head = newNode
 }
 
-// FindAccount searches for a specific account in the PathManager's linked list.
-// If the account is found but has timed out, it is removed from the list, and nil is returned.
-// If the account is found and has not timed out, it is returned.
-// Along the way, any other accounts that have timed out are also removed from the list.
-// The function returns nil if the account is not found or has been removed due to timeout.
+// FindAccount searches for a specific account in the PathManager's linked list
+// and returns it if found. This method also removes any accounts that have
+// timed out (based on the LastModified timestamp) as it traverses the list.
+// Thread safety is ensured using a mutex.
 func (pm *PathManager) FindAccount(username string) *AccountNode {
     pm.mu.Lock()         // Lock the mutex before accessing shared data
     defer pm.mu.Unlock() // Ensure the mutex is unlocked when the function returns
