@@ -94,16 +94,6 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
     return nil
 }
 
-
-// DisplayAccounts prints out the entire linked list
-func (pm *PathManager) DisplayAccounts() {
-    current := pm.head
-    for current != nil {
-        fmt.Printf("Username: %s, Last Modified: %s\n", current.Username, current.LastModified)
-        current = current.Next
-    }
-}
-
 // HandlePathRequest processes a single hop for either incoming or outgoing path
 func (pm *PathManager) HandlePathRequest(identifier [32]byte, isOutgoing bool, requestOrigin PeerAccount) *PathEntry {
     return handlePathRequest(pm.head, identifier, isOutgoing, requestOrigin)
