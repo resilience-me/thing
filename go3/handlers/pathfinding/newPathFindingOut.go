@@ -11,8 +11,8 @@ import (
 func NewPathFindingOut(session main.Session) {
     datagram := session.Datagram
 
-    // Validate the counter using the ValidateCounter function from pathfinding package
-    if err := ValidateCounter(datagram); err != nil {
+    // Validate the counter using the ValidateCounterIn function from pathfinding package
+    if err := ValidateCounterIn(datagram); err != nil {
         log.Printf("Counter validation failed for user %s: %v", datagram.Username, err)
         return // Simply return if the counter is invalid; no response is sent
     }
