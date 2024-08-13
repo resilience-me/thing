@@ -49,7 +49,7 @@ func (node *AccountNode) AddPathEntry(identifier string, incoming, outgoing Peer
     node.PathFinding = newEntry
 }
 
-// FindAccount searches for a specific account in the PathManager's linked list
+// Find searches for a specific account in the PathManager's linked list
 // and returns it if found. Thread safety is ensured using a mutex.
 func (pm *PathManager) Find(username string) *AccountNode {
     pm.mu.Lock()         // Lock the mutex before accessing shared data
@@ -65,7 +65,7 @@ func (pm *PathManager) Find(username string) *AccountNode {
     return nil // Not found or expired
 }
 
-// FindPathEntry checks if the given identifier exists in the PathFinding linked list,
+// Find checks if the given identifier exists in the PathFinding linked list,
 // removes any expired entries based on the configured timeout duration,
 // and returns the PathEntry for the identifier if it is found.
 func (node *AccountNode) Find(identifier string) *PathEntry {
