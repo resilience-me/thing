@@ -32,6 +32,9 @@ var commandHandlers = [256]CommandHandler{
     128: server_trustlines.GetTrustline,     // Server Command
     139: server_trustlines.SetSyncOut,       // Server Command
     131: server_trustlines.SetTimestamp,     // Server Command
+    132: pathfinding.PathFindingOut,         // Server Command
+    133: pathfinding.PathFindingIn,          // Server Command
+    134: pathfinding.PathFindingRecurse,     // Server Command
     // Other indices are nil by default
 }
 
