@@ -7,25 +7,26 @@ import (
     "ripple/config"
 )
 
-// AccountNode represents a node in the linked list
-type AccountNode struct {
-    Username     string
-    LastModified time.Time
-    PathFinding  *PathEntry // Linked list of PathEntry nodes
-    Next         *AccountNode
-}
-
 type PeerAccount struct {
     Username      string
     ServerAddress string
 }
 
+// PathEntry represents an entry in the pathfinding linked list
 type PathEntry struct {
     Identifier [32]byte
     Timestamp  time.Time
     Incoming   PeerAccount
     Outgoing   PeerAccount
     Next       *PathEntry
+}
+
+// AccountNode represents a node in the linked list
+type AccountNode struct {
+    Username     string
+    LastModified time.Time
+    PathFinding  *PathEntry // Linked list of PathEntry nodes
+    Next         *AccountNode
 }
 
 // PathManager manages the linked list of accounts
