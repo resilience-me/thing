@@ -1,3 +1,12 @@
+package db_pathfinding
+
+import (
+    "fmt"
+    "io/ioutil"
+    "os"
+    "path/filepath"
+)
+
 // GetPeers retrieves a list of all peer accounts for a given username
 func GetPeers(username string) ([]PeerAccount, error) {
     var peers []PeerAccount
