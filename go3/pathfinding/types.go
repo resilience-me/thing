@@ -1,7 +1,7 @@
 package pathfinding
 
 import (
-  "ripple/linkedlist"
+  "ripple/pathfinding/linkedlist"
 )
 
 // PeerAccount represents a peer in the network.
