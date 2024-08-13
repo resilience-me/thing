@@ -1,12 +1,19 @@
 package linkedlist
 
-import "time"
+import (
+    "time"
+)
 
-// LinkedListNodeBase serves as a base struct for linked list nodes with a timestamp, identifier, and next pointer.
+// BaseNode serves as a base struct for linked list nodes with a timestamp, identifier, and next pointer.
 type BaseNode struct {
     Timestamp  time.Time   // Represents when the node was last modified or created
     Identifier string      // Identifier as a string
-    Next       interface{} // Pointer to the next node in the linked list
+    Next       *BaseNode   // Pointer to the next node in the linked list
+}
+
+// BaseList manages a linked list of BaseNode elements.
+type BaseList struct {
+    head *BaseNode // Pointer to the head of the linked list
 }
 
 // Find finds a node by its identifier, removes expired nodes, and returns the found node.
