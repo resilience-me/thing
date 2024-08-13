@@ -54,7 +54,7 @@ func NewPathFindingOut(session main.Session) {
 
         // Send the PathFindingActive command back to the peer
         responseDatagram := &main.Datagram{
-            Command:           main.ClientPathfinding_PathFindingStarted,
+            Command:           main.Pathfinding_PathFindingStarted,
             Username:          datagram.PeerUsername,             // Send to the peer username
             PeerUsername:      datagram.Username,                  // Original sender as PeerUsername
             PeerServerAddress: config.GetServerAddress(),          // Use config to get the server address
