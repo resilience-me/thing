@@ -1,7 +1,7 @@
 package pathfinding
 
 import (
-    "fmt"
+    "log"
 )
 
 // PathFindingOut handles the pathfinding output command for a given session
@@ -24,7 +24,7 @@ func PathFindingOut(session Session) {
     } else {
         // Create a new account node
         accountNode = session.PathManager.AddAccount(username)
-        fmt.Printf("Created new account node for user %s.\n", username)
+        log.Printf("Created new account node for user %s.\n", username)
     }
 
     // Evaluate the existence of the path entry
@@ -41,6 +41,6 @@ func PathFindingOut(session Session) {
         // Use the AddPathEntry method to add the new path entry
         accountNode.AddPathEntry(identifier, incoming, outgoing)
 
-        fmt.Printf("Created new path entry for account %s with identifier %x.\n", username, identifier)
+        log.Printf("Created new path entry for account %s with identifier %x.\n", username, identifier)
     }
 }
