@@ -28,14 +28,14 @@ func (bl *BaseList) Add(identifier string) *BaseNode {
 }
 
 // Find finds a node by its identifier, removes expired nodes, and returns the found node.
-func (bl *BaseList) Find(identifier string, timeout time.Duration) *BaseNode {
+func (bl *BaseList) Find(identifier string) *BaseNode {
     var prev *BaseNode
     current := bl.head
     now := time.Now()
 
     for current != nil {
         // Check if the node has expired
-        if now.Sub(current.Timestamp) > timeout {
+        if now.Sub(current.Timestamp) > config.PathFindingTimeout {
             // Remove expired node
             if prev == nil {
                 bl.head = current.Next
