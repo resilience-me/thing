@@ -40,3 +40,23 @@ func GeneratePaymentInIdentifier(dg *Datagram) []byte {
     userY := append(username, serverAddress...)
     return generatePaymentIdentifier(userX, userY, dg.Arguments)
 }
+
+// GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
+func GenerateAndInitiatePaymentOut(session main.Session, datagram *Datagram, username string) ([]byte, error) {
+
+    // Generate the payment identifier
+    paymentIdentifier := GeneratePaymentOutIdentifier(datagram)
+
+    // Log the identifier
+    log.Printf("Generated Payment Identifier: %x\n", paymentIdentifier)
+
+    // Initiate the outgoing payment using the extracted username and paymentIdentifier
+    err := session.PathManager.InitiateOutgoingPayment(username, paymentIdentifier)
+    if err != nil {
+        log.Printf("Failed to initiate outgoing payment for user %s: %v", username, err)
+        return nil, err
+    }
+
+    log.Printf("Payment initialized successfully for user %s.", username)
+    return paymentIdentifier, nil
+}
