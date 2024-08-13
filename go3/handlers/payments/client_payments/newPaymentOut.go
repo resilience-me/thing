@@ -21,7 +21,7 @@ func NewPaymentOut(session main.Session) {
     // Log the identifier (for example)
     log.Printf("Generated Payment Identifier: %x\n", paymentIdentifier)
 
-    // Step 1: Initiate the outgoing payment using the extracted username and paymentIdentifier
+    // Initiate the outgoing payment using the extracted username and paymentIdentifier
     err := session.PathManager.InitiateOutgoingPayment(username, paymentIdentifier)
     if err != nil {
         // Handle the error (e.g., log it, return it to the caller)
