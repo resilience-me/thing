@@ -26,32 +26,40 @@ func PathFindingOut(session Session) {
         return // Early exit if no path entry exists
     }
 
-    // Evaluate the existence of the path entry
-    if pathEntry != nil {
-        // Path entry exists
-
-        counter := session.Datagram.Counter
-        if pathEntry.CounterIn > counter {
-    		log.Println("Received counter is not greater than or equal to pathEntry.CounterIn. Potential replay attack.")
-            return
-        }
-
-        // Send the PathFindingRecurse command back to the peer
-        responseDatagram := &main.Datagram{
-            Command:           main.Pathfinding_PathFindingRecurse,
-            Username:          datagram.PeerUsername,             // Send to the peer username
-            PeerUsername:      datagram.Username,                  // Original sender as PeerUsername
-            PeerServerAddress: config.GetServerAddress(),          // Use config to get the server address
-            Arguments:         datagram.Arguments,                 // Include the original Arguments
-            Counter:           
-        }
-
-        // Log the sending action
-        log.Printf("Sending PathFindingRecurse command from %s to %s", datagram.PeerUsername, datagram.Username)
-
-
-    } else {
-        // Path entry does not exist
+    counter := session.Datagram.Counter
+    if pathEntry.CounterIn > counter {
+        log.Println("Received counter is not greater than or equal to pathEntry.CounterIn. Potential replay attack.")
         return
     }
+
+    // Retrieve all peers associated with this user
+    peers, err := db_pathfinding.GetPeers(username)
+    if err != nil {
+        log.Printf("Error retrieving peers for user %s: %v", username, err)
+        return
+    }
+
+    // If a path entry exists, decide whether to send NewPathFindingOut or PathFindingOut based on CounterOut
+    peerUsername := session.Datagram.PeerUsername
+    if _, exists := pathEntry.CounterOut[peerUsername]; !exists {
+        // No counter exists for this peer, send NewPathFindingOut command
+        SendNewPathFindingOut(peerUsername, session.Datagram.Arguments)
+    } else {
+        // Counter exists, send PathFindingOut command
+        SendPathFindingOut(peerUsername, session.Datagram.Arguments)
+    }
+
+    // Send the PathFindingRecurse command back to the peer
+    responseDatagram := &main.Datagram{
+        Command:           main.Pathfinding_PathFindingRecurse,
+        Username:          datagram.PeerUsername,             // Send to the peer username
+        PeerUsername:      datagram.Username,                  // Original sender as PeerUsername
+        PeerServerAddress: config.GetServerAddress(),          // Use config to get the server address
+        Arguments:         datagram.Arguments,                 // Include the original Arguments
+        Counter:           
+    }
+
+    // Log the sending action
+    log.Printf("Sending PathFindingRecurse command from %s to %s", datagram.PeerUsername, datagram.Username)
+
 }
