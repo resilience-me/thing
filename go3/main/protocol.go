@@ -32,10 +32,12 @@ var commandHandlers = [256]CommandHandler{
     128: server_trustlines.GetTrustline,     // Server Command
     129: server_trustlines.SetSyncOut,       // Server Command
     130: server_trustlines.SetTimestamp,     // Server Command
-    131: pathfinding.NewPathFindingOut,      // Server Command
-    132: pathfinding.PathFindingOut,         // Server Command
-    133: pathfinding.PathFindingIn,          // Server Command
-    134: pathfinding.PathFindingRecurse,     // Server Command
+    131: pathfinding.NewPaymentOut,          // Server Command
+    132: pathfinding.NewPaymentIn,           // Server Command
+    133: pathfinding.NewPathFindingOut,      // Server Command
+    134: pathfinding.PathFindingOut,         // Server Command
+    135: pathfinding.PathFindingIn,          // Server Command
+    136: pathfinding.PathFindingRecurse,     // Server Command
     // Other indices are nil by default
 }
 
@@ -49,8 +51,10 @@ const (
     ServerTrustlines_GetTrustline      = 128
     ServerTrustlines_SetSyncOut        = 129
     ServerTrustlines_SetTimestamp      = 130
-    Pathfinding_NewPathFindingOut      = 131
-    Pathfinding_PathFindingOut         = 132
-    Pathfinding_PathFindingIn          = 133
-    Pathfinding_PathFindingRecurse     = 134
+    Pathfinding_NewPaymentOut          = 131
+    Pathfinding_NewPaymentIn           = 132
+    Pathfinding_NewPathFindingOut      = 133
+    Pathfinding_PathFindingOut         = 134
+    Pathfinding_PathFindingIn          = 135
+    Pathfinding_PathFindingRecurse     = 136
 )
