@@ -5,6 +5,7 @@ package main
 import (
     "ripple/handlers/trustlines/client_trustlines"
     "ripple/handlers/trustlines/server_trustlines"
+    "ripple/handlers/payments"
 )
 
 // Datagram holds the structure of the incoming data
@@ -32,12 +33,12 @@ var commandHandlers = [256]CommandHandler{
     128: server_trustlines.GetTrustline,     // Server Command
     129: server_trustlines.SetSyncOut,       // Server Command
     130: server_trustlines.SetTimestamp,     // Server Command
-    131: pathfinding.NewPaymentOut,          // Server Command
-    132: pathfinding.NewPaymentIn,           // Server Command
-    133: pathfinding.NewPathFindingOut,      // Server Command
-    134: pathfinding.PathFindingOut,         // Server Command
-    135: pathfinding.PathFindingIn,          // Server Command
-    136: pathfinding.PathFindingRecurse,     // Server Command
+    131: payments.NewPaymentOut,             // Server Command
+    132: payments.NewPaymentIn,              // Server Command
+    133: payments.NewPathFindingOut,         // Server Command
+    134: payments.PathFindingOut,            // Server Command
+    135: payments.PathFindingIn,             // Server Command
+    136: payments.PathFindingRecurse,        // Server Command
     // Other indices are nil by default
 }
 
@@ -51,10 +52,10 @@ const (
     ServerTrustlines_GetTrustline      = 128
     ServerTrustlines_SetSyncOut        = 129
     ServerTrustlines_SetTimestamp      = 130
-    Pathfinding_NewPaymentOut          = 131
-    Pathfinding_NewPaymentIn           = 132
-    Pathfinding_NewPathFindingOut      = 133
-    Pathfinding_PathFindingOut         = 134
-    Pathfinding_PathFindingIn          = 135
-    Pathfinding_PathFindingRecurse     = 136
+    Payments_NewPaymentOut             = 131
+    Payments_NewPaymentIn              = 132
+    Payments_NewPathFindingOut         = 133
+    Payments_PathFindingOut            = 134
+    Payments_PathFindingIn             = 135
+    Payments_PathFindingRecurse        = 136
 )
