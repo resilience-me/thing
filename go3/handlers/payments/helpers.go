@@ -5,42 +5,28 @@ import (
     "fmt"
 )
 
-// GeneratePaymentOutIdentifier constructs and hashes the identifier for an outgoing payment.
+// generatePaymentIdentifier uses nested append calls to concatenate userX, userY, and Arguments before hashing.
+func generatePaymentIdentifier(userX, userY []byte, arguments []byte) []byte {
+    // Concatenate userX, userY, and arguments[0:8] using nested append
+    preimage := append(append(userX, userY...), arguments[0:8]...)
+
+    // Compute SHA-256 hash of the combined byte slice
+    hash := sha256.Sum256(preimage)
+
+    // Return the hash as a byte slice
+    return hash[:]
+}
+
+// Wrapper functions for outgoing and incoming payments
 func GeneratePaymentOutIdentifier(dg *Datagram) []byte {
-    var buf []byte
-
-    // For outgoing payments, the buyer is generating the identifier
-    buf = append(buf, PadTo32Bytes(dg.Username)...)
-    buf = append(buf, PadTo32Bytes(GetServerAddress())...)
-    buf = append(buf, PadTo32Bytes(dg.PeerUsername)...)
-    buf = append(buf, PadTo32Bytes(dg.PeerServerAddress)...)
-
-    // Append amount and nonce from Arguments
-    buf = append(buf, dg.Arguments[0:8]...)
-
-    // Compute SHA-256 hash of the concatenated byte slice
-    hash := sha256.Sum256(buf)
-
-    // Return the hash as a byte slice
-    return hash[:]
+    userX := append(PadTo32Bytes(dg.Username), PadTo32Bytes(GetServerAddress())...)
+    userY := append(PadTo32Bytes(dg.PeerUsername), PadTo32Bytes(dg.PeerServerAddress)...)
+    return generatePaymentIdentifier(userX, userY, dg.Arguments)
 }
 
-// GeneratePaymentInIdentifier constructs and hashes the identifier for an incoming payment.
 func GeneratePaymentInIdentifier(dg *Datagram) []byte {
-    var buf []byte
-
-    // For incoming payments, the seller is generating the identifier
-    buf = append(buf, PadTo32Bytes(dg.PeerUsername)...)
-    buf = append(buf, PadTo32Bytes(dg.PeerServerAddress)...)
-    buf = append(buf, PadTo32Bytes(dg.Username)...)
-    buf = append(buf, PadTo32Bytes(GetServerAddress())...)
-
-    // Append amount and nonce from Arguments
-    buf = append(buf, dg.Arguments[0:8]...)
-
-    // Compute SHA-256 hash of the concatenated byte slice
-    hash := sha256.Sum256(buf)
-
-    // Return the hash as a byte slice
-    return hash[:]
+    userX := append(PadTo32Bytes(dg.PeerUsername), PadTo32Bytes(dg.PeerServerAddress)...)
+    userY := append(PadTo32Bytes(dg.Username), PadTo32Bytes(GetServerAddress())...)
+    return generatePaymentIdentifier(userX, userY, dg.Arguments)
 }
+
