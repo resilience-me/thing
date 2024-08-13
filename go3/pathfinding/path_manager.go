@@ -34,10 +34,10 @@ func (pm *PathManager) AddAccount(username string) *AccountNode {
     return newNode // Return the newly created AccountNode
 }
 
-// AddPathEntry adds a new PathEntry to the AccountNode's PathFinding linked list.
+// Add adds a new PathNode to the AccountNode's PathFinding linked list.
 // It takes the incoming and outgoing PeerAccount, as well as a unique identifier.
-func (node *AccountNode) AddPathEntry(identifier string, incoming, outgoing PeerAccount) {
-    newEntry := &PathEntry{
+func (node *AccountNode) Add(identifier string, incoming, outgoing PeerAccount) {
+    newEntry := &PathNode{
         Identifier: identifier,
         Timestamp:  time.Now(),
         Incoming:   incoming,
@@ -67,14 +67,14 @@ func (pm *PathManager) Find(username string) *AccountNode {
 
 // Find checks if the given identifier exists in the PathFinding linked list,
 // removes any expired entries based on the configured timeout duration,
-// and returns the PathEntry for the identifier if it is found.
-func (node *AccountNode) Find(identifier string) *PathEntry {
-    // Use the BaseList's Find method to search for the PathEntry
+// and returns the PathNode for the identifier if it is found.
+func (node *AccountNode) Find(identifier string) *PathNode {
+    // Use the BaseList's Find method to search for the PathNode
     baseNode := node.BaseList.Find(identifier)
 
-    // Simplified type assertion to PathEntry
+    // Simplified type assertion to PathNode
     if baseNode != nil {
-        return baseNode.(*PathEntry) // Directly return the asserted PathEntry
+        return baseNode.(*PathNode) // Directly return the asserted PathNode
     }
     return nil // Not found or expired
 }
