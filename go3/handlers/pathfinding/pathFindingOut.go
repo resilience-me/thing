@@ -31,8 +31,6 @@ func PathFindingOut(session Session) {
     if pathEntry != nil {
         // Path entry exists
 
-        log.Printf("Created new path entry for account %s with identifier %x.\n", username, identifier)
-
         // Send the PathFindingRecurse command back to the peer
         responseDatagram := &main.Datagram{
             Command:           main.ClientPathfinding_PathFindingRecurse,
