@@ -47,15 +47,11 @@ func GenerateAndInitiatePaymentOut(session main.Session, datagram *Datagram, use
     // Generate the payment identifier
     paymentIdentifier := GeneratePaymentOutIdentifier(datagram)
 
-    // Log the identifier
-    log.Printf("Generated Payment Identifier: %x\n", paymentIdentifier)
-
     // Initiate the outgoing payment using the extracted username and paymentIdentifier
     err := session.PathManager.InitiateOutgoingPayment(username, paymentIdentifier)
     if err != nil {
-        return nil, fmt.Errorf("Failed to initiate outgoing payment for user %s: %v", username, err)
+        return fmt.Errorf("Failed to initiate outgoing payment for user %s: %v", username, err)
     }
 
-    log.Printf("Payment initialized successfully for user %s.", username)
-    return paymentIdentifier, nil
+    return nil
 }
