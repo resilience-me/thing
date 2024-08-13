@@ -28,14 +28,15 @@ func generatePaymentIdentifier(userX, userY []byte, arguments []byte) []byte {
 
 // Wrapper functions for outgoing and incoming payments
 func GeneratePaymentOutIdentifier(dg *Datagram) []byte {
-    userX := append(main.PadTo32Bytes(dg.Username), main.PadTo32Bytes(GetServerAddress())...)
-    userY := append(main.PadTo32Bytes(dg.PeerUsername), main.PadTo32Bytes(dg.PeerServerAddress)...)
+    username, serverAddress, peerUsername, peerServerAddress := PadUserIdentifiers(dg)
+    userX := append(username, serverAddress...)
+    userY := append(peerUsername, peerServerAddress...)
     return generatePaymentIdentifier(userX, userY, dg.Arguments)
 }
 
 func GeneratePaymentInIdentifier(dg *Datagram) []byte {
-    userX := append(main.PadTo32Bytes(dg.PeerUsername), main.PadTo32Bytes(dg.PeerServerAddress)...)
-    userY := append(main.PadTo32Bytes(dg.Username), main.PadTo32Bytes(GetServerAddress())...)
+    username, serverAddress, peerUsername, peerServerAddress := PadUserIdentifiers(dg)
+    userY := append(username, serverAddress...)
+    userX := append(peerUsername, peerServerAddress...)
     return generatePaymentIdentifier(userX, userY, dg.Arguments)
 }
-
