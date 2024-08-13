@@ -59,6 +59,7 @@ func (pm *PathManager) AddAccount(username string) {
     newNode := &AccountNode{
         Username:     username,
         LastModified: time.Now(),
+        PathFinding:  nil, // Initialize with no pathfinding entries
         Next:         pm.head,
     }
     pm.head = newNode
