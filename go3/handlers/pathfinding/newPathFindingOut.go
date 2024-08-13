@@ -39,9 +39,32 @@ func NewPathFindingOut(session main.Session) {
     }
 
     // Evaluate the existence of the path entry
-    if pathEntry != nil {
+    if pathEntry == nil {
+
+        // Path entry does not exist, create a new one
+        outgoing := PeerAccount{
+            Username:      session.Datagram.PeerUsername,       // Get the peer username from the Datagram
+            ServerAddress: session.Datagram.PeerServerAddress,   // Get the peer server address from the Datagram
+        }
+
+        // Use the AddPathEntry method to add the new path entry
+        accountNode.AddPathEntry(identifier, PeerAccount{}, outgoing)
+
+        log.Printf("Created new path entry for account %s with identifier %x.\n", username, identifier)
+
+        // Send the PathFindingActive command back to the peer
+        responseDatagram := &main.Datagram{
+            Command:           main.ClientPathfinding_PathFindingStarted,
+            Username:          datagram.PeerUsername,             // Send to the peer username
+            PeerUsername:      datagram.Username,                  // Original sender as PeerUsername
+            PeerServerAddress: config.GetServerAddress(),          // Use config to get the server address
+            Arguments:         datagram.Arguments,                 // Include the original Arguments
+            Counter:           0,
+        }
+
+        // Log the sending action
+        log.Printf("Sending PathFindingRecurse command from %s to %s", datagram.PeerUsername, datagram.Username)
+    } else {
         // Path entry exists, cannot create a new pathfinding out
         return
-    } else {
-        // Path entry does not exist, create a new one
     }
