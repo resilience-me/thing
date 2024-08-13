@@ -34,48 +34,24 @@ func (pm *PathManager) AddAccount(username string) *AccountNode {
 }
 
 // FindAccount searches for a specific account in the PathManager's linked list
-// and returns it if found. This method also removes any accounts that have
-// timed out (based on the LastModified timestamp) as it traverses the list.
-// Thread safety is ensured using a mutex.
+// and returns it if found. Thread safety is ensured using a mutex.
 func (pm *PathManager) FindAccount(username string) *AccountNode {
     pm.mu.Lock()         // Lock the mutex before accessing shared data
     defer pm.mu.Unlock() // Ensure the mutex is unlocked when the function returns
 
-    var prev *AccountNode
-    current := pm.head
-    now := time.Now()
+    // Use the BaseList's Find method to search for the node
+    baseNode := pm.BaseList.Find(username)
 
-    for current != nil {
-        isTarget := current.Username == username
-
-        if now.Sub(current.LastModified) > config.PathFindingTimeout {
-            // Remove timed-out node, whether it's the target or not
-            if prev == nil {
-                pm.head = current.Next
-            } else {
-                prev.Next = current.Next
-            }
-
-            // If the timed-out node was the target, return nil immediately
-            if isTarget {
-                return nil
-            }
-        } else {
-            // If it's not timed out, check if it's the target
-            if isTarget {
-                return current // Target found and not timed out
-            }
-            prev = current
-        }
-
-        current = current.Next
+    // Simplified type assertion to AccountNode
+    if baseNode != nil {
+        return baseNode.(*AccountNode) // Directly return the asserted AccountNode
     }
-    return nil
+    return nil // Not found or expired
 }
 
 // AddPathEntry adds a new PathEntry to the AccountNode's PathFinding linked list.
 // It takes the incoming and outgoing PeerAccount, as well as a unique identifier.
-func (node *AccountNode) AddPathEntry(identifier [32]byte, incoming, outgoing PeerAccount) {
+func (node *AccountNode) AddPathEntry(identifier string, incoming, outgoing PeerAccount) {
     newEntry := &PathEntry{
         Identifier: identifier,
         Timestamp:  time.Now(),
@@ -91,36 +67,13 @@ func (node *AccountNode) AddPathEntry(identifier [32]byte, incoming, outgoing Pe
 // FindPathEntry checks if the given identifier exists in the PathFinding linked list,
 // removes any expired entries based on the configured timeout duration,
 // and returns the PathEntry for the identifier if it is found.
-func (node *AccountNode) FindPathEntry(identifier [32]byte) *PathEntry {
-    now := time.Now()
-    var prev *PathEntry
-    current := node.PathFinding
+func (node *AccountNode) FindPathEntry(identifier string) *PathEntry {
+    // Use the BaseList's Find method to search for the PathEntry
+    baseNode := node.PathFinding.Find(identifier)
 
-    for current != nil {
-        isTarget := current.Identifier == identifier
-
-        if now.Sub(current.Timestamp) > config.PathFindingTimeout {
-            // Remove expired entry
-            if prev == nil {
-                node.PathFinding = current.Next
-            } else {
-                prev.Next = current.Next
-            }
-            // If the timed-out node was the target, return nil immediately
-            if isTarget {
-                return nil
-            }
-
-        } else {
-            // If it's not timed out, check if it's the target
-            if isTarget {
-                return current // Target found and not timed out
-            }
-            prev = current
-        }
-
-        current = current.Next
+    // Simplified type assertion to PathEntry
+    if baseNode != nil {
+        return baseNode.(*PathEntry) // Directly return the asserted PathEntry
     }
-
-    return nil
+    return nil // Not found or expired
 }
