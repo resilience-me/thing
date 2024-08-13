@@ -49,18 +49,4 @@ func PathFindingOut(session Session) {
             SendPathFindingOut(peer, session.Datagram.Arguments)
         }
     }
-
-    // Send the PathFindingRecurse command back to the peer
-    responseDatagram := &main.Datagram{
-        Command:           main.Pathfinding_PathFindingRecurse,
-        Username:          datagram.PeerUsername,             // Send to the peer username
-        PeerUsername:      datagram.Username,                  // Original sender as PeerUsername
-        PeerServerAddress: config.GetServerAddress(),          // Use config to get the server address
-        Arguments:         datagram.Arguments,                 // Include the original Arguments
-        Counter:           
-    }
-
-    // Log the sending action
-    log.Printf("Sending PathFindingRecurse command from %s to %s", datagram.PeerUsername, datagram.Username)
-
 }
