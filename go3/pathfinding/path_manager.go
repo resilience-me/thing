@@ -94,6 +94,21 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
     return nil
 }
 
+// AddPathEntry adds a new PathEntry to the AccountNode's PathFinding linked list.
+// It takes the incoming and outgoing PeerAccount, as well as a unique identifier.
+func (node *AccountNode) AddPathEntry(identifier [32]byte, incoming, outgoing PeerAccount) {
+    newEntry := &PathEntry{
+        Identifier: identifier,
+        Timestamp:  time.Now(),
+        Incoming:   incoming,
+        Outgoing:   outgoing,
+        Next:      node.PathFinding, // Insert at the beginning
+    }
+
+    // Update the PathFinding list
+    node.PathFinding = newEntry
+}
+
 // FindIdentifier checks if the given identifier exists in the PathFinding linked list,
 // removes any expired entries based on the configured timeout duration,
 // and returns the PathEntry for the identifier if it is found.
