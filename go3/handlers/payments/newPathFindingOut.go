@@ -1,4 +1,4 @@
-package pathfinding
+package payments
 
 import (
     "log"
