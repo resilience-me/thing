@@ -31,6 +31,11 @@ func PathFindingOut(session Session) {
     if pathEntry != nil {
         // Path entry exists
 
+        counter := session.Datagram.Counter
+        if pathEntry.Counter > counter {
+            return
+        }
+
         // Send the PathFindingRecurse command back to the peer
         responseDatagram := &main.Datagram{
             Command:           main.Pathfinding_PathFindingRecurse,
