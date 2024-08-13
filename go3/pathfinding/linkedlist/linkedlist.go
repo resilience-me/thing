@@ -23,9 +23,8 @@ func (bl *BaseList) Add(newNode *BaseNode) {
     bl.head = newNode              // Update the head to be the new node
 }
 
-// FindParent searches for the parent of a node by its identifier, removes expired nodes while traversing,
-// and returns the parent node. If the node is the head, parent will be nil.
-func (bl *BaseList) FindParent(identifier string) *BaseNode {
+// Find finds a node by its identifier, removes expired nodes, and returns the found node.
+func (bl *BaseList) Find(identifier string) *BaseNode {
     var prev *BaseNode
     current := bl.head
     now := time.Now()
@@ -39,31 +38,18 @@ func (bl *BaseList) FindParent(identifier string) *BaseNode {
             } else {
                 prev.Next = current.Next
             }
-            // If the expired node was the target, return nil (since it's been removed)
+            // If the expired node was the target, return nil
             if current.Identifier == identifier {
                 return nil
             }
         } else {
-            // If the node is the target and not expired, return its parent
+            // If the node is the target and not expired, return it
             if current.Identifier == identifier {
-                return prev
+                return current
             }
             prev = current
         }
         current = current.Next
     }
     return nil
-}
-
-// Find searches for a node by its identifier and returns the found node.
-func (bl *BaseList) Find(identifier string) *BaseNode {
-    parent := bl.FindParent(identifier)
-
-    // If parent is nil, the node wasn't found in the list
-    if parent == nil {
-        return nil
-    }
-
-    // If parent is found, return its next node (which should be the target node)
-    return parent.Next
 }
