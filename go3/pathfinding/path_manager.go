@@ -94,6 +94,37 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
     return nil
 }
 
+// HasIdentifier checks if the given identifier exists in the PathFinding linked list,
+// removes any expired entries based on the configured timeout duration,
+// and returns true if the identifier is found, even if it is deleted due to expiration.
+func (node *AccountNode) HasIdentifier(identifier [32]byte) bool {
+    now := time.Now()
+    var prev *PathEntry
+    current := node.PathFinding
+
+    for current != nil {
+        isTarget := current.Identifier == identifier
+
+        if now.Sub(current.Timestamp) > config.PathFindingTimeout {
+            // Remove expired entry
+            if prev == nil {
+                node.PathFinding = current.Next
+            } else {
+                prev.Next = current.Next
+            }
+        } else {
+            prev = current
+        }
+
+        if isTarget {
+            return true
+        }
+
+        current = current.Next
+    }
+    return false
+}
+
 // HandlePathRequest processes a single hop for either incoming or outgoing path
 func (pm *PathManager) HandlePathRequest(identifier [32]byte, isOutgoing bool, requestOrigin PeerAccount) *PathEntry {
     return handlePathRequest(pm.head, identifier, isOutgoing, requestOrigin)
