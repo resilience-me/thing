@@ -54,3 +54,16 @@ func (bl *BaseList) FindParent(identifier string) *BaseNode {
     }
     return nil
 }
+
+// Find searches for a node by its identifier and returns the found node.
+func (bl *BaseList) Find(identifier string) *BaseNode {
+    parent := bl.FindParent(identifier)
+
+    // If parent is nil, the node wasn't found in the list
+    if parent == nil {
+        return nil
+    }
+
+    // If parent is found, return its next node (which should be the target node)
+    return parent.Next
+}
