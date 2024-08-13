@@ -31,6 +31,14 @@ func PathFindingOut(session Session) {
     if pathEntry != nil {
         // Path entry exists
     } else {
-        // Path entry does not exist
+        // Path entry does not exist, create a new one
+        outgoing := PeerAccount{
+            Username:      session.Datagram.PeerUsername,       // Get the peer username from the Datagram
+            ServerAddress: session.Datagram.PeerServerAddress,   // Get the peer server address from the Datagram
+        }
+        incoming := PeerAccount{} // Zero value for Incoming since this is an outgoing request
+
+        // Use the AddPathEntry method to add the new path entry
+        accountNode.AddPathEntry(identifier, incoming, outgoing)
     }
 }
