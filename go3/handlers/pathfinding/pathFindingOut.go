@@ -58,6 +58,13 @@ func PathFindingOut(session main.Session) {
 
         if _, exists := pathNode.CounterOut[peer.Username]; !exists {
             newDatagram.Command = main.Pathfinding_NewPathFindingOut
+            // Retrieve and increment the counter value
+            counter, err := pathfinding.GetAndIncrementCounter(datagram)
+            if err != nil {
+                log.Printf("Error handling counter_out for user %s: %v", username, err)
+                return
+            }
+            newDatagram.Counter = counter
         } else {
             newDatagram.Command = main.Pathfinding_PathFindingOut
             newDatagram.Counter = pathNode.CounterOut[peer.Username]
