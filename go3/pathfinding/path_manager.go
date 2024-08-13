@@ -11,7 +11,7 @@ import (
 type AccountNode struct {
     Username     string
     LastModified time.Time
-    PathFinding   *PathEntry // Linked list of PathEntry nodes
+    PathFinding  *PathEntry // Linked list of PathEntry nodes
     Next         *AccountNode
 }
 
