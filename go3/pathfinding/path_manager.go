@@ -69,7 +69,7 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
     for current != nil {
         isTarget := current.Username == username
 
-        if now.Sub(current.LastModified) > accountTimeout {
+        if now.Sub(current.LastModified) > config.PathFindingTimeout {
             // Remove timed-out node, whether it's the target or not
             if prev == nil {
                 pm.head = current.Next
