@@ -18,7 +18,7 @@ func (pm *PathManager) FindOrAdd(username string) *AccountNode {
 func (pm *PathManager) ResetPayment(accountNode *AccountNode) {
     if accountNode.Payment != nil {
         // Remove the previous payment's PathNode
-        accountNode.PathList.Remove(accountNode.Payment.Identifier)
+        accountNode.Remove(accountNode.Payment.Identifier)
         accountNode.Payment = nil // Clear the previous payment
     }
 }
