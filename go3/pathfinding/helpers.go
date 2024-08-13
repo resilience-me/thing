@@ -4,12 +4,17 @@ import (
     "fmt"
 )
 
-// FindOrAdd looks for an existing account and returns it, or adds a new one if it does not exist.
+// FindOrAdd function finds the account node and resets the timestamp
 func (pm *PathManager) FindOrAdd(username string) *AccountNode {
-    // Attempt to find the existing node
-    existingNode := pm.Find(username)
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    // Use BaseList.Find to locate the base node directly
+    existingNode := pm.BaseList.Find(username)
+
     if existingNode != nil {
-        return existingNode
+        existingNode.Timestamp = time.Now() // Directly reset the timestamp in the BaseNode
+        return existingNode.(*AccountNode)  // Type assert only for returning the correct type
     }
 
     // Only reach here if no existing node was found; add a new one
