@@ -6,25 +6,24 @@ import (
 
 // PathFindingOut handles the pathfinding output command for a given session
 func PathFindingOut(session Session) {
-    // Extract the username from the Datagram
+    // Extract the username and identifier from the session's datagram
     username := session.Datagram.Username
-
-    // Extract the identifier from the Arguments (assuming it is stored in the first 32 bytes)
     var identifier [32]byte
-    copy(identifier[:], session.Datagram.Arguments[:32]) // Adjust based on the actual position
-
-    // Find the account node by username
+    copy(identifier[:], session.Datagram.Arguments[:32])
+    
+    // Attempt to find the account node and path entry
     accountNode := session.PathManager.FindAccount(username)
-
-    // Check if the accountNode exists
+    
+    // Check if the account node exists and find the path entry
     var pathEntry *PathEntry
     if accountNode != nil {
-        // Account exists, search for the path entry
         pathEntry = accountNode.FindPathEntry(identifier)
-    } else {
-        // Create a new account node
-        accountNode = session.PathManager.AddAccount(username)
-        log.Printf("Created new account node for user %s.\n", username)
+    }
+
+    // If no path entry exists, terminate the handler as no path has been initiated
+    if pathEntry == nil {
+        log.Printf("No path entry found for identifier %x and user %s. Handler terminates.", identifier, username)
+        return // Early exit if no path entry exists
     }
 
     // Evaluate the existence of the path entry
