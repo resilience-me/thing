@@ -36,16 +36,16 @@ var commandHandlers = [256]CommandHandler{
 }
 
 const (
-    ClientTrustlines_SetTrustline          = 0
-    ClientTrustlines_SyncTrustlineIn       = 1
-    ClientTrustlines_SyncTrustlineOut      = 2
-    ClientTrustlines_GetTrustlineIn        = 3
-    ClientTrustlines_GetTrustlineOut       = 4
-    ServerTrustlines_SetTrustline          = 127
-    ServerTrustlines_GetTrustline          = 128
-    ServerTrustlines_SetSyncOut            = 129
-    ServerTrustlines_SetTimestamp          = 130
-    ServerPathfinding_PathFindingOut       = 131
-    ServerPathfinding_PathFindingIn        = 132
-    ServerPathfinding_PathFindingRecurse   = 133
+    ClientTrustlines_SetTrustline      = 0
+    ClientTrustlines_SyncTrustlineIn   = 1
+    ClientTrustlines_SyncTrustlineOut  = 2
+    ClientTrustlines_GetTrustlineIn    = 3
+    ClientTrustlines_GetTrustlineOut   = 4
+    ServerTrustlines_SetTrustline      = 127
+    ServerTrustlines_GetTrustline      = 128
+    ServerTrustlines_SetSyncOut        = 129
+    ServerTrustlines_SetTimestamp      = 130
+    Pathfinding_PathFindingOut         = 131
+    Pathfinding_PathFindingIn          = 132
+    Pathfinding_PathFindingRecurse     = 133
 )
