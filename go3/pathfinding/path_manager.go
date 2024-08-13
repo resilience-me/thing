@@ -2,7 +2,7 @@ package pathfinding
 
 import (
     "sync"
-    "ripple/linkedlist"
+    "ripple/pathfinding/linkedlist"
 )
 
 // PathManager manages the linked list of accounts
