@@ -9,8 +9,14 @@ import (
 // NewPaymentOut handles the command to initiate a new outgoing payment.
 func NewPaymentOut(session main.Session) {
 
+    // Retrieve the Datagram from the session
+    datagram := session.Datagram
+
+    // Extract username from the datagram
+    username := datagram.Username
+    
     // Generate the payment identifier
-    paymentIdentifier := payments.GeneratePaymentOutIdentifier(dg)
+    paymentIdentifier := payments.GeneratePaymentOutIdentifier(datagram)
 
     // Log the identifier (for example)
     log.Printf("Generated Payment Identifier: %x\n", paymentIdentifier)
@@ -19,8 +25,9 @@ func NewPaymentOut(session main.Session) {
     err := session.PathManager.InitiateOutgoingPayment(username, paymentIdentifier)
     if err != nil {
         // Handle the error (e.g., log it, return it to the caller)
-        log.Printf("failed to initiate outgoing payment for user %s: %w", username, err)
+        log.Printf("Failed to initiate outgoing payment for user %s: %v", username, err)
         return
     }
 
+    // Continue with other payment processing steps as needed...
 }
