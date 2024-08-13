@@ -22,3 +22,12 @@ func BytesToUint32(data []byte) uint32 {
 func bytesToString(data []byte) string {
     return string(bytes.TrimRight(data, "\x00"))
 }
+
+// Pad to 32 bytes and copy the string's bytes into the new slice.
+func PadTo32Bytes(str string) []byte {
+    // Create a slice of 32 bytes initialized with zero.
+    result := make([]byte, 32)
+    // Convert string to bytes and copy into the result slice.
+    copy(result, []byte(str))
+    return result
+}
