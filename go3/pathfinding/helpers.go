@@ -12,8 +12,8 @@ func (pm *PathManager) FindOrAdd(username string) *AccountNode {
     return pm.Add(username)
 }
 
-// InitiatePayment initializes a payment, ensuring the AccountNode and PathNode are correctly set up.
-func (pm *PathManager) InitiatePayment(username, paymentID string) error {
+// Shared function to initialize a payment, based on whether it is incoming or outgoing
+func (pm *PathManager) initiatePayment(username, paymentID string, inOrOut bool) error {
     // Step 1: Find or add the AccountNode
     accountNode := pm.FindOrAdd(username)
     
@@ -30,11 +30,21 @@ func (pm *PathManager) InitiatePayment(username, paymentID string) error {
     // Step 4: Initialize the Payment struct and assign it to the AccountNode
     accountNode.Payment = &Payment{
         Identifier: paymentID,
-        InOrOut:    true, // Assuming this node is the initiator of the payment
+        InOrOut:    inOrOut, // Set based on whether this is an incoming or outgoing payment
         Deadline:   time.Now().Add(5 * time.Minute), // Assuming a 5-minute deadline for the payment
     }
 
     accountNode.ActivePaymentPathNode = pathNode // Set the active payment PathNode
 
     return nil // Indicate success
+}
+
+// Wrapper for initiating an outgoing payment
+func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string) error {
+    return pm.initiatePayment(username, paymentID, true)
+}
+
+// Wrapper for initiating an incoming payment
+func (pm *PathManager) InitiateIncomingPayment(username, paymentID string) error {
+    return pm.initiatePayment(username, paymentID, false)
 }
