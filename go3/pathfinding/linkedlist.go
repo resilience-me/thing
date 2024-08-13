@@ -1,4 +1,4 @@
-package linkedlist
+package pathfinding
 
 import (
     "time"
