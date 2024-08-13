@@ -53,7 +53,7 @@ func PathFindingOut(session main.Session) {
             Username:          peer.Username,
             PeerUsername:      username,  // Sender's username
             PeerServerAddress: config.GetServerAddress(), // Sender's server address
-            Arguments:         session.Datagram.Arguments, // Arguments originally received
+            Arguments:         datagram.Arguments, // Arguments originally received
         }
 
         if _, exists := pathNode.CounterOut[peer.Username]; !exists {
@@ -72,9 +72,9 @@ func PathFindingOut(session main.Session) {
 
         // Sign and send the datagram to the peer
         if err := handlers.SignAndSendDatagram(session, commonDatagram); err != nil {
-            fmt.Printf("Failed to send pathfinding datagram to %s: %v\n", peer.Username, err)
+            log.Printf("Failed to send pathfinding datagram to %s: %v\n", peer.Username, err)
             continue // Continue with other peers even if one fails
         }
     }
-    fmt.Println("PathFindingOut completed for all peers.")
+    log.Println("PathFindingOut completed for all peers.")
 }
