@@ -34,6 +34,7 @@ The path-finding optimizes for never going too deep. It is bidirectional, reduci
         Timestamp  time.Time
         Incoming   PeerAccount
         Outgoing   PeerAccount
+        Counter    uint32
         Next       *PathEntry
     }
     
