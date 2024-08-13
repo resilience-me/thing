@@ -56,13 +56,32 @@ func (pm *PathManager) AddAccount(username string) {
     pm.head = newNode
 }
 
-// FindAccount searches for a node by username
 func (pm *PathManager) FindAccount(username string) *AccountNode {
+    var prev *AccountNode
     current := pm.head
+    now := time.Now()
+
     for current != nil {
-        if current.Username == username {
-            return current
+        if now.Sub(current.LastModified) > accountTimeout {
+            // Remove timed-out node, whether it's the target or not
+            if prev == nil {
+                pm.head = current.Next
+            } else {
+                prev.Next = current.Next
+            }
+
+            // If the timed-out node was the target, return nil immediately
+            if current.Username == username {
+                return nil
+            }
+        } else {
+            // If it's not timed out, check if it's the target
+            if current.Username == username {
+                return current // Target found and not timed out
+            }
+            prev = current
         }
+
         current = current.Next
     }
     return nil
