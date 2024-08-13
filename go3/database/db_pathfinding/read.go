@@ -5,12 +5,13 @@ import (
     "io/ioutil"
     "os"
     "path/filepath"
+    "ripple/config"
 )
 
 // GetPeers retrieves a list of all peer accounts for a given username
 func GetPeers(username string) ([]PeerAccount, error) {
     var peers []PeerAccount
-    baseDir := filepath.Join("datadir", "accounts", username, "peers")
+    baseDir := filepath.Join(config.GetDataDir(), "accounts", username, "peers")
 
     // Read all server address directories in the peers directory
     serverDirs, err := ioutil.ReadDir(baseDir)
