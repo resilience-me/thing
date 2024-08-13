@@ -38,11 +38,17 @@ The path-finding optimizes for never going too deep. It is bidirectional, reduci
         CounterOut map[string]int
         Next       *PathEntry
     }
-    
+
+    type Payment struct {
+        Identifier string
+        InOrOut    bool
+    }
+
     type AccountNode struct {
         Username       string
         LastModified   time.Time
         PathFinding    *PathEntry
+        Payment        *Payment
         Next           *AccountNode
     }
 
