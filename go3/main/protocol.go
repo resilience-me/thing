@@ -30,8 +30,9 @@ var commandHandlers = [256]CommandHandler{
     4:   client_trustlines.GetTrustlineOut,  // Client Command
     127: server_trustlines.SetTrustline,     // Server Command
     128: server_trustlines.GetTrustline,     // Server Command
-    139: server_trustlines.SetSyncOut,       // Server Command
-    131: server_trustlines.SetTimestamp,     // Server Command
+    129: server_trustlines.SetSyncOut,       // Server Command
+    130: server_trustlines.SetTimestamp,     // Server Command
+    131: pathfinding.NewPathFindingOut,      // Server Command
     132: pathfinding.PathFindingOut,         // Server Command
     133: pathfinding.PathFindingIn,          // Server Command
     134: pathfinding.PathFindingRecurse,     // Server Command
@@ -48,7 +49,8 @@ const (
     ServerTrustlines_GetTrustline      = 128
     ServerTrustlines_SetSyncOut        = 129
     ServerTrustlines_SetTimestamp      = 130
-    Pathfinding_PathFindingOut         = 131
-    Pathfinding_PathFindingIn          = 132
-    Pathfinding_PathFindingRecurse     = 133
+    Pathfinding_NewPathFindingOut      = 131
+    Pathfinding_PathFindingOut         = 132
+    Pathfinding_PathFindingIn          = 133
+    Pathfinding_PathFindingRecurse     = 134
 )
