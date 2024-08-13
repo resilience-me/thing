@@ -18,6 +18,7 @@ type PathEntry struct {
     Timestamp  time.Time
     Incoming   PeerAccount
     Outgoing   PeerAccount
+    Counter    uint32
     Next       *PathEntry
 }
 
