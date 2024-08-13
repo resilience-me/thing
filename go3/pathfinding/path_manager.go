@@ -34,21 +34,9 @@ type PathManager struct {
     mu   sync.Mutex // Mutex to protect access to the linked list
 }
 
-// NewPathManager creates a new PathManager with an initial list of accounts
+// NewPathManager initializes and returns a new PathManager instance
 func NewPathManager() *PathManager {
-    var head *AccountNode
-
-    for _, username := range initialAccounts {
-        head = &AccountNode{
-            Username:     username,
-            LastModified: time.Now(),
-            Next:         head,
-        }
-    }
-
-    return &PathManager{
-        head: head,
-    }
+    return &PathManager{}
 }
 
 // AddAccount adds a new account to the PathManager's linked list
