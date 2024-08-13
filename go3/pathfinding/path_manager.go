@@ -2,7 +2,6 @@ package pathfinding
 
 import (
     "sync"
-    "ripple/pathfinding/linkedlist"
 )
 
 // PathManager manages the linked list of accounts
@@ -15,6 +14,43 @@ type PathManager struct {
 func NewPathManager() *PathManager {
     return &PathManager{}
 }
+
+// AddAccount adds a new account or returns an existing one.
+func (pm *PathManager) AddAccount(username string) *AccountNode {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    if node, exists := pm.Accounts[username]; exists {
+        return node
+    }
+
+    node := &AccountNode{
+        Username: username,
+        Paths:    make(map[string]*PathNode),
+    }
+    pm.Accounts[username] = node
+    return node
+}
+
+// FindAccount retrieves an account from the manager.
+func (pm *PathManager) FindAccount(username string) *AccountNode {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    if node, exists := pm.Accounts[username]; exists {
+        return node
+    }
+    return nil
+}
+
+// RemoveAccount removes an account from the manager.
+func (pm *PathManager) RemoveAccount(username string) {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    delete(pm.Accounts, username)
+}
+
 
 // Add adds a new account to the PathManager's linked list and returns the new AccountNode.
 func (pm *PathManager) Add(username string) *AccountNode {
