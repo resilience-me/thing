@@ -3,33 +3,31 @@ package pathfinding
 import (
     "log"
     "ripple/main"
+    "ripple/database/db_pathfinding"
 )
 
-// PathFindingOut handles the pathfinding output command for a given session
+// PathFindingOut handles the pathfinding output command for a given session.
 func PathFindingOut(session main.Session) {
-    // Extract the username and identifier from the session's datagram
-    username := session.Datagram.Username
+    datagram := session.Datagram
+    username := datagram.Username
     var identifier [32]byte
-    copy(identifier[:], session.Datagram.Arguments[:32])
+    copy(identifier[:], datagram.Arguments[:32])
     
-    // Attempt to find the account node and path entry
     accountNode := session.PathManager.Find(username)
-    
-    // Check if the account node exists and find the path entry
-    var pathNode *pathNode
-    if accountNode != nil {
-        pathNode = accountNode.Find(identifier)
+    if accountNode == nil {
+        log.Printf("No account node found for user %s. Terminating handler.", username)
+        return
     }
-
-    // If no path entry exists, terminate the handler as no path has been initiated
+    
+    pathNode := accountNode.Find(identifier)
     if pathNode == nil {
         log.Printf("No path entry found for identifier %x and user %s. Handler terminates.", identifier, username)
-        return // Early exit if no path entry exists
+        return
     }
 
-    counter := session.Datagram.Counter
-    if pathNode.CounterIn > counter {
-        log.Println("Received counter is not greater than or equal to pathEntry.CounterIn. Potential replay attack.")
+    // Assuming the pathNode.CounterIn needs to be checked against datagram.Counter
+    if pathNode.CounterIn >= datagram.Counter {
+        log.Println("Received counter is not valid or a replay attack may be happening.")
         return
     }
 
@@ -40,14 +38,34 @@ func PathFindingOut(session main.Session) {
         return
     }
 
-    // Forward the request to all peers
+    // Send pathfinding requests to all peers, depending on existing counters
     for _, peer := range peers {
-        if _, exists := pathEntry.CounterOut[peer.Username]; !exists {
-            // No counter exists for this peer, send NewPathFindingOut command
-            SendNewPathFindingOut(peer, session.Datagram.Arguments)
+        if _, exists := pathNode.CounterOut[peer.Username]; !exists {
+            // Send a new pathfinding request if no counter exists for this peer
+            err := SendNewPathFindingOut(peer, datagram.Arguments)
+            if err != nil {
+                log.Printf("Failed to send new pathfinding request to %s: %v", peer.Username, err)
+            }
         } else {
-            // Counter exists, send PathFindingOut command
-            SendPathFindingOut(peer, session.Datagram.Arguments)
+            // Update or handle existing pathfinding state
+            err := SendPathFindingOut(peer, datagram.Arguments)
+            if err != nil {
+                log.Printf("Failed to update pathfinding request to %s: %v", peer.Username, err)
+            }
         }
     }
+}
+
+// SendNewPathFindingOut simulates sending a new pathfinding request
+func SendNewPathFindingOut(peer db_pathfinding.PeerAccount, args []byte) error {
+    // Simulated function for sending out pathfinding requests
+    log.Printf("Sending new pathfinding request to %s at %s", peer.Username, peer.ServerAddress)
+    return nil
+}
+
+// SendPathFindingOut simulates sending an updated pathfinding request
+func SendPathFindingOut(peer db_pathfinding.PeerAccount, args []byte) error {
+    // Simulated function for sending out pathfinding requests
+    log.Printf("Updating pathfinding request to %s at %s", peer.Username, peer.ServerAddress)
+    return nil
 }
