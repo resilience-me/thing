@@ -1,4 +1,4 @@
-package payments
+package client_payments
 
 import (
     "fmt"
