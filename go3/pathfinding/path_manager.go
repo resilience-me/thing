@@ -18,16 +18,19 @@ func NewPathManager() *PathManager {
 
 // Add adds a new account to the PathManager's linked list and returns the new AccountNode.
 func (pm *PathManager) Add(username string) *AccountNode {
-    pm.mu.Lock()
-    defer pm.mu.Unlock()
-
     newNode := &AccountNode{
         BaseNode: linkedlist.BaseNode{Identifier: username},
     }
-
     pm.BaseList.Add(&newNode.BaseNode)
-
     return newNode
+}
+
+// SafeAdd is wrapper for Add that adds mutex for concurrency safety
+func (pm *PathManager) SafeAdd(username string) *AccountNode {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    return pm.Add(username)
 }
 
 // Find searches for a specific account in the PathManager's linked list and returns it if found.
