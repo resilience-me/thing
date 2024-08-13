@@ -34,6 +34,21 @@ func (pm *PathManager) AddAccount(username string) *AccountNode {
     return newNode // Return the newly created AccountNode
 }
 
+// AddPathEntry adds a new PathEntry to the AccountNode's PathFinding linked list.
+// It takes the incoming and outgoing PeerAccount, as well as a unique identifier.
+func (node *AccountNode) AddPathEntry(identifier string, incoming, outgoing PeerAccount) {
+    newEntry := &PathEntry{
+        Identifier: identifier,
+        Timestamp:  time.Now(),
+        Incoming:   incoming,
+        Outgoing:   outgoing,
+        Next:      node.PathFinding, // Insert at the beginning
+    }
+
+    // Update the PathFinding list
+    node.PathFinding = newEntry
+}
+
 // FindAccount searches for a specific account in the PathManager's linked list
 // and returns it if found. Thread safety is ensured using a mutex.
 func (pm *PathManager) FindAccount(username string) *AccountNode {
@@ -48,21 +63,6 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
         return baseNode.(*AccountNode) // Directly return the asserted AccountNode
     }
     return nil // Not found or expired
-}
-
-// AddPathEntry adds a new PathEntry to the AccountNode's PathFinding linked list.
-// It takes the incoming and outgoing PeerAccount, as well as a unique identifier.
-func (node *AccountNode) AddPathEntry(identifier string, incoming, outgoing PeerAccount) {
-    newEntry := &PathEntry{
-        Identifier: identifier,
-        Timestamp:  time.Now(),
-        Incoming:   incoming,
-        Outgoing:   outgoing,
-        Next:      node.PathFinding, // Insert at the beginning
-    }
-
-    // Update the PathFinding list
-    node.PathFinding = newEntry
 }
 
 // FindPathEntry checks if the given identifier exists in the PathFinding linked list,
