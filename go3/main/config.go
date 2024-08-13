@@ -6,10 +6,13 @@ import (
     "log"
     "os"
     "path/filepath"
+    "time"  // Ensure "time" is imported since PathFindingTimeout uses it
 )
 
-var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
+// PathFindingTimeout is a global constant that defines the timeout duration for pathfinding operations
+const PathFindingTimeout = 5 * time.Minute
 
+var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
 var serverAddress string // Store the server address as a string
 
 // GetServerAddress returns the server address as a string
