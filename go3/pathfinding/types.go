@@ -34,9 +34,3 @@ type Payment struct {
     Identifier string
     InOrOut    bool // True for outgoing, false for incoming.
 }
-
-// PathManager manages all AccountNodes in a system.
-type PathManager struct {
-    Accounts map[string]*AccountNode // Map usernames to their respective AccountNodes.
-    mu       sync.Mutex // Protects the Accounts map.
-}
