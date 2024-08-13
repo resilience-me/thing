@@ -13,7 +13,7 @@ func PathFindingOut(session main.Session) {
     var identifier [32]byte
     copy(identifier[:], datagram.Arguments[:32])
     
-    accountNode := session.PathManager.Find(username)
+    accountNode := session.PathManager.SafeFind(username)
     if accountNode == nil {
         log.Printf("No account node found for user %s. Terminating handler.", username)
         return
