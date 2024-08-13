@@ -9,6 +9,7 @@ import (
     "sync"
     "syscall"
     "ripple/config"
+    "ripple/pathfinding"
 )
 
 // Session struct represents a network session with an optional connection
