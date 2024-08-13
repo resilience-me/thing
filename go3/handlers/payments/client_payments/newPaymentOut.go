@@ -19,7 +19,8 @@ func NewPaymentOut(session main.Session) {
     err := session.PathManager.InitiateOutgoingPayment(username, paymentIdentifier)
     if err != nil {
         // Handle the error (e.g., log it, return it to the caller)
-        return log.Printf("failed to initiate outgoing payment for user %s: %w", username, err)
+        log.Printf("failed to initiate outgoing payment for user %s: %w", username, err)
+        return
     }
 
 }
