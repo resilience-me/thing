@@ -1,4 +1,4 @@
-package main
+package pathfinding
 
 import (
     "crypto/sha256"
