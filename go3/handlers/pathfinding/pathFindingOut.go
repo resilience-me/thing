@@ -12,22 +12,22 @@ func PathFindingOut(session Session) {
     copy(identifier[:], session.Datagram.Arguments[:32])
     
     // Attempt to find the account node and path entry
-    accountNode := session.PathManager.FindAccount(username)
+    accountNode := session.PathManager.Find(username)
     
     // Check if the account node exists and find the path entry
-    var pathEntry *PathEntry
+    var pathNode *pathNode
     if accountNode != nil {
-        pathEntry = accountNode.FindPathEntry(identifier)
+        pathNode = accountNode.Find(identifier)
     }
 
     // If no path entry exists, terminate the handler as no path has been initiated
-    if pathEntry == nil {
+    if pathNode == nil {
         log.Printf("No path entry found for identifier %x and user %s. Handler terminates.", identifier, username)
         return // Early exit if no path entry exists
     }
 
     counter := session.Datagram.Counter
-    if pathEntry.CounterIn > counter {
+    if pathNode.CounterIn > counter {
         log.Println("Received counter is not greater than or equal to pathEntry.CounterIn. Potential replay attack.")
         return
     }
