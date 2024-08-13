@@ -96,7 +96,7 @@ func (pm *PathManager) FindAccount(username string) *AccountNode {
 
 // FindIdentifier checks if the given identifier exists in the PathFinding linked list,
 // removes any expired entries based on the configured timeout duration,
-// and returns true if the identifier is found, even if it is deleted due to expiration.
+// and returns the PathEntry for the identifier if it is found.
 func (node *AccountNode) FindIdentifier(identifier [32]byte) *PathEntry {
     now := time.Now()
     var prev *PathEntry
@@ -112,12 +112,17 @@ func (node *AccountNode) FindIdentifier(identifier [32]byte) *PathEntry {
             } else {
                 prev.Next = current.Next
             }
-        } else {
-            prev = current
-        }
+            // If the timed-out node was the target, return nil immediately
+            if isTarget {
+                return nil
+            }
 
-        if isTarget {
-            return current
+        } else {
+            // If it's not timed out, check if it's the target
+            if isTarget {
+                return current // Target found and not timed out
+            }
+            prev = current
         }
 
         current = current.Next
