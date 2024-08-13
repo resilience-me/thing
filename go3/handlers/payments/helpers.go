@@ -3,6 +3,7 @@ package payments
 import (
     "crypto/sha256"
     "fmt"
+    "ripple/main"
 )
 
 // generatePaymentIdentifier uses nested append calls to concatenate userX, userY, and Arguments before hashing.
@@ -19,14 +20,14 @@ func generatePaymentIdentifier(userX, userY []byte, arguments []byte) []byte {
 
 // Wrapper functions for outgoing and incoming payments
 func GeneratePaymentOutIdentifier(dg *Datagram) []byte {
-    userX := append(PadTo32Bytes(dg.Username), PadTo32Bytes(GetServerAddress())...)
-    userY := append(PadTo32Bytes(dg.PeerUsername), PadTo32Bytes(dg.PeerServerAddress)...)
+    userX := append(main.PadTo32Bytes(dg.Username), main.PadTo32Bytes(GetServerAddress())...)
+    userY := append(main.PadTo32Bytes(dg.PeerUsername), main.PadTo32Bytes(dg.PeerServerAddress)...)
     return generatePaymentIdentifier(userX, userY, dg.Arguments)
 }
 
 func GeneratePaymentInIdentifier(dg *Datagram) []byte {
-    userX := append(PadTo32Bytes(dg.PeerUsername), PadTo32Bytes(dg.PeerServerAddress)...)
-    userY := append(PadTo32Bytes(dg.Username), PadTo32Bytes(GetServerAddress())...)
+    userX := append(main.PadTo32Bytes(dg.PeerUsername), main.PadTo32Bytes(dg.PeerServerAddress)...)
+    userY := append(main.PadTo32Bytes(dg.Username), main.PadTo32Bytes(GetServerAddress())...)
     return generatePaymentIdentifier(userX, userY, dg.Arguments)
 }
 
