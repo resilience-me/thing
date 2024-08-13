@@ -20,18 +20,23 @@ func (pm *PathManager) FindOrAdd(username string) *AccountNode {
 func (pm *PathManager) initiatePayment(username, paymentID string, inOrOut bool) error {
     // Step 1: Find or add the AccountNode
     accountNode := pm.FindOrAdd(username)
-    
-    // Step 2: Check if a PathNode for this payment already exists
+
+    // Step 2: Check if a payment is already associated with this AccountNode
+    if accountNode.Payment != nil {
+        accountNode.FindAndRemove(accountNode.Payment)
+    }
+
+    // Step 3: Check if a PathNode for this payment already exists
     pathNode := accountNode.Find(paymentID)
     if pathNode != nil {
         // If a PathNode already exists for this payment, return an error or handle accordingly
         return fmt.Errorf("payment with ID %s is already in progress", paymentID)
     }
 
-    // Step 3: If no PathNode exists, create a new one
+    // Step 4: If no PathNode exists, create a new one
     pathNode = accountNode.Add(paymentID, PeerAccount{}, PeerAccount{})
 
-    // Step 4: Initialize the Payment struct and assign it to the AccountNode
+    // Step 5: Initialize the Payment struct and assign it to the AccountNode
     accountNode.Payment = &Payment{
         Identifier: paymentID,
         InOrOut:    inOrOut, // Set based on whether this is an incoming or outgoing payment
