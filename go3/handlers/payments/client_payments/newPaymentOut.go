@@ -28,6 +28,12 @@ func NewPaymentOut(session main.Session) {
         log.Printf("Failed to initiate outgoing payment for user %s: %v", username, err)
         return
     }
+    log.Printf("Payment initialized successfully for user %s.", username)
 
-    // Continue with other payment processing steps as needed...
+    // Send success response
+    if err := main.SendSuccessResponse([]byte("Payment initialized successfully."), session.Conn); err != nil {
+        log.Printf("Failed to send success response to user %s: %v", username, err)
+        return
+    }
+    log.Printf("Sent success response to client for user %s.", username)
 }
