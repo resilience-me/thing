@@ -8,7 +8,6 @@ import (
 
 // GetPayment handles the command to retrieve payment parameters.
 func GetPayment(session main.Session) {
-
     // Retrieve the Datagram from the session
     datagram := session.Datagram
 
@@ -22,20 +21,17 @@ func GetPayment(session main.Session) {
         return
     }
 
-    // Retrieve payment details using the wrapper method
+    // Retrieve and serialize payment details using the wrapper method
     paymentDetails := fetchAndSerializePaymentDetails(session)
     if paymentDetails == nil {
-        log.Printf("No payment information available for user %s.", username)
-        main.SendErrorResponse("No payment information available.", session.Conn)
-        return
+        paymentDetails = []byte{}  // Send an empty response if no payment details
     }
 
-    log.Printf("Retrieved payment details successfully for payment ID %s.", paymentID)
-
-    // Send the payment details as success response
+    // Send the payment details as a success response
     if err := main.SendSuccessResponse(paymentDetails, session.Conn); err != nil {
-        log.Printf("Failed to send payment details to client for payment ID %s: %v", paymentID, err)
+        log.Printf("Failed to send payment details to client for user %s: %v", username, err)
         return
     }
-    log.Printf("Sent payment details successfully to client for payment ID %s.", paymentID)
+
+    log.Printf("Sent payment details successfully to client for user %s.", username)
 }
