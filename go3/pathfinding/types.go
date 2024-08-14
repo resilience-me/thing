@@ -25,7 +25,7 @@ type PathNode struct {
 type AccountNode struct {
     Username      string
     LastModified  time.Time
-    Paths         map[[32]byte]*PathNode // Maps identifiers to PathNode.
+    Paths         map[string]*PathNode // Maps identifiers to PathNode.
     Payment       *Payment
 }
 
