@@ -20,17 +20,23 @@ func (pm *PathManager) AddAccount(username string) *AccountNode {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
+    // Check if the account node already exists and return it if so
     if node, exists := pm.Accounts[username]; exists {
         return node
     }
 
+    // If not exists, create a new AccountNode with the current time as the LastModified timestamp
     node := &AccountNode{
-        Username: username,
-        Paths:    make(map[string]*PathNode),
+        Username:     username,
+        LastModified: time.Now(), // Set the LastModified to the current time
+        Paths:        make(map[string]*PathNode),
     }
+
+    // Add the new node to the Accounts map
     pm.Accounts[username] = node
     return node
 }
+
 
 // FindAccount retrieves an account from the manager.
 func (pm *PathManager) FindAccount(username string) *AccountNode {
