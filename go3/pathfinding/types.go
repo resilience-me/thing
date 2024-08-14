@@ -34,5 +34,5 @@ type Account struct {
 type Payment struct {
     Identifier  string
     Counterpart PeerAccount
-    InOrOut     bool // True for outgoing, false for incoming.
+    InOrOut     byte  // 0 for incoming, 1 for outgoing, stored as a single byte
 }
