@@ -5,6 +5,22 @@ import (
     "ripple/main"
 )
 
+// ConcatenateAndPad takes four strings and one byte slice, pads each to 32 bytes, and concatenates them.
+func ConcatenateAndPad(s1, s2, s3, s4 string, b []byte) string {
+	const length = 32
+
+	// Pad each string and convert the byte slice to a string with appropriate padding.
+	return fmt.Sprintf(
+		"%-32s%-32s%-32s%-32s%-32s",
+		s1,
+		s2,
+		s3,
+		s4,
+		string(b[:min(len(b), length)])) // Ensure byte slice is not larger than 32 bytes
+}
+
+
+
 // PadUserIdentifiers pads and returns the four components needed for identifier generation.
 func PadUserIdentifiers(dg *Datagram) ([]byte, []byte, []byte, []byte) {
     username := main.PadTo32Bytes(dg.Username)
