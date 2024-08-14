@@ -73,14 +73,3 @@ func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string) error
 func (pm *PathManager) InitiateIncomingPayment(username, paymentID string) error {
     return pm.initiatePayment(username, paymentID, false)
 }
-
-// PathManager class with GetPaymentDetails method using Find
-func (pm *PathManager) GetPaymentDetails(username string) *Payment {
-    // Use the existing Find method to retrieve the account
-    account := pm.Find(username)
-    if account != nil {
-        return account.Payment
-    }
-
-    return nil
-}
