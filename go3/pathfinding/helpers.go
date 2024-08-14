@@ -31,6 +31,8 @@ func (pm *PathManager) cleanupAccounts() {
 
 // initiatePayment sets up or updates payment details for an account, creating the account if necessary.
 func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool) error {
+    // Perform account cleanup before processing the new payment
+    pm.cleanupAccounts()
     // Retrieve the account from the PathManager, creating it if necessary
     account := pm.Find(username)
     if account == nil {
@@ -52,7 +54,11 @@ func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool
     // Add or update the related Path entry with a new timestamp
     account.Add(identifier, PeerAccount{}, PeerAccount{}) // Adjust PeerAccount as needed
 
-    // Reinsert the account to update LastModified and ensure it's in the map
+    // Update LastModified. Then reinsert, to prevent a minimal race condition risk.
+    // The risk is that LastModified could have been very close to timing out when
+    // the cleanup was run at the beginning of this function, and another thread
+    // could have run the cleanup a few nanoseconds later and deleted the account
+    // This is easily mitigated by simply reinserting it, hence Reinsert is used.
     pm.Reinsert(username, account)
 
     return nil
