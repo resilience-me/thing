@@ -13,8 +13,8 @@ type PaymentDetails struct {
     Nonce       uint32
 }
 
-// SerializePaymentDetails constructs a byte array directly from PaymentDetails.
-func SerializePaymentDetails(details *PaymentDetails) []byte {
+// serializePaymentDetails constructs a byte array directly from PaymentDetails.
+func serializePaymentDetails(details *PaymentDetails) []byte {
     // Create a buffer with the exact size needed
     buffer := make([]byte, 32+32+1+4+4)  // Total size: 73 bytes
 
@@ -34,8 +34,8 @@ func SerializePaymentDetails(details *PaymentDetails) []byte {
     return buffer
 }
 
-// GetPaymentDetails fetches the payment details from the account, including the related Path.
-func GetPaymentDetails(session main.Session) *PaymentDetails {
+// getPaymentDetails fetches the payment details from the account, including the related Path.
+func getPaymentDetails(session main.Session) *PaymentDetails {
     // Retrieve the username from the session datagram
     username := session.Datagram.Username
 
@@ -60,4 +60,17 @@ func GetPaymentDetails(session main.Session) *PaymentDetails {
     }
 
     return paymentDetails
+}
+
+// Wrapper function to fetch and serialize payment details
+func GetPaymentDetails(session main.Session) []byte {
+    // Fetch the payment details
+    details := getPaymentDetails(session)
+    if details == nil {
+        return nil  // Return nil to indicate no data is available
+    }
+
+    // Serialize the payment details
+    serializedData := serializePaymentDetails(details)
+    return serializedData
 }
