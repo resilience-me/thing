@@ -4,16 +4,16 @@ import (
     "sync"
 )
 
-// PathManager manages all AccountNodes in a system.
+// PathManager manages all Account entries in a system.
 type PathManager struct {
-    Accounts map[string]*AccountNode // Map usernames to their respective AccountNodes.
-    mu       sync.Mutex // Protects the Accounts map.
+    Accounts map[string]*Account // Map usernames to their respective Accounts.
+    mu       sync.Mutex          // Protects the Accounts map.
 }
 
 // NewPathManager initializes and returns a new PathManager instance.
 func NewPathManager() *PathManager {
     return &PathManager{
-        Accounts: make(map[string]*AccountNode), // Properly initialize the map.
+        Accounts: make(map[string]*Account), // Properly initialize the map.
     }
 }
 
