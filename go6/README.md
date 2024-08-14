@@ -6,4 +6,4 @@ Each account, in each of its peer connections, stores a series of counters.
 
 `snd.nxt` is the locally stored representation of the `rcv.nxt` at the receiving end. The sender is forced to ensure this is identical to `rcv.nxt` at the receiver, and does this by polling.
 
-`
+`snd.una` is the most recent sent sequence number.
