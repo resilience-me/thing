@@ -1,8 +1,9 @@
 package payments
 
 import (
-    "crypto/sha256"
-    "ripple/main"
+	"crypto/sha256"
+	"fmt"
+	"ripple/main"
 )
 
 // ConcatenateAndPadAndHash takes four strings and an 8-byte slice, pads each string to 32 bytes,
@@ -17,7 +18,7 @@ func ConcatenateAndPadAndHash(s1, s2, s3, s4 string, b []byte) []byte {
 		s4,
 	))
 
-	// Append the 8-byte slice to the byte slice
+	// Append the byte slice to the byte slice
 	concatenated := append(paddedStrings, b...)
 
 	// Compute SHA-256 hash of the concatenated result
@@ -26,57 +27,18 @@ func ConcatenateAndPadAndHash(s1, s2, s3, s4 string, b []byte) []byte {
 	return hash[:]
 }
 
-// ConcatenateAndPad takes four strings and one byte slice, pads each to 32 bytes, and concatenates them.
-func ConcatenateAndPad(s1, s2, s3, s4 string, b []byte) string {
-	const length = 32
-
-	// Pad each string and convert the byte slice to a string with appropriate padding.
-	return fmt.Sprintf(
-		"%-32s%-32s%-32s%-32s%-32s",
-		s1,
-		s2,
-		s3,
-		s4,
-		string(b[:min(len(b), length)])) // Ensure byte slice is not larger than 32 bytes
-}
-
-
-
-// PadUserIdentifiers pads and returns the four components needed for identifier generation.
-func PadUserIdentifiers(dg *Datagram) ([]byte, []byte, []byte, []byte) {
-    username := main.PadTo32Bytes(dg.Username)
-    serverAddress := main.PadTo32Bytes(GetServerAddress())
-    peerUsername := main.PadTo32Bytes(dg.PeerUsername)
-    peerServerAddress := main.PadTo32Bytes(dg.PeerServerAddress)
-    return username, serverAddress, peerUsername, peerServerAddress
-}
-
-// generatePaymentIdentifier uses nested append calls to concatenate userX, userY, and Arguments before hashing.
-func generatePaymentIdentifier(userX, userY []byte, arguments []byte) []byte {
-    // Concatenate userX, userY, and arguments[0:8] using nested append
-    preimage := append(append(userX, userY...), arguments[0:8]...)
-
-    // Compute SHA-256 hash of the combined byte slice
-    hash := sha256.Sum256(preimage)
-
-    // Return the hash as a byte slice
-    return hash[:]
-}
-
-// Wrapper functions for outgoing and incoming payments
+// GeneratePaymentOutIdentifier generates a payment identifier for outgoing payments.
 func GeneratePaymentOutIdentifier(dg *Datagram) []byte {
-    username, serverAddress, peerUsername, peerServerAddress := PadUserIdentifiers(dg)
-    userX := append(username, serverAddress...)
-    userY := append(peerUsername, peerServerAddress...)
-    return generatePaymentIdentifier(userX, userY, dg.Arguments)
+    // Directly pass the strings and the byte slice to ConcatenateAndPadAndHash
+    return ConcatenateAndPadAndHash(dg.Username, GetServerAddress(), dg.PeerUsername, dg.PeerServerAddress, dg.Arguments[:8])
 }
 
+// GeneratePaymentInIdentifier generates a payment identifier for incoming payments.
 func GeneratePaymentInIdentifier(dg *Datagram) []byte {
-    username, serverAddress, peerUsername, peerServerAddress := PadUserIdentifiers(dg)
-    userX := append(peerUsername, peerServerAddress...)
-    userY := append(username, serverAddress...)
-    return generatePaymentIdentifier(userX, userY, dg.Arguments)
+    // Directly pass the strings and the byte slice to ConcatenateAndPadAndHash
+    return ConcatenateAndPadAndHash(dg.PeerUsername, dg.PeerServerAddress, dg.Username, GetServerAddress(), dg.Arguments[:8])
 }
+
 
 // GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
 func GenerateAndInitiatePaymentOut(session main.Session, datagram *Datagram, username string) error {
