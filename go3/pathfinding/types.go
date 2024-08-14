@@ -1,35 +1,35 @@
-package pathfinding
+package main
 
 import (
     "sync"
     "time"
 )
 
-// PeerAccount holds the details about a peer account.
+// PeerAccount holds details about a peer account.
 type PeerAccount struct {
     Username      string
     ServerAddress string
 }
 
-// Path is the replacement for PathEntry, adapted for use with a map.
+// Path replaces PathNode, tailored for use with a map and string identifiers.
 type Path struct {
-    Identifier   [32]byte // Using array for fixed-size identifiers.
-    Timestamp    time.Time
-    Incoming     PeerAccount
-    Outgoing     PeerAccount
-    CounterIn    int
-    CounterOut   map[string]int // Map for outgoing counters by username.
+    Identifier   string          // Identifier for the path.
+    Timestamp    time.Time       // Timestamp of the last update.
+    Incoming     PeerAccount     // Details of the incoming peer.
+    Outgoing     PeerAccount     // Details of the outgoing peer.
+    CounterIn    int             // Counter for incoming paths.
+    CounterOut   map[string]int  // Map for outgoing counters by username.
 }
 
-// AccountNode holds all pathfinding related nodes and payment information.
+// Account holds all path-related information and payment details.
 type Account struct {
     Username      string
     LastModified  time.Time
-    Paths         map[string]*PathNode // Maps identifiers to PathNode.
+    Paths         map[string]*Path // Maps string identifiers to Path.
     Payment       *Payment
 }
 
-// Payment structure adapted for use with AccountNode.
+// Payment structure adapted for use with Account.
 type Payment struct {
     Identifier string
     InOrOut    bool // True for outgoing, false for incoming.
