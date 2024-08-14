@@ -9,6 +9,9 @@ func (pm *PathManager) initiatePayment(username string, paymentDetails Payment) 
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
+    // Perform account cleanup before processing the new payment
+    pm.cleanupAccounts()
+
     account, exists := pm.Accounts[username]
     if !exists {
         // If the account does not exist, create it and set LastModified to now
