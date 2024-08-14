@@ -31,27 +31,16 @@ func (pm *PathManager) cleanupAccounts() {
 
 // initiatePayment sets up or updates payment details for an account, creating the account if necessary.
 func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool) error {
-    // Perform account cleanup before processing the new payment
-    pm.cleanupAccounts()
-
+    // Retrieve the account from the PathManager, creating it if necessary
     account := pm.Find(username)
-
-    //If account exists
-    if account != nil {
-        // Check if the identifier is already in use
-        if account.Find(identifier) != nil {
-            return
-        }
-        // Refresh LastModified
-        pm.Touch(username)
-
-        // Check for an existing payment and handle path removal
-        if account.Payment != nil {
-            account.Remove(account.Payment.Identifier)
-        }
-    } else {
-        // If the account does not exist, create it
+    if account == nil {
+        // Account does not exist; create it
         account = pm.Add(username)
+    }
+
+    // Remove the existing path if present
+    if account.Payment != nil {
+        account.Remove(account.Payment.Identifier)
     }
 
     // Set or update the payment details
@@ -61,7 +50,10 @@ func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool
     }
 
     // Add or update the related Path entry with a new timestamp
-    account.Add(identifier, PeerAccount{}, PeerAccount{})
+    account.Add(identifier, PeerAccount{}, PeerAccount{}) // Adjust PeerAccount as needed
+
+    // Reinsert the account to update LastModified and ensure it's in the map
+    pm.Reinsert(username, account)
 
     return nil
 }
