@@ -9,20 +9,20 @@ import (
 // ConcatenateAndPadAndHash takes four strings and an 8-byte slice, pads each string to 32 bytes,
 // concatenates them with the 8-byte slice, and then hashes the result using SHA-256.
 func ConcatenateAndPadAndHash(s1, s2, s3, s4 string, b []byte) []byte {
-	// Convert padded strings to byte slice
-	paddedStrings := []byte(fmt.Sprintf(
-		"%-32s%-32s%-32s%-32s",
-		s1,
-		s2,
-		s3,
-		s4,
-	))
+	// Create a buffer of size 136 bytes to hold the four 32-byte padded strings plus 8 bytes
+	buffer := make([]byte, 136)
 
-	// Append the byte slice to the byte slice
-	concatenated := append(paddedStrings, b...)
+	// Copy each string into the buffer; any overflow will be safely overwritten by the next string
+	copy(buffer[0:], s1)
+	copy(buffer[32:], s2)
+	copy(buffer[64:], s3)
+	copy(buffer[96:], s4)
 
-	// Compute SHA-256 hash of the concatenated result
-	hash := sha256.Sum256(concatenated)
+	// Copy the 8-byte slice into the buffer at position 128
+	copy(buffer[128:], b)
+
+	// Compute SHA-256 hash of the buffer
+	hash := sha256.Sum256(buffer)
 
 	return hash[:]
 }
