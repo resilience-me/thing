@@ -32,6 +32,7 @@ type Account struct {
 
 // Payment structure adapted for use with Account.
 type Payment struct {
-    Identifier string
-    InOrOut    bool // True for outgoing, false for incoming.
+    Identifier  string
+    Counterpart PeerAccount
+    InOrOut     bool // True for outgoing, false for incoming.
 }
