@@ -48,6 +48,18 @@ func (pm *PathManager) initiatePayment(username string, paymentDetails Payment) 
     return nil
 }
 
+func (pm *PathManager) cleanupAccounts() {
+    now := time.Now()
+
+    for username, account := range pm.Accounts {
+        // Only check the LastModified timestamp to decide if the account should be removed
+        if now.Sub(account.LastModified) > config.PathFindingTimeout {
+            delete(pm.Accounts, username)
+        }
+    }
+}
+
+
 // findOrAdd function finds the account node and resets the timestamp
 func (pm *PathManager) findOrAdd(username string) *AccountNode {
     existingNode := pm.Find(username)
