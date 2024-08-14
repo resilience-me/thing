@@ -4,8 +4,19 @@ import (
     "fmt"
 )
 
+func (pm *PathManager) cleanupAccounts() {
+    now := time.Now()
+
+    for username, account := range pm.Accounts {
+        // Only check the LastModified timestamp to decide if the account should be removed
+        if now.Sub(account.LastModified) > config.PathFindingTimeout {
+            delete(pm.Accounts, username)
+        }
+    }
+}
+
 // initiatePayment sets up or updates payment details for an account, creating the account if necessary.
-func (pm *PathManager) initiatePayment(username string, paymentDetails Payment) error {
+func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool) error {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
@@ -34,13 +45,13 @@ func (pm *PathManager) initiatePayment(username string, paymentDetails Payment) 
 
     // Set or update the payment details
     account.Payment = &Payment{
-        Identifier: paymentDetails.Identifier,
-        InOrOut:    paymentDetails.InOrOut,
+        Identifier: identifier,
+        InOrOut:    inOrOut,
     }
 
     // Optionally, add or update the related Path entry with a new timestamp
     account.Paths[paymentDetails.Identifier] = &Path{
-        Identifier:   paymentDetails.Identifier,
+        Identifier:   identifier,
         Timestamp:    time.Now(),  // This timestamp represents the payment time
         Incoming:     PeerAccount{}, // These would be set according to your logic
         Outgoing:     PeerAccount{},
@@ -51,16 +62,17 @@ func (pm *PathManager) initiatePayment(username string, paymentDetails Payment) 
     return nil
 }
 
-func (pm *PathManager) cleanupAccounts() {
-    now := time.Now()
-
-    for username, account := range pm.Accounts {
-        // Only check the LastModified timestamp to decide if the account should be removed
-        if now.Sub(account.LastModified) > config.PathFindingTimeout {
-            delete(pm.Accounts, username)
-        }
-    }
+// Wrapper for initiating an outgoing payment
+func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string) error {
+    return pm.initiatePayment(username, paymentID, true)
 }
+
+// Wrapper for initiating an incoming payment
+func (pm *PathManager) InitiateIncomingPayment(username, paymentID string) error {
+    return pm.initiatePayment(username, paymentID, false)
+}
+
+
 
 
 // findOrAdd function finds the account node and resets the timestamp
@@ -120,12 +132,4 @@ func (pm *PathManager) initiatePayment(username, paymentID string, inOrOut bool)
     return nil // Indicate success
 }
 
-// Wrapper for initiating an outgoing payment
-func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string) error {
-    return pm.initiatePayment(username, paymentID, true)
-}
 
-// Wrapper for initiating an incoming payment
-func (pm *PathManager) InitiateIncomingPayment(username, paymentID string) error {
-    return pm.initiatePayment(username, paymentID, false)
-}
