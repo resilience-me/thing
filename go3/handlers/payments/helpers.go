@@ -27,17 +27,18 @@ func ConcatenateAndPadAndHash(s1, s2, s3, s4 string, b []byte) []byte {
 	return hash[:]
 }
 
-// GeneratePaymentOutIdentifier generates a payment identifier for outgoing payments.
-func GeneratePaymentOutIdentifier(dg *Datagram) []byte {
-    // Directly pass the strings and the byte slice to ConcatenateAndPadAndHash
-    return ConcatenateAndPadAndHash(dg.Username, GetServerAddress(), dg.PeerUsername, dg.PeerServerAddress, dg.Arguments[:8])
+// GeneratePaymentOutIdentifier generates a payment identifier for outgoing payments and returns it as a hexadecimal string.
+func GeneratePaymentOutIdentifier(dg *Datagram) string {
+	hash := ConcatenateAndPadAndHash(dg.Username, GetServerAddress(), dg.PeerUsername, dg.PeerServerAddress, dg.Arguments[:8])
+	return fmt.Sprintf("%x", hash)
 }
 
-// GeneratePaymentInIdentifier generates a payment identifier for incoming payments.
-func GeneratePaymentInIdentifier(dg *Datagram) []byte {
-    // Directly pass the strings and the byte slice to ConcatenateAndPadAndHash
-    return ConcatenateAndPadAndHash(dg.PeerUsername, dg.PeerServerAddress, dg.Username, GetServerAddress(), dg.Arguments[:8])
+// GeneratePaymentInIdentifier generates a payment identifier for incoming payments and returns it as a hexadecimal string.
+func GeneratePaymentInIdentifier(dg *Datagram) string {
+	hash := ConcatenateAndPadAndHash(dg.PeerUsername, dg.PeerServerAddress, dg.Username, GetServerAddress(), dg.Arguments[:8])
+	return fmt.Sprintf("%x", hash)
 }
+
 
 
 // GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
