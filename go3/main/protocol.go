@@ -32,6 +32,8 @@ var commandHandlers = [256]CommandHandler{
     4:   client_trustlines.GetTrustlineOut,  // Client Command
     5:   client_payments.NewPaymentOut,      // Client Command
     6:   client_payments.NewPaymentIn,       // Client Command
+    7:   client_payments.GetPayment,         // Client Command
+
     127: server_trustlines.SetTrustline,     // Server Command
     128: server_trustlines.GetTrustline,     // Server Command
     129: server_trustlines.SetSyncOut,       // Server Command
@@ -51,6 +53,8 @@ const (
     ClientTrustlines_GetTrustlineOut   = 4
     ClientPayments_NewPaymentOut       = 5
     ClientPayments_NewPaymentIn        = 6
+    ClientPayments_GetPayment          = 7
+
     ServerTrustlines_SetTrustline      = 127
     ServerTrustlines_GetTrustline      = 128
     ServerTrustlines_SetSyncOut        = 129
