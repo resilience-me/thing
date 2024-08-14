@@ -4,26 +4,47 @@ import (
     "fmt"
 )
 
-// InitiatePayment starts a new payment process by creating or updating a path node.
-func (pm *PathManager) InitiatePayment(username, identifier string, peer PeerAccount, inOrOut bool) error {
+// initiatePayment sets up or updates payment details for an account, creating the account if necessary.
+func (pm *PathManager) initiatePayment(username string, paymentDetails Payment) error {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
     account, exists := pm.Accounts[username]
     if !exists {
-        return fmt.Errorf("account %s does not exist", username)
+        // If the account does not exist, create it and set LastModified to now
+        account = &Account{
+            Username:      username,
+            LastModified:  time.Now(),
+            Paths:         make(map[string]*Path),
+        }
+        pm.Accounts[username] = account
+    } else {
+        // If account exists, check for an existing payment and handle path removal
+        if account.Payment != nil {
+            if _, ok := account.Paths[account.Payment.Identifier]; ok {
+                delete(account.Paths, account.Payment.Identifier)
+            }
+        }
+        // Update the LastModified only if account already existed and is being modified
+        account.LastModified = time.Now()
     }
 
-    if _, exists := account.Paths[identifier]; exists {
-        return fmt.Errorf("path %s already exists for account %s", identifier, username)
+    // Set or update the payment details
+    account.Payment = &Payment{
+        Identifier: paymentDetails.Identifier,
+        InOrOut:    paymentDetails.InOrOut,
     }
 
-    account.Paths[identifier] = &PathNode{
-        Identifier:   identifier,
-        Incoming:     PeerAccount{},
-        Outgoing:     peer,
-        LastModified: time.Now(),
+    // Optionally, add or update the related Path entry with a new timestamp
+    account.Paths[paymentDetails.Identifier] = &Path{
+        Identifier:   paymentDetails.Identifier,
+        Timestamp:    time.Now(),  // This timestamp represents the payment time
+        Incoming:     PeerAccount{}, // These would be set according to your logic
+        Outgoing:     PeerAccount{},
+        CounterIn:    0,
+        CounterOut:   make(map[string]int),
     }
+
     return nil
 }
 
