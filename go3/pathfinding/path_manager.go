@@ -18,8 +18,8 @@ func NewPathManager() *PathManager {
     }
 }
 
-// AddAccount adds a new account or returns an existing one.
-func (pm *PathManager) AddAccount(username string) *Account {
+// Add adds a new account or returns an existing one.
+func (pm *PathManager) Add(username string) *Account {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
@@ -40,8 +40,8 @@ func (pm *PathManager) AddAccount(username string) *Account {
     return account
 }
 
-// FindAccount retrieves an account from the manager.
-func (pm *PathManager) FindAccount(username string) *Account {
+// Find retrieves an account from the manager.
+func (pm *PathManager) Find(username string) *Account {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
@@ -51,17 +51,16 @@ func (pm *PathManager) FindAccount(username string) *Account {
     return nil
 }
 
-// RemoveAccount removes an account from the manager.
-func (pm *PathManager) RemoveAccount(username string) {
+// Remove deletes an account from the manager.
+func (pm *PathManager) Remove(username string) {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
     delete(pm.Accounts, username)
 }
 
-// AddPath adds a new Path to an Account.
-func (account *Account) AddPath(identifier string, incoming, outgoing PeerAccount) {
-    // Create a new Path entry
+// Add creates and adds a new Path to an Account.
+func (account *Account) Add(identifier string, incoming, outgoing PeerAccount) {
     newPath := &Path{
         Identifier:   identifier,
         Timestamp:    time.Now(),
@@ -70,21 +69,18 @@ func (account *Account) AddPath(identifier string, incoming, outgoing PeerAccoun
         CounterIn:    0,
         CounterOut:   make(map[string]int),
     }
-    // Add the new path to the Account's Paths map
     account.Paths[identifier] = newPath
 }
 
-// FindPath retrieves a Path from an Account.
-func (account *Account) FindPath(identifier string) *Path {
-    // Direct access to the path using the map
+// Find retrieves a Path from an Account using the identifier.
+func (account *Account) Find(identifier string) *Path {
     if path, exists := account.Paths[identifier]; exists {
         return path
     }
     return nil
 }
 
-// RemovePath removes a Path from an Account.
-func (account *Account) RemovePath(identifier string) {
-    // Remove the path from the Account's Paths map
+// Remove deletes a Path from an Account using the identifier.
+func (account *Account) Remove(identifier string) {
     delete(account.Paths, identifier)
 }
