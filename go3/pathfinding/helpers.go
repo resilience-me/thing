@@ -4,6 +4,29 @@ import (
     "fmt"
 )
 
+// InitiatePayment starts a new payment process by creating or updating a path node.
+func (pm *PathManager) InitiatePayment(username, identifier string, peer PeerAccount, inOrOut bool) error {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+
+    account, exists := pm.Accounts[username]
+    if !exists {
+        return fmt.Errorf("account %s does not exist", username)
+    }
+
+    if _, exists := account.Paths[identifier]; exists {
+        return fmt.Errorf("path %s already exists for account %s", identifier, username)
+    }
+
+    account.Paths[identifier] = &PathNode{
+        Identifier:   identifier,
+        Incoming:     PeerAccount{},
+        Outgoing:     peer,
+        LastModified: time.Now(),
+    }
+    return nil
+}
+
 // findOrAdd function finds the account node and resets the timestamp
 func (pm *PathManager) findOrAdd(username string) *AccountNode {
     existingNode := pm.Find(username)
