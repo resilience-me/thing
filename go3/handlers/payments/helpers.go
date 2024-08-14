@@ -5,6 +5,29 @@ import (
     "ripple/main"
 )
 
+// ConcatenateAndPadAndHash takes four strings and an 8-byte slice, pads each string to 32 bytes,
+// concatenates them with the 8-byte slice, and then hashes the result using SHA-256.
+func ConcatenateAndPadAndHash(s1, s2, s3, s4 string, b [8]byte) []byte {
+	const stringLength = 32
+
+	// Format and pad the strings, convert to byte slice
+	paddedStrings := []byte(fmt.Sprintf(
+		"%-32s%-32s%-32s%-32s",
+		s1,
+		s2,
+		s3,
+		s4,
+	))
+
+	// Append the 8-byte slice to the byte slice
+	concatenated := append(paddedStrings, b[:]...)
+
+	// Compute SHA-256 hash of the concatenated result
+	hash := sha256.Sum256(concatenated)
+
+	return hash[:]
+}
+
 // ConcatenateAndPad takes four strings and one byte slice, pads each to 32 bytes, and concatenates them.
 func ConcatenateAndPad(s1, s2, s3, s4 string, b []byte) string {
 	const length = 32
