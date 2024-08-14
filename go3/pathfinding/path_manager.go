@@ -51,46 +51,6 @@ func (pm *PathManager) RemoveAccount(username string) {
     delete(pm.Accounts, username)
 }
 
-
-// Add adds a new account to the PathManager's linked list and returns the new AccountNode.
-func (pm *PathManager) Add(username string) *AccountNode {
-    newNode := &AccountNode{
-        BaseNode: linkedlist.BaseNode{Identifier: username},
-    }
-    pm.BaseList.Add(&newNode.BaseNode)
-    return newNode
-}
-
-// SafeAdd is wrapper for Add that adds mutex for concurrency safety
-func (pm *PathManager) SafeAdd(username string) *AccountNode {
-    pm.mu.Lock()
-    defer pm.mu.Unlock()
-
-    return pm.Add(username)
-}
-
-// Find searches for a specific account in the PathManager's linked list and returns it if found.
-func (pm *PathManager) Find(username string) *AccountNode {
-    baseNode := pm.BaseList.Find(username)
-    if baseNode != nil {
-        return baseNode.(*AccountNode)
-    }
-    return nil
-}
-
-// SafeFind searches is wrapper for Find that adds mutex for concurrency safety
-func (pm *PathManager) SafeFind(username string) *AccountNode {
-    pm.mu.Lock()
-    defer pm.mu.Unlock()
-
-    accountNode := pm.Find(username)
-
-    if accountNode != nil {
-        return accountNode
-    }
-    return nil
-}
-
 // Add adds a new PathNode to the AccountNode's PathFinding linked list.
 func (node *AccountNode) Add(identifier string, incoming, outgoing PeerAccount) {
     newEntry := &PathNode{
