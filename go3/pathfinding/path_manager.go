@@ -10,9 +10,11 @@ type PathManager struct {
     mu       sync.Mutex // Protects the Accounts map.
 }
 
-// NewPathManager initializes and returns a new PathManager instance
+// NewPathManager initializes and returns a new PathManager instance.
 func NewPathManager() *PathManager {
-    return &PathManager{}
+    return &PathManager{
+        Accounts: make(map[string]*AccountNode), // Properly initialize the map.
+    }
 }
 
 // AddAccount adds a new account or returns an existing one.
