@@ -22,11 +22,11 @@ func GetPayment(session main.Session) {
         return
     }
 
-    // Retrieve payment details using the payment ID
-    paymentDetails, err := payments.GetPaymentDetails(username)
-    if err != nil {
-        log.Printf("Failed to retrieve payment details for user %s: %v", username, err)
-        main.SendErrorResponse("Failed to retrieve payment details.", session.Conn)
+    // Retrieve payment details using the wrapper method
+    paymentDetails := fetchAndSerializePaymentDetails(session)
+    if paymentDetails == nil {
+        log.Printf("No payment information available for user %s.", username)
+        main.SendErrorResponse("No payment information available.", session.Conn)
         return
     }
 
