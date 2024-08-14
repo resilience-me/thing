@@ -24,34 +24,6 @@ The Path finding is very simple. It is practically “stateless”, no routing t
 
 The path-finding optimizes for never going too deep. It is bidirectional, reducing accounts queried to 2*sqrt(unidirectional). And, it searches in increments of 1, always returning to the root before increasing the depth by 1. Thus, whenever a path is found, the search ends (the root stops replying to response by incrementing request. ) Path requests use an identifier that is a simple random number, and are sent both from buyer and receiver. Whenever these “fronts” meet, a path is found, and the first path found is chosen. The "first path found" approximates fewest hops.
 
-    type PeerAccount {
-        Username string
-        ServerAddress string
-    }
-    
-    type PathEntry struct {
-        Identifier [32]byte
-        Timestamp  time.Time
-        Incoming   PeerAccount
-        Outgoing   PeerAccount
-        CounterIn  int
-        CounterOut map[string]int
-        Next       *PathEntry
-    }
-
-    type Payment struct {
-        Identifier string
-        InOrOut    bool
-    }
-
-    type AccountNode struct {
-        Username       string
-        LastModified   time.Time
-        PathFinding    *PathEntry
-        Payment        *Payment
-        Next           *AccountNode
-    }
-
 ### Coordinating payments
 
 Step 1) A command to place a time lock on the trustlines is sent down the path. 
