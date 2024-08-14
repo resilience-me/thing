@@ -6,17 +6,16 @@ import (
     "ripple/config" // For using config.PathFindingTimeout
 )
 
-// Touch checks if an account exists, updates its LastModified timestamp if it does, and returns the account.
-func (pm *PathManager) Touch(username string) *Account {
+// Reinsert updates LastModified and reinserts the account if it was removed.
+func (pm *PathManager) Reinsert(username string, account *Account) {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
-    account, exists := pm.Accounts[username]
-    if exists {
-        // Update the LastModified timestamp if the account exists
-        account.LastModified = time.Now()
-    }
-    return account
+    // Update LastModified
+    account.LastModified = time.Now()
+
+    // Reinsert the account
+    pm.Accounts[username] = account
 }
 
 func (pm *PathManager) cleanupAccounts() {
