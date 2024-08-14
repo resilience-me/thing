@@ -15,9 +15,10 @@ type PeerAccount struct {
 type Path struct {
     Identifier   string          // Identifier for the path.
     Timestamp    time.Time       // Timestamp of the last update.
+    Amount       uint32
     Incoming     PeerAccount     // Details of the incoming peer.
     Outgoing     PeerAccount     // Details of the outgoing peer.
-    CounterIn    int             // Counter for incoming paths.
+    CounterIn    uint32          // Counter for incoming paths.
     CounterOut   map[string]int  // Map for outgoing counters by username.
 }
 
