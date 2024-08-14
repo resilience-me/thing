@@ -11,8 +11,8 @@ type PeerAccount struct {
     ServerAddress string
 }
 
-// PathNode is the replacement for PathEntry, adapted for use with a map.
-type PathNode struct {
+// Path is the replacement for PathEntry, adapted for use with a map.
+type Path struct {
     Identifier   [32]byte // Using array for fixed-size identifiers.
     Timestamp    time.Time
     Incoming     PeerAccount
@@ -22,7 +22,7 @@ type PathNode struct {
 }
 
 // AccountNode holds all pathfinding related nodes and payment information.
-type AccountNode struct {
+type Account struct {
     Username      string
     LastModified  time.Time
     Paths         map[string]*PathNode // Maps identifiers to PathNode.
