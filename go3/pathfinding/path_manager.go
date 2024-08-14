@@ -18,24 +18,19 @@ func NewPathManager() *PathManager {
     }
 }
 
-// Add adds a new account or returns an existing one.
+// Add creates a new account every time, overwriting any existing one.
 func (pm *PathManager) Add(username string) *Account {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
-    // Check if the account already exists and return it if so
-    if account, exists := pm.Accounts[username]; exists {
-        return account
-    }
-
-    // If not exists, create a new Account with the current time as the LastModified timestamp
+    // Create a new Account with the current time as the LastModified timestamp
     account := &Account{
         Username:     username,
-        LastModified: time.Now(), // Set the LastModified to the current time
+        LastModified: time.Now(),
         Paths:        make(map[string]*Path),
     }
 
-    // Add the new account to the Accounts map
+    // Always add the new account to the Accounts map, overwriting any existing one
     pm.Accounts[username] = account
     return account
 }
