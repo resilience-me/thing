@@ -7,7 +7,7 @@ import (
 
 type PaymentDetails struct {
     Counterpart PeerAccount
-    InOrOut     bool
+    InOrOut     byte
     Amount      uint32
     Nonce       uint32
 }
