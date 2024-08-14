@@ -1,6 +1,7 @@
 package client_payments
 
 import (
+    "encoding/binary"
     "ripple/main"
     "ripple/pathfinding"
 )
