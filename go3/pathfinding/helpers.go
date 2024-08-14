@@ -35,11 +35,18 @@ func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool
     // Perform account cleanup before processing the new payment
     pm.cleanupAccounts()
 
-    // Check if the account exists and refresh LastModified if so
-    account := pm.Touch(username)
+    account := pm.Find(username)
 
+    //If account exists
     if account != nil {
-        // If account exists, check for an existing payment and handle path removal
+        // Check if the identifier is already in use
+        if account.Find(identifier) != nil {
+            return
+        }
+        // Refresh LastModified
+        pm.Touch(username)
+
+        // Check for an existing payment and handle path removal
         if account.Payment != nil {
             account.Remove(account.Payment.Identifier)
         }
