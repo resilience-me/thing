@@ -7,7 +7,7 @@ import (
 )
 
 // Reinsert updates LastModified and reinserts the account if it was removed.
-func (pm *PathManager) Reinsert(username string, account *Account) {
+func (pm *PathManager) reinsert(username string, account *Account) {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
@@ -58,8 +58,8 @@ func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool
     // The risk is that LastModified could have been very close to timing out when
     // the cleanup was run at the beginning of this function, and another thread
     // could have run the cleanup a few nanoseconds later and deleted the account
-    // This is easily mitigated by simply reinserting it, hence Reinsert is used.
-    pm.Reinsert(username, account)
+    // This is easily mitigated by simply reinserting it, hence reinsert is used.
+    pm.reinsert(username, account)
 
     return nil
 }
