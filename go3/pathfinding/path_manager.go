@@ -2,6 +2,7 @@ package pathfinding
 
 import (
     "sync"
+    "time"
 )
 
 // PathManager manages all Account entries in a system.
@@ -18,35 +19,34 @@ func NewPathManager() *PathManager {
 }
 
 // AddAccount adds a new account or returns an existing one.
-func (pm *PathManager) AddAccount(username string) *AccountNode {
+func (pm *PathManager) AddAccount(username string) *Account {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
-    // Check if the account node already exists and return it if so
-    if node, exists := pm.Accounts[username]; exists {
-        return node
+    // Check if the account already exists and return it if so
+    if account, exists := pm.Accounts[username]; exists {
+        return account
     }
 
-    // If not exists, create a new AccountNode with the current time as the LastModified timestamp
-    node := &AccountNode{
+    // If not exists, create a new Account with the current time as the LastModified timestamp
+    account := &Account{
         Username:     username,
         LastModified: time.Now(), // Set the LastModified to the current time
-        Paths:        make(map[string]*PathNode),
+        Paths:        make(map[string]*Path),
     }
 
-    // Add the new node to the Accounts map
-    pm.Accounts[username] = node
-    return node
+    // Add the new account to the Accounts map
+    pm.Accounts[username] = account
+    return account
 }
 
-
 // FindAccount retrieves an account from the manager.
-func (pm *PathManager) FindAccount(username string) *AccountNode {
+func (pm *PathManager) FindAccount(username string) *Account {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
-    if node, exists := pm.Accounts[username]; exists {
-        return node
+    if account, exists := pm.Accounts[username]; exists {
+        return account
     }
     return nil
 }
@@ -59,28 +59,32 @@ func (pm *PathManager) RemoveAccount(username string) {
     delete(pm.Accounts, username)
 }
 
-// Add adds a new PathNode to the AccountNode's PathFinding linked list.
-func (node *AccountNode) Add(identifier string, incoming, outgoing PeerAccount) {
-    newEntry := &PathNode{
-        BaseNode: linkedlist.BaseNode{Identifier: identifier},
-        Incoming: incoming,
-        Outgoing: outgoing,
+// AddPath adds a new Path to an Account.
+func (account *Account) AddPath(identifier string, incoming, outgoing PeerAccount) {
+    // Create a new Path entry
+    newPath := &Path{
+        Identifier:   identifier,
+        Timestamp:    time.Now(),
+        Incoming:     incoming,
+        Outgoing:     outgoing,
+        CounterIn:    0,
+        CounterOut:   make(map[string]int),
     }
-    node.BaseList.Add(&newEntry.BaseNode)
+    // Add the new path to the Account's Paths map
+    account.Paths[identifier] = newPath
 }
 
-// Find checks if the given identifier exists in the PathFinding linked list,
-// removes any expired entries based on the configured timeout duration,
-// and returns the PathNode for the identifier if it is found.
-func (node *AccountNode) Find(identifier string) *PathNode {
-    baseNode := node.BaseList.Find(identifier)
-
-    if baseNode != nil {
-        return baseNode.(*PathNode)
+// FindPath retrieves a Path from an Account.
+func (account *Account) FindPath(identifier string) *Path {
+    // Direct access to the path using the map
+    if path, exists := account.Paths[identifier]; exists {
+        return path
     }
     return nil
 }
 
-func (node *AccountNode) Remove(identifier string) {
-    node.PathList.Remove(identifier)
+// RemovePath removes a Path from an Account.
+func (account *Account) RemovePath(identifier string) {
+    // Remove the path from the Account's Paths map
+    delete(account.Paths, identifier)
 }
