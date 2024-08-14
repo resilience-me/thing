@@ -63,7 +63,7 @@ func getPaymentDetails(session main.Session) *PaymentDetails {
 }
 
 // Wrapper function to fetch and serialize payment details
-func GetPaymentDetails(session main.Session) []byte {
+func getSerializedPaymentDetails(session main.Session) []byte {
     // Fetch the payment details
     details := getPaymentDetails(session)
     if details == nil {
