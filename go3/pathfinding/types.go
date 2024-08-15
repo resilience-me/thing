@@ -51,6 +51,15 @@ type Account struct {
     Payment       *Payment
 }
 
+// NewAccount creates and returns a new Account with the provided username.
+func NewAccount(username string) *Account {
+    return &Account{
+        Username: username,
+        Cleanup:  time.Now().Add(config.PathFindingTimeout), // Set the initial Cleanup time
+        Paths:    make(map[string]*Path),
+    }
+}
+
 // Payment structure adapted for use with Account
 type Payment struct {
     Identifier  string
