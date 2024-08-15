@@ -57,7 +57,7 @@ func GenerateAndInitiatePaymentIn(session main.Session) {
     payment := generatePaymentIn(session.Datagram, paymentIdentifier)
 
     // Initiate the incoming payment using the constructed Payment struct
-    session.PathManager.initiatePayment(session.Datagram.Username, payment)
+    session.PathManager.InitiatePayment(session.Datagram.Username, payment)
 }
 
 // GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
@@ -67,7 +67,7 @@ func GenerateAndInitiatePaymentOut(session main.Session) {
     payment := generatePaymentOut(session.Datagram, paymentIdentifier)
 
     // Initiate the outgoing payment using the constructed Payment struct
-    session.PathManager.initiatePayment(session.Datagram.Username, payment)
+    session.PathManager.InitiatePayment(session.Datagram.Username, payment)
 }
 
 func (account *Account) CalculateCommittedAmounts() map[string]CommitTotals {
