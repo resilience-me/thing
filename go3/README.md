@@ -24,7 +24,7 @@ A number of counters keep track of state of trustlines. There is "sync counter",
 
 ### Counters in payments and path finding
 
-During path finding and payments, ongoing path searches and payment attempts have their own counters in RAM, and do not use permanently stored counters like trustlines do. These are CounterIn for preventing replay attacks in received datagrams, and a CounterOut for each of an account's peer accounts involved.
+During path finding and payments, ongoing path searches and payment attempts have their own counters in RAM, and do not use permanently stored counters like trustlines do. These are `CounterIn` for preventing replay attacks in received datagrams, and a `CounterOut` for each of an account's peer accounts involved.
 
 ### Path finding
 
