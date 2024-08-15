@@ -6,56 +6,6 @@ import (
     "ripple/database/db_trustlines"
 )
 
-// ValidateCounter checks if the provided counter is greater than the stored counter value for counter.
-func ValidateCounter(datagram *main.Datagram) error {
-    // Retrieve the stored counter value
-    prevCounter, err := db_trustlines.GetCounter(datagram)
-    if err != nil {
-        return fmt.Errorf("error getting stored counter for user %s: %v", datagram.Username, err)
-    }
-
-    // Check if the incoming counter is valid (greater than the stored counter)
-    if datagram.Counter <= prevCounter {
-        return fmt.Errorf("counter validation failed for user %s", datagram.Username)
-    }
-
-    return nil
-}
-
-// ValidateCounterIn checks if the provided counter is greater than the stored counter_in value.
-func ValidateCounterIn(datagram *main.Datagram) error {
-    // Retrieve the stored counter_in value
-    prevCounterIn, err := db_trustlines.GetCounterIn(datagram)
-    if err != nil {
-        return fmt.Errorf("error getting stored counter_in for user %s: %v", datagram.Username, err)
-    }
-
-    // Check if the incoming counter is valid (greater than the stored counter_in)
-    if datagram.Counter <= prevCounterIn {
-        return fmt.Errorf("counter_in validation failed for user %s", datagram.Username)
-    }
-
-    return nil
-}
-
-// GetAndIncrementCounterOut retrieves the current counter_out, increments it, and updates the database.
-// It returns the counter value before it was incremented.
-func GetAndIncrementCounterOut(datagram *main.Datagram) (uint32, error) {
-    // Retrieve the current value of counter_out from the database.
-    counterOut, err := db_trustlines.GetCounterOut(datagram)
-    if err != nil {
-        return 0, err  // Return error if unable to fetch the counter.
-    }
-
-    // Increment the counter and update it in the database within the same function call.
-    if err := db_trustlines.SetCounterOut(datagram, counterOut + 1); err != nil {
-        return 0, err  // Return error if unable to update the counter.
-    }
-
-    // Return the original counter value that was fetched.
-    return counterOut, nil
-}
-
 // IncrementSyncCounter retrieves the current sync_counter, increments it, and updates the database.
 // It returns an error if something goes wrong during the process.
 func IncrementSyncCounter(datagram *main.Datagram) error {
