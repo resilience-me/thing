@@ -57,7 +57,7 @@ func handleTrustlineUpdate(session main.Session, syncInBytes []byte, syncIn uint
     log.Printf("Trustline, sync_in, and timestamp updated successfully for user %s.", session.Datagram.Username)
 
     // Retrieve and increment the counter_out value
-    counterOut, err := trustlines.GetAndIncrementCounterOut(session.Datagram)
+    counterOut, err := db_server.GetAndIncrementCounterOut(session.Datagram)
     if err != nil {
         log.Printf("Error handling counter_out for user %s: %v", session.Datagram.Username, err)
         return
