@@ -39,17 +39,23 @@ func (pm *PathManager) cleanupCacheAndFetchAccount(username string) *Account {
     return account
 }
 
-// Reinsert updates LastModified and reinserts the account if it was removed.
+// Reinsert updates the Cleanup field and reinserts the account if it was removed.
 func (pm *PathManager) reinsert(username string, account *Account) {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
-    // Update Cleanup field
-    account.Cleanup = time.Now().Add(config.PathFindingTimeout)
+    // Calculate the new proposed Cleanup time
+    newCleanup := time.Now().Add(config.PathFindingTimeout)
+
+    // Only update the Cleanup field if the new timeout is later than the current one
+    if newCleanup.After(account.Cleanup) {
+        account.Cleanup = newCleanup
+    }
 
     // Reinsert the account
     pm.Accounts[username] = account
 }
+
 
 // InitiatePayment sets up or updates payment details for an account, creating the account if necessary.
 func (pm *PathManager) InitiatePayment(username string, payment *Payment) {
@@ -67,6 +73,6 @@ func (pm *PathManager) InitiatePayment(username string, payment *Payment) {
     // Add or update the related Path entry with a new timestamp
     account.Add(payment.Identifier, PeerAccount{}, PeerAccount{})  // No PeerAccount details needed
 
-    // Reinsert to manage any possible race condition, though very unlikely
+    // Reinsert to manage a very unlikely race condition
     pm.reinsert(username, account)
 }
