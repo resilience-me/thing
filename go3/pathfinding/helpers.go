@@ -1,8 +1,8 @@
 package pathfinding
 
 import (
-    "time"        // For using time.Now() and time.Duration
     "sync"        // For using sync.Mutex
+    "time"        // For using time.Now()
     "ripple/config" // For using config.PathFindingTimeout
 )
 
@@ -10,7 +10,6 @@ func (pm *PathManager) cleanupAccounts() {
     now := time.Now()
     for username, account := range pm.Accounts {
         if now.After(account.Cleanup) {
-            // Logic to handle cleanup of the account
             delete(pm.Accounts, username)
         }
     }
@@ -46,14 +45,14 @@ func (pm *PathManager) reinsert(username string, account *Account) {
     defer pm.mu.Unlock()
 
     // Update Cleanup field
-    account.Cleanup = time.Now()+config.PathFindingTimeout
+    account.Cleanup = time.Now().Add(config.PathFindingTimeout)
 
     // Reinsert the account
     pm.Accounts[username] = account
 }
 
 // initiatePayment sets up or updates payment details for an account, creating the account if necessary.
-func (pm *PathManager) initiatePayment(username, identifier string, inOrOut byte, counterpart PeerAccount) error {
+func (pm *PathManager) initiatePayment(username, identifier string, inOrOut byte, counterpart PeerAccount) {
     // Fetch or create the account, with any necessary cleanup
     account := pm.CleanupCacheAndFetchAccount(username)
 
@@ -74,16 +73,14 @@ func (pm *PathManager) initiatePayment(username, identifier string, inOrOut byte
 
     // Reinsert to manage any possible race condition, though very unlikely
     pm.reinsert(username, account)
-
-    return nil
 }
 
 // Wrapper for initiating an outgoing payment
-func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string, counterpart PeerAccount) error {
-    return pm.initiatePayment(username, paymentID, 0, counterpart)  // 0 for outgoing
+func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string, counterpart PeerAccount) {
+    pm.initiatePayment(username, paymentID, 0, counterpart)  // 0 for outgoing
 }
 
 // Wrapper for initiating an incoming payment
-func (pm *PathManager) InitiateIncomingPayment(username, paymentID string, counterpart PeerAccount) error {
-    return pm.initiatePayment(username, paymentID, 1, counterpart)  // 1 for incoming
+func (pm: *PathManager) InitiateIncomingPayment(username, paymentID string, counterpart PeerAccount) {
+    pm.initiatePayment(username, paymentID, 1, counterpart)  // 1 for incoming
 }
