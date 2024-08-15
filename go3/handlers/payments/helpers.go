@@ -41,13 +41,13 @@ func GeneratePaymentInIdentifier(dg *Datagram) string {
 }
 
 // GenerateOutgoingPayment generates a Payment struct for an outgoing payment.
-func generateOutgoingPayment(datagram *Datagram) *Payment {
+func generateOutgoingPayment(datagram *Datagram) Payment {
     paymentIdentifier := GeneratePaymentOutIdentifier(datagram)
     return pathfinding.NewPayment(datagram, paymentIdentifier, 1)
 }
 
 // GenerateIncomingPayment generates a Payment struct for an incoming payment.
-func generateIncomingPayment(datagram *Datagram) *Payment {
+func generateIncomingPayment(datagram *Datagram) Payment {
     paymentIdentifier := GeneratePaymentInIdentifier(datagram)
     return pathfinding.NewPayment(datagram, paymentIdentifier, 1)
 }
