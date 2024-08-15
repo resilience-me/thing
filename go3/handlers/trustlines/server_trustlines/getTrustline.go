@@ -13,7 +13,7 @@ func GetTrustline(session main.Session) {
     datagram := session.Datagram
 
     // Validate the counter_in to ensure the request is not a replay
-    if err := trustlines.ValidateCounterIn(datagram); err != nil {
+    if err := db_server.ValidateCounterIn(datagram); err != nil {
         log.Printf("Counter_in validation failed for user %s: %v", datagram.Username, err)
         return
     }
@@ -69,7 +69,7 @@ func GetTrustline(session main.Session) {
     log.Printf("Datagram command %d sent successfully in GetTrustline for user %s.", dg.Command, session.Datagram.Username)
 
     // Update the counter_in after successfully processing the request
-    if err := db_trustlines.SetCounterIn(datagram, datagram.Counter); err != nil {
+    if err := db_server.SetCounterIn(datagram, datagram.Counter); err != nil {
         log.Printf("Error updating counter_in in GetTrustline for user %s: %v", datagram.Username, err)
         return
     }
