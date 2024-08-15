@@ -55,3 +55,24 @@ func GenerateAndInitiatePaymentOut(session main.Session, datagram *Datagram, use
 
     return nil
 }
+
+func (account *Account) CalculateCommittedAmounts() map[string]CommitTotals {
+    now := time.Now().Unix()
+    commitExpiration := now - int64(config.CommitTimeout.Seconds()) // Pre-calculate the expiration threshold
+
+    totals := make(map[string]CommitTotals)
+    
+    for _, path := range account.Paths {
+        if path.Commit && path.Timestamp.Unix() > commitExpiration { // Check if the path is still valid
+            // Update totals for outgoing transactions (credit given by this account)
+            outgoingPeer := path.Outgoing.Username
+            totals[outgoingPeer].Outgoing += path.Amount
+
+            // Update totals for incoming transactions (credit received by this account)
+            incomingPeer := path.Incoming.Username
+            totals[incomingPeer].Incoming += path.Amount
+        }
+    }
+    
+    return totals
+}
