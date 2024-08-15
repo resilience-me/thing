@@ -18,6 +18,7 @@ type Path struct {
     Amount       uint32
     Incoming     PeerAccount     // Details of the incoming peer.
     Outgoing     PeerAccount     // Details of the outgoing peer.
+    Commit       bool
     CounterIn    uint32          // Counter for incoming paths.
     CounterOut   map[string]int  // Map for outgoing counters by username.
 }
