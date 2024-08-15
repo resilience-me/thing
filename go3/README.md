@@ -16,7 +16,7 @@ The command is one byte, allowing 256 commands. The first 128 commands are clien
 
 ### Counters
 
-There is three main sets of counters to prevent datagrams being replayed. One for client to server interactions (`counter.txt` in `accounts/username`), and two for server to server interactions (one per direction) for each peer account a user account has (`counter_out.txt` and `counter_in.txt` in `accounts/username/peers/server_address/username`.
+There is three main sets of counters to prevent datagrams being replayed. One for client to server interactions (`counter.txt` in `accounts/username`), and two for server to server interactions (one per direction) for each peer account a user account has (`counter_out.txt` and `counter_in.txt` in `accounts/username/peers/server_address/username`).
 
 ### Handling trustlines
 
