@@ -22,10 +22,6 @@ There is three main sets of counters to prevent datagrams being replayed. One fo
 
 A number of counters keep track of state of trustlines. There is "sync counter", that tracks how many times the trustline has been updated. And, `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `sync_counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. The timestamp is never exchanged and there is no need for consensus on time, the platform does not use timestamps as counters or "nonces".
 
-### Counters in payments and path finding
-
-During path finding and payments, ongoing path searches and payment attempts have their own counters in RAM, and do not use permanently stored counters like trustlines do. These are `CounterIn` for preventing replay attacks in received datagrams, and a `CounterOut` for each of an account's peer accounts involved.
-
 ### Path finding
 
 The Path finding is very simple. It is practically “stateless”, no routing tables are stored, all routing is generated for each payment request.
@@ -39,3 +35,7 @@ Step 1) A command to place a time lock on the trustlines is sent down the path.
 Step 2) A command to finalize the commit is sent down the path. This increases the time lock, and, adds a rule that the commit can only be aborted if it is verified that the next in line has aborted it, or never received it. (Thus if it reaches buyer, it cannot be cancelled unless buyer somehow cancels it... )
 
 Step 3) A command to finalize the payment is sent down the path. A credit line has now formed, and the payment is complete.
+
+### Counters in payments and path finding
+
+During path finding and payments, ongoing path searches and payment attempts have their own counters in RAM, and do not use permanently stored counters like trustlines do. These are `CounterIn` for preventing replay attacks in received datagrams, and a `CounterOut` for each of an account's peer accounts involved.
