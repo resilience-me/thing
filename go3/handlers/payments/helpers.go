@@ -7,9 +7,9 @@ import (
 	"ripple/pathfinding"
 )
 
-// ConcatenateAndPadAndHash takes four strings and an 8-byte slice, pads each string to 32 bytes,
+// concatenateAndPadAndHash takes four strings and an 8-byte slice, pads each string to 32 bytes,
 // concatenates them with the 8-byte slice, and then hashes the result using SHA-256.
-func ConcatenateAndPadAndHash(s1, s2, s3, s4 string, b []byte) []byte {
+func concatenateAndPadAndHash(s1, s2, s3, s4 string, b []byte) []byte {
 	// Create a buffer of size 136 bytes to hold the four 32-byte padded strings plus 8 bytes
 	buffer := make([]byte, 136)
 
@@ -28,34 +28,23 @@ func ConcatenateAndPadAndHash(s1, s2, s3, s4 string, b []byte) []byte {
 	return hash[:]
 }
 
-// GeneratePaymentOutIdentifier generates a payment identifier for outgoing payments and returns it as a hexadecimal string.
-func GeneratePaymentOutIdentifier(dg *Datagram) string {
+// generatePaymentOutIdentifier generates a payment identifier for outgoing payments and returns it as a hexadecimal string.
+func generatePaymentOutIdentifier(dg *Datagram) string {
 	hash := ConcatenateAndPadAndHash(dg.Username, GetServerAddress(), dg.PeerUsername, dg.PeerServerAddress, dg.Arguments[:8])
 	return fmt.Sprintf("%x", hash)
 }
 
-// GeneratePaymentInIdentifier generates a payment identifier for incoming payments and returns it as a hexadecimal string.
-func GeneratePaymentInIdentifier(dg *Datagram) string {
+// generatePaymentInIdentifier generates a payment identifier for incoming payments and returns it as a hexadecimal string.
+func generatePaymentInIdentifier(dg *Datagram) string {
 	hash := ConcatenateAndPadAndHash(dg.PeerUsername, dg.PeerServerAddress, dg.Username, GetServerAddress(), dg.Arguments[:8])
 	return fmt.Sprintf("%x", hash)
-}
-
-// GenerateOutgoingPayment generates a Payment struct for an outgoing payment.
-func generateOutgoingPayment(datagram *Datagram) *Payment {
-    paymentIdentifier := GeneratePaymentOutIdentifier(datagram)
-    return pathfinding.NewPayment(datagram, paymentIdentifier, 1)
-}
-
-// GenerateIncomingPayment generates a Payment struct for an incoming payment.
-func generateIncomingPayment(datagram *Datagram) *Payment {
-    paymentIdentifier := GeneratePaymentInIdentifier(datagram)
-    return pathfinding.NewPayment(datagram, paymentIdentifier, 1)
 }
 
 // GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
 func GenerateAndInitiatePaymentOut(session main.Session) error {
     // Generate the Payment struct for an outgoing payment
-    payment := generateOutgoingPayment(session.Datagram)
+    paymentIdentifier := generatePaymentOutIdentifier(datagram)
+    payment := pathfinding.NewPayment(datagram, paymentIdentifier, 1)
 
     // Initiate the outgoing payment using the constructed Payment struct
     session.PathManager.initiatePayment(session.Datagram.Username, payment)
@@ -66,7 +55,9 @@ func GenerateAndInitiatePaymentOut(session main.Session) error {
 // GenerateAndInitiatePaymentIn handles the generation of the payment identifier and initiation of the incoming payment.
 func GenerateAndInitiatePaymentIn(session main.Session) error {
     // Generate the Payment struct for an incoming payment
-    payment := generateIncomingPayment(session.Datagram)
+
+    paymentIdentifier := generatePaymentInIdentifier(datagram)
+    payment := pathfinding.NewPayment(datagram, paymentIdentifier, 0)
 
     // Initiate the incoming payment using the constructed Payment struct
     session.PathManager.initiatePayment(session.Datagram.Username, payment)
