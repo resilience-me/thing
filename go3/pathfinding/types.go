@@ -1,9 +1,23 @@
 package pathfinding
 
 import (
+    "sync"
     "time"
-    "ripple/config"
+    "ripple/config" // Assuming the config package is used here
 )
+
+// PathManager manages all Account entries in a system.
+type PathManager struct {
+    Accounts map[string]*Account // Map usernames to their respective Accounts.
+    mu       sync.Mutex          // Protects the Accounts map.
+}
+
+// NewPathManager initializes and returns a new PathManager instance.
+func NewPathManager() *PathManager {
+    return &PathManager{
+        Accounts: make(map[string]*Account), // Properly initialize the map.
+    }
+}
 
 // PeerAccount holds details about a peer account
 type PeerAccount struct {
