@@ -28,6 +28,22 @@ func SetCounterIn(dg *main.Datagram, value uint32) error {
 	return database.WriteUint32ToFile(peerDir, "counter_in.txt", value)
 }
 
+// ValidateCounterIn checks if the provided counter is greater than the stored counter_in value.
+func ValidateCounterIn(datagram *main.Datagram) error {
+    // Retrieve the stored counter_in value
+    prevCounterIn, err := GetCounterIn(datagram)
+    if err != nil {
+        return fmt.Errorf("error getting stored counter_in for user %s: %v", datagram.Username, err)
+    }
+
+    // Check if the incoming counter is valid (greater than the stored counter_in)
+    if datagram.Counter <= prevCounterIn {
+        return fmt.Errorf("counter_in validation failed for user %s", datagram.Username)
+    }
+
+    return nil
+}
+
 // GetAndIncrementCounterOut retrieves the current counter_out, increments it, and updates the database.
 // It returns the counter value before it was incremented.
 func GetAndIncrementCounterOut(datagram *main.Datagram) (uint32, error) {
