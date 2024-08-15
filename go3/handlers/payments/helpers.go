@@ -55,7 +55,7 @@ func GenerateAndInitiatePaymentIn(session main.Session) {
     // Generate the Payment struct for an incoming payment
 
     paymentIdentifier := generatePaymentInIdentifier(datagram)
-    payment := generatePaymentIn(datagram, identifier)
+    payment := generatePaymentIn(session.Datagram, paymentIdentifier)
 
     // Initiate the incoming payment using the constructed Payment struct
     session.PathManager.initiatePayment(session.Datagram.Username, payment)
@@ -65,7 +65,7 @@ func GenerateAndInitiatePaymentIn(session main.Session) {
 func GenerateAndInitiatePaymentOut(session main.Session) {
     // Generate the Payment struct for an outgoing payment
     paymentIdentifier := generatePaymentOutIdentifier(datagram)
-    payment := generatePaymentOut(datagram, identifier
+    payment := generatePaymentOut(session.Datagram, paymentIdentifier
 
     // Initiate the outgoing payment using the constructed Payment struct
     session.PathManager.initiatePayment(session.Datagram.Username, payment)
