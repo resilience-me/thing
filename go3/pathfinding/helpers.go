@@ -54,16 +54,10 @@ func (pm *PathManager) reinsert(username string, account *Account) {
 
 // initiatePayment sets up or updates payment details for an account, creating the account if necessary.
 func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool) error {
-    // Perform account cleanup before processing the new payment
-    pm.cleanupAccounts()
-    // Retrieve the account from the PathManager, creating it if necessary
-    account := pm.Find(username)
-    if account == nil {
-        // Account does not exist; create it
-        account = pm.Add(username)
-    }
 
-    // Remove the existing path if present
+    account := cleanupCacheAndFetchAccount()
+
+    // If previous payment existed, remove it
     if account.Payment != nil {
         account.Remove(account.Payment.Identifier)
     }
