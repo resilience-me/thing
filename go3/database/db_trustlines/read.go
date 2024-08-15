@@ -1,13 +1,6 @@
 package db_trustlines
 
-import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"strconv"
-
-	"ripple/database"
-)
+import "ripple/database"
 
 // GetTrustlineOut retrieves the outbound trustline using the datagram to determine the directory.
 func GetTrustlineOut(dg *Datagram) (uint32, error) {
