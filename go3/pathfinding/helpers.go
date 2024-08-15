@@ -26,7 +26,7 @@ func (account *Account) cleanupPaths() {
     }
 }
 
-func (pm *PathManager) FetchAccount(username string) *Account {
+func (pm *PathManager) CleanupCacheAndFetchAccount(username string) *Account {
     // Cleanup all accounts first
     pm.cleanupAccounts()
 
