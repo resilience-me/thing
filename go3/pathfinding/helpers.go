@@ -52,7 +52,7 @@ func (pm *PathManager) reinsert(username string, account *Account) {
 }
 
 // initiatePayment sets up or updates payment details for an account, creating the account if necessary.
-func (pm *PathManager) initiatePayment(username, identifier string, inOrOut byte, counterpart PeerAccount) {
+func (pm *PathManager) initiatePayment(username string, payment *Payment) {
     // Fetch or create the account, with any necessary cleanup
     account := pm.CleanupCacheAndFetchAccount(username)
 
@@ -62,14 +62,10 @@ func (pm *PathManager) initiatePayment(username, identifier string, inOrOut byte
     }
 
     // Set or update the payment details
-    account.Payment = &Payment{
-        Identifier:  identifier,
-        Counterpart: counterpart,  // Set the counterpart for the payment
-        InOrOut:     inOrOut,
-    }
+    account.Payment = payment
 
     // Add or update the related Path entry with a new timestamp
-    account.Add(identifier, PeerAccount{}, PeerAccount{})  // No PeerAccount details needed
+    account.Add(payment.Identifier, PeerAccount{}, PeerAccount{})  // No PeerAccount details needed
 
     // Reinsert to manage any possible race condition, though very unlikely
     pm.reinsert(username, account)
