@@ -23,12 +23,8 @@ func (pm *PathManager) Add(username string) *Account {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
-    // Create a new Account with the current time as the LastModified timestamp
-    account := &Account{
-        Username:     username,
-        LastModified: time.Now(),
-        Paths:        make(map[string]*Path),
-    }
+    // Use the NewAccount constructor to create a new Account
+    account := NewAccount(username)
 
     // Always add the new account to the Accounts map, overwriting any existing one
     pm.Accounts[username] = account
