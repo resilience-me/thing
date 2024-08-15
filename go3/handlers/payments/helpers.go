@@ -55,7 +55,7 @@ func generateIncomingPayment(datagram *Datagram) *Payment {
 // GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
 func GenerateAndInitiatePaymentOut(session main.Session) error {
     // Generate the Payment struct for an outgoing payment
-    payment := GenerateOutgoingPayment(session.Datagram)
+    payment := generateOutgoingPayment(session.Datagram)
 
     // Initiate the outgoing payment using the constructed Payment struct
     session.PathManager.initiatePayment(session.Datagram.Username, payment)
@@ -66,7 +66,7 @@ func GenerateAndInitiatePaymentOut(session main.Session) error {
 // GenerateAndInitiatePaymentIn handles the generation of the payment identifier and initiation of the incoming payment.
 func GenerateAndInitiatePaymentIn(session main.Session) error {
     // Generate the Payment struct for an incoming payment
-    payment := GenerateIncomingPayment(session.Datagram)
+    payment := generateIncomingPayment(session.Datagram)
 
     // Initiate the incoming payment using the constructed Payment struct
     session.PathManager.initiatePayment(session.Datagram.Username, payment)
