@@ -2,14 +2,14 @@ package trustlines
 
 import (
     "ripple/main"
-    "ripple/database/db_trustlines"
+    "ripple/database/db_server"
     "fmt"
 )
 
 // InitializeDatagram initializes common Datagram fields for a response and increments counter_out.
 func InitializeDatagram(datagram *main.Datagram) (*main.Datagram, error) {
     // Retrieve and increment the counter_out value
-    counterOut, err := GetAndIncrementCounterOut(datagram)
+    counterOut, err := db_server.GetAndIncrementCounterOut(datagram)
     if err != nil {
         return nil, fmt.Errorf("error handling counter_out for user %s: %v", datagram.Username, err)
     }
