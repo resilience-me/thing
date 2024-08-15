@@ -10,6 +10,14 @@ type PeerAccount struct {
     ServerAddress string
 }
 
+// NewPeerAccount is a constructor for creating a PeerAccount struct based on the provided username and server address.
+func NewPeerAccount(username, serverAddress string) PeerAccount {
+    return PeerAccount{
+        Username:      username,
+        ServerAddress: serverAddress,
+    }
+}
+
 // Path replaces PathNode, tailored for use with a map and string identifiers
 type Path struct {
     Identifier   string          // Identifier for the path
@@ -39,16 +47,13 @@ type Payment struct {
 
 // NewPayment is a constructor for creating a Payment struct based on an identifier, datagram, and inOrOut value.
 func NewPayment(datagram *Datagram, identifier string, inOrOut byte) *Payment {
-    // Create the counterpart PeerAccount using the two relevant fields from the datagram
-    counterpart := PeerAccount{
-        Username:      datagram.PeerUsername,
-        ServerAddress: datagram.PeerServerAddress,
-    }
-
-    // Initialize and return the Payment struct
+    // Initialize and return the Payment struct, using NewPeerAccount for the Counterpart field
     return &Payment{
-        Identifier:  identifier,
-        Counterpart: counterpart,
-        InOrOut:     inOrOut,
+        Identifier: identifier,
+        Counterpart: NewPeerAccount(
+            datagram.PeerUsername,
+            datagram.PeerServerAddress,
+        ),
+        InOrOut: inOrOut,
     }
 }
