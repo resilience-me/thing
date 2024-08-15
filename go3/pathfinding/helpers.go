@@ -26,6 +26,20 @@ func (account *Account) cleanupPaths() {
     }
 }
 
+func (pm *PathManager) FetchAccount(username string) *Account {
+    // Cleanup all accounts first
+    pm.cleanupAccounts()
+
+    account := pm.Find(username)
+
+    if account == nil {
+        return pm.Add(username)
+    }
+    account.cleanupPaths()
+
+    return account
+}
+
 // Reinsert updates LastModified and reinserts the account if it was removed.
 func (pm *PathManager) reinsert(username string, account *Account) {
     pm.mu.Lock()
