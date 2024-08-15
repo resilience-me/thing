@@ -53,36 +53,37 @@ func (pm *PathManager) reinsert(username string, account *Account) {
 }
 
 // initiatePayment sets up or updates payment details for an account, creating the account if necessary.
-func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool) error {
+func (pm *PathManager) initiatePayment(username, identifier string, inOrOut byte, counterpart PeerAccount) error {
+    // Fetch or create the account, with any necessary cleanup
+    account := pm.CleanupCacheAndFetchAccount(username)
 
-    account := cleanupCacheAndFetchAccount()
-
-    // If previous payment existed, remove it
+    // If a previous payment existed, remove it
     if account.Payment != nil {
         account.Remove(account.Payment.Identifier)
     }
 
     // Set or update the payment details
     account.Payment = &Payment{
-        Identifier: identifier,
-        InOrOut:    inOrOut,
+        Identifier:  identifier,
+        Counterpart: counterpart,  // Set the counterpart for the payment
+        InOrOut:     inOrOut,
     }
 
     // Add or update the related Path entry with a new timestamp
-    account.Add(identifier, PeerAccount{}, PeerAccount{}) // Adjust PeerAccount as needed
+    account.Add(identifier, PeerAccount{}, PeerAccount{})  // No PeerAccount details needed
 
-    // Reinsert to manage a minimal (very minimal and very unlikely) possible race condition
+    // Reinsert to manage any possible race condition, though very unlikely
     pm.reinsert(username, account)
 
     return nil
 }
 
 // Wrapper for initiating an outgoing payment
-func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string) error {
-    return pm.initiatePayment(username, paymentID, true)
+func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string, counterpart PeerAccount) error {
+    return pm.initiatePayment(username, paymentID, 0, counterpart)
 }
 
 // Wrapper for initiating an incoming payment
-func (pm *PathManager) InitiateIncomingPayment(username, paymentID string) error {
-    return pm.initiatePayment(username, paymentID, false)
+func (pm *PathManager) InitiateIncomingPayment(username, paymentID string, counterpart PeerAccount) error {
+    return pm.initiatePayment(username, paymentID, 1, counterpart)
 }
