@@ -30,6 +30,18 @@ type Path struct {
     CounterOut   map[string]int  // Map for outgoing counters by username
 }
 
+// NewPath is a constructor for creating a Path struct based on an identifier, incoming and outgoing PeerAccount.
+func NewPath(identifier string, incoming, outgoing PeerAccount) *Path {
+    return &Path{
+        Identifier:   identifier,
+        Timeout:      time.Now().Add(config.PathFindingTimeout), // Set the Timeout using PathFindingTimeout
+        Incoming:     incoming,
+        Outgoing:     outgoing,
+        CounterIn:    0,
+        CounterOut:   make(map[string]int),
+    }
+}
+
 // Account holds all path-related information and payment details
 type Account struct {
     Username      string
