@@ -3,7 +3,7 @@ package pathfinding
 import (
     "sync"
     "time"
-    "ripple/config" // Assuming the config package is used here
+    "ripple/config"
 )
 
 // PathManager manages all Account entries in a system.
