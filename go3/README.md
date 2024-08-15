@@ -14,9 +14,13 @@ Uses TCP to transfer single-packet Datagrams with "guaranteed delivery" (the ret
 
 The command is one byte, allowing 256 commands. The first 128 commands are client commands, the last 128 are server commands. The counter is managed with different counters for different commands. The signature relies on a symmetric secret key, in client command shared by the server and the client, and in server commands shared by two users with a direct connection in the system. It uses HMAC. And, the 256 byte long arguments field, can hold arbitrary data for operands to the command. The datagram is 389 bytes.
 
+### Counters
+
+There is three main sets of counters to prevent datagrams being replayed. One for client to server interactions (`counter.txt` in `accounts/username`), and two for server to server interactions (one per direction) for each peer account a user account has (`counter_out.txt` and `counter_in.txt` in `accounts/username/peers/server_address/username`.
+
 ### Handling trustlines
 
-A number of counters keep track of state of trustlines. There is `counter`, that prevents replays of commands from client to server. There is `counter_out` and `counter_in` that prevent replay of commands in server-to-server exchanges between an account and a peer. Then there is also "sync counter", that tracks how many times the trustline has been updated. And, `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `sync_counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. The timestamp is never exchanged and there is no need for consensus on time, the platform does not use timestamps as counters or "nonces".
+A number of counters keep track of state of trustlines. There is "sync counter", that tracks how many times the trustline has been updated. And, `sync_in` and `sync_out`, that track synchronization of trustlines (relative to `sync_counter`). There is also `timestamp`, for an account to locally track when an incoming trustline was last synced. The timestamp is never exchanged and there is no need for consensus on time, the platform does not use timestamps as counters or "nonces".
 
 ### Path finding
 
