@@ -80,10 +80,10 @@ func (pm *PathManager) initiatePayment(username, identifier string, inOrOut byte
 
 // Wrapper for initiating an outgoing payment
 func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string, counterpart PeerAccount) error {
-    return pm.initiatePayment(username, paymentID, 0, counterpart)
+    return pm.initiatePayment(username, paymentID, 0, counterpart)  // 0 for outgoing
 }
 
 // Wrapper for initiating an incoming payment
 func (pm *PathManager) InitiateIncomingPayment(username, paymentID string, counterpart PeerAccount) error {
-    return pm.initiatePayment(username, paymentID, 1, counterpart)
+    return pm.initiatePayment(username, paymentID, 1, counterpart)  // 1 for incoming
 }
