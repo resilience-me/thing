@@ -47,7 +47,7 @@ func (pm *PathManager) reinsert(username string, account *Account) {
     // Calculate the new proposed Cleanup time
     newCleanup := time.Now().Add(config.PathFindingTimeout)
 
-    // Only update the Cleanup field if the new timeout is later than the current one
+    // Ensure reinsert does not lower Cleanup timer for an account currently committed to a payment
     if newCleanup.After(account.Cleanup) {
         account.Cleanup = newCleanup
     }
