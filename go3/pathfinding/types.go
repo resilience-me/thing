@@ -26,7 +26,7 @@ type Path struct {
 // Account holds all path-related information and payment details
 type Account struct {
     Username      string
-    LastModified  time.Time
+    Cleanup       time.Time
     Paths         map[string]*Path // Maps string identifiers to Path.
     Payment       *Payment
 }
