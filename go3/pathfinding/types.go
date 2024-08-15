@@ -2,6 +2,7 @@ package pathfinding
 
 import (
     "time"
+    "ripple/config"
 )
 
 // PeerAccount holds details about a peer account
