@@ -39,16 +39,25 @@ func GeneratePaymentInIdentifier(dg *Datagram) string {
 	return fmt.Sprintf("%x", hash)
 }
 
-
-
 // GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
-func GenerateAndInitiatePaymentOut(session main.Session, datagram *Datagram, username string) error {
+func GenerateAndInitiatePaymentOut(session main.Session) error {
+    // Access the datagram directly from the session
+    datagram := session.Datagram
+
+    // Extract necessary fields from the datagram
+    username := datagram.Username
+    
+    // Create the counterpart PeerAccount using the two relevant fields from the datagram
+    counterpart := PeerAccount{
+        Username: datagram.PeerUsername,
+        ServerAddress: datagram.PeerServerAddress,
+    }
 
     // Generate the payment identifier
     paymentIdentifier := GeneratePaymentOutIdentifier(datagram)
 
-    // Initiate the outgoing payment using the extracted username and paymentIdentifier
-    err := session.PathManager.InitiateOutgoingPayment(username, paymentIdentifier)
+    // Initiate the outgoing payment using the extracted information
+    err := session.PathManager.InitiateOutgoingPayment(username, paymentIdentifier, counterpart)
     if err != nil {
         return fmt.Errorf("Failed to initiate outgoing payment for user %s: %v", username, err)
     }
