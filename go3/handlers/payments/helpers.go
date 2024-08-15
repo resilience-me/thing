@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"ripple/main"
+	"ripple/pathfinding"
 )
 
 // ConcatenateAndPadAndHash takes four strings and an 8-byte slice, pads each string to 32 bytes,
@@ -39,33 +40,16 @@ func GeneratePaymentInIdentifier(dg *Datagram) string {
 	return fmt.Sprintf("%x", hash)
 }
 
-// GeneratePayment creates a Payment struct based on the provided datagram and inOrOut value.
-func generatePayment(datagram *Datagram, inOrOut byte) *Payment {
-    // Create the counterpart PeerAccount using the two relevant fields from the datagram
-    counterpart := PeerAccount{
-        Username:      datagram.PeerUsername,
-        ServerAddress: datagram.PeerServerAddress,
-    }
-
-    // Generate the payment identifier
-    paymentIdentifier := GeneratePaymentOutIdentifier(datagram)
-
-    // Initialize and return the Payment struct
-    return &Payment{
-        Identifier:  paymentIdentifier,
-        Counterpart: counterpart,
-        InOrOut:     inOrOut,
-    }
-}
-
 // GenerateOutgoingPayment generates a Payment struct for an outgoing payment.
 func generateOutgoingPayment(datagram *Datagram) *Payment {
-    return GeneratePayment(datagram, 0) // 0 for outgoing
+    paymentIdentifier := GeneratePaymentOutIdentifier(datagram)
+    return pathfinding.NewPayment(datagram, paymentIdentifier, 1)
 }
 
 // GenerateIncomingPayment generates a Payment struct for an incoming payment.
 func generateIncomingPayment(datagram *Datagram) *Payment {
-    return GeneratePayment(datagram, 1) // 1 for incoming
+    paymentIdentifier := GeneratePaymentInIdentifier(datagram)
+    return pathfinding.NewPayment(datagram, paymentIdentifier, 1)
 }
 
 // GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
