@@ -31,7 +31,7 @@ type Path struct {
 }
 
 // NewPath is a constructor for creating a Path struct based on an identifier, incoming and outgoing PeerAccount, and amount.
-func NewPath(identifier string, incoming, outgoing PeerAccount, amount uint32) *Path {
+func NewPath(identifier string, amount uint32, incoming, outgoing PeerAccount) *Path {
     return &Path{
         Identifier:   identifier,
         Timeout:      time.Now().Add(config.PathFindingTimeout), // Set the Timeout using PathFindingTimeout
