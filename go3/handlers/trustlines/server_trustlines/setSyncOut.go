@@ -30,7 +30,7 @@ func SetSyncOut(session main.Session) {
 
     // Check if the new sync_out is greater than the previous sync_out
     if syncOut <= prevSyncOut {
-        log.Printf("Received sync_out (%d) is not greater than previous sync_out (%d) for user %s. Potential replay attack.",
+        log.Printf("Received sync_out (%d) is not greater than previous sync_out (%d) for user %s.",
             syncOut, prevSyncOut, datagram.Username)
         return
     }
