@@ -45,8 +45,8 @@ func (pm *PathManager) reinsert(username string, account *Account) {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
-    // Update LastModified
-    account.LastModified = time.Now()
+    // Update Cleanup field
+    account.Cleanup = time.Now()+config.PathFindingTimeout
 
     // Reinsert the account
     pm.Accounts[username] = account
@@ -71,11 +71,7 @@ func (pm *PathManager) initiatePayment(username, identifier string, inOrOut bool
     // Add or update the related Path entry with a new timestamp
     account.Add(identifier, PeerAccount{}, PeerAccount{}) // Adjust PeerAccount as needed
 
-    // Update LastModified. Then reinsert, to prevent a minimal race condition risk.
-    // The risk is that LastModified could have been very close to timing out when
-    // the cleanup was run at the beginning of this function, and another thread
-    // could have run the cleanup a few nanoseconds later and deleted the account
-    // This is easily mitigated by simply reinserting it, hence reinsert is used.
+    // Reinsert to manage a minimal (very minimal and very unlikely) possible race condition
     pm.reinsert(username, account)
 
     return nil
