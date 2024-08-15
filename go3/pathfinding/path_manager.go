@@ -55,8 +55,8 @@ func (pm *PathManager) Remove(username string) {
 }
 
 // Add creates and adds a new Path to an Account.
-func (account *Account) Add(identifier string, incoming, outgoing PeerAccount) {
-    newPath := NewPath(identifier, incoming, outgoing)
+func (account *Account) Add(identifier string, amount uint32, incoming, outgoing PeerAccount) {
+    newPath := NewPath(identifier, amount, incoming, outgoing)
     account.Paths[identifier] = newPath
 }
 
