@@ -51,8 +51,8 @@ func (pm *PathManager) reinsert(username string, account *Account) {
     pm.Accounts[username] = account
 }
 
-// initiatePayment sets up or updates payment details for an account, creating the account if necessary.
-func (pm *PathManager) initiatePayment(username string, payment *Payment) {
+// InitiatePayment sets up or updates payment details for an account, creating the account if necessary.
+func (pm *PathManager) InitiatePayment(username string, payment *Payment) {
     // Fetch or create the account, with any necessary cleanup
     account := pm.CleanupCacheAndFetchAccount(username)
 
@@ -69,14 +69,4 @@ func (pm *PathManager) initiatePayment(username string, payment *Payment) {
 
     // Reinsert to manage any possible race condition, though very unlikely
     pm.reinsert(username, account)
-}
-
-// Wrapper for initiating an outgoing payment
-func (pm *PathManager) InitiateOutgoingPayment(username, paymentID string, counterpart PeerAccount) {
-    pm.initiatePayment(username, paymentID, 0, counterpart)  // 0 for outgoing
-}
-
-// Wrapper for initiating an incoming payment
-func (pm: *PathManager) InitiateIncomingPayment(username, paymentID string, counterpart PeerAccount) {
-    pm.initiatePayment(username, paymentID, 1, counterpart)  // 1 for incoming
 }
