@@ -1,7 +1,6 @@
-package main
+package pathfinding
 
 import (
-    "sync"
     "time"
 )
 
@@ -36,4 +35,20 @@ type Payment struct {
     Identifier  string
     Counterpart PeerAccount
     InOrOut     byte  // 0 for incoming, 1 for outgoing, stored as a single byte
+}
+
+// NewPayment is a constructor for creating a Payment struct based on an identifier, datagram, and inOrOut value.
+func NewPayment(datagram *Datagram, identifier string, inOrOut byte) *Payment {
+    // Create the counterpart PeerAccount using the two relevant fields from the datagram
+    counterpart := PeerAccount{
+        Username:      datagram.PeerUsername,
+        ServerAddress: datagram.PeerServerAddress,
+    }
+
+    // Initialize and return the Payment struct
+    return &Payment{
+        Identifier:  identifier,
+        Counterpart: counterpart,
+        InOrOut:     inOrOut,
+    }
 }
