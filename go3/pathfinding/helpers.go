@@ -22,8 +22,8 @@ func (pm *PathManager) cleanupAccounts() {
     now := time.Now()
 
     for username, account := range pm.Accounts {
-        // Only check the LastModified timestamp to decide if the account should be removed
-        if now.Sub(account.LastModified) > config.PathFindingTimeout {
+        if now.After(account.Cleanup) {
+            // Logic to handle cleanup of the account
             delete(pm.Accounts, username)
         }
     }
