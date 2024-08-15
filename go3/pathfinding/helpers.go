@@ -6,6 +6,26 @@ import (
     "ripple/config" // For using config.PathFindingTimeout
 )
 
+func (pm *PathManager) cleanupAccounts() {
+    now := time.Now()
+    for username, account := range pm.Accounts {
+        if now.After(account.Cleanup) {
+            // Logic to handle cleanup of the account
+            delete(pm.Accounts, username)
+        }
+    }
+}
+
+// cleanupPaths removes expired paths within the Account.
+func (account *Account) cleanupPaths() {
+    now := time.Now()
+    for pathID, path := range account.Paths {
+        if now.After(path.Timeout) {
+            delete(account.Paths, pathID)  // Remove expired paths
+        }
+    }
+}
+
 // Reinsert updates LastModified and reinserts the account if it was removed.
 func (pm *PathManager) reinsert(username string, account *Account) {
     pm.mu.Lock()
@@ -16,17 +36,6 @@ func (pm *PathManager) reinsert(username string, account *Account) {
 
     // Reinsert the account
     pm.Accounts[username] = account
-}
-
-func (pm *PathManager) cleanupAccounts() {
-    now := time.Now()
-
-    for username, account := range pm.Accounts {
-        if now.After(account.Cleanup) {
-            // Logic to handle cleanup of the account
-            delete(pm.Accounts, username)
-        }
-    }
 }
 
 // initiatePayment sets up or updates payment details for an account, creating the account if necessary.
