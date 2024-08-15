@@ -12,6 +12,9 @@ import (
 // PathFindingTimeout is a global constant that defines the timeout duration for pathfinding operations
 const PathFindingTimeout = 5 * time.Minute
 
+// CommitTimeout is a global constant that defines the timeout duration for commits during payment
+const CommitTimeout = 10 * time.Minute
+
 var datadir = filepath.Join(os.Getenv("HOME"), "ripple")
 var serverAddress string // Store the server address as a string
 
