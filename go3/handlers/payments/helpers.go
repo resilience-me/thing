@@ -39,28 +39,53 @@ func GeneratePaymentInIdentifier(dg *Datagram) string {
 	return fmt.Sprintf("%x", hash)
 }
 
-// GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
-func GenerateAndInitiatePaymentOut(session main.Session) error {
-    // Access the datagram directly from the session
-    datagram := session.Datagram
-
-    // Extract necessary fields from the datagram
-    username := datagram.Username
-    
+// GeneratePayment creates a Payment struct based on the provided datagram and inOrOut value.
+func generatePayment(datagram *Datagram, inOrOut byte) *Payment {
     // Create the counterpart PeerAccount using the two relevant fields from the datagram
     counterpart := PeerAccount{
-        Username: datagram.PeerUsername,
+        Username:      datagram.PeerUsername,
         ServerAddress: datagram.PeerServerAddress,
     }
 
     // Generate the payment identifier
     paymentIdentifier := GeneratePaymentOutIdentifier(datagram)
 
-    // Initiate the outgoing payment using the extracted information
-    err := session.PathManager.InitiateOutgoingPayment(username, paymentIdentifier, counterpart)
-    if err != nil {
-        return fmt.Errorf("Failed to initiate outgoing payment for user %s: %v", username, err)
+    // Initialize and return the Payment struct
+    return &Payment{
+        Identifier:  paymentIdentifier,
+        Counterpart: counterpart,
+        InOrOut:     inOrOut,
     }
+}
+
+// GenerateOutgoingPayment generates a Payment struct for an outgoing payment.
+func generateOutgoingPayment(datagram *Datagram) *Payment {
+    return GeneratePayment(datagram, 0) // 0 for outgoing
+}
+
+// GenerateIncomingPayment generates a Payment struct for an incoming payment.
+func generateIncomingPayment(datagram *Datagram) *Payment {
+    return GeneratePayment(datagram, 1) // 1 for incoming
+}
+
+// GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
+func GenerateAndInitiatePaymentOut(session main.Session) error {
+    // Generate the Payment struct for an outgoing payment
+    payment := GenerateOutgoingPayment(session.Datagram)
+
+    // Initiate the outgoing payment using the constructed Payment struct
+    session.PathManager.initiatePayment(session.Datagram.Username, payment)
+
+    return nil
+}
+
+// GenerateAndInitiatePaymentIn handles the generation of the payment identifier and initiation of the incoming payment.
+func GenerateAndInitiatePaymentIn(session main.Session) error {
+    // Generate the Payment struct for an incoming payment
+    payment := GenerateIncomingPayment(session.Datagram)
+
+    // Initiate the incoming payment using the constructed Payment struct
+    session.PathManager.initiatePayment(session.Datagram.Username, payment)
 
     return nil
 }
