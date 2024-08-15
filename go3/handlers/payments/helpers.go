@@ -51,7 +51,7 @@ func generatePaymentOut(datagram *Datagram, identifier string) *Payment {
 }
 
 // GenerateAndInitiatePaymentIn handles the generation of the payment identifier and initiation of the incoming payment.
-func GenerateAndInitiatePaymentIn(session main.Session) error {
+func GenerateAndInitiatePaymentIn(session main.Session) {
     // Generate the Payment struct for an incoming payment
 
     paymentIdentifier := generatePaymentInIdentifier(datagram)
@@ -59,20 +59,16 @@ func GenerateAndInitiatePaymentIn(session main.Session) error {
 
     // Initiate the incoming payment using the constructed Payment struct
     session.PathManager.initiatePayment(session.Datagram.Username, payment)
-
-    return nil
 }
 
 // GenerateAndInitiatePaymentOut handles the generation of the payment identifier and initiation of the outgoing payment.
-func GenerateAndInitiatePaymentOut(session main.Session) error {
+func GenerateAndInitiatePaymentOut(session main.Session) {
     // Generate the Payment struct for an outgoing payment
     paymentIdentifier := generatePaymentOutIdentifier(datagram)
     payment := generatePaymentOut(datagram, identifier
 
     // Initiate the outgoing payment using the constructed Payment struct
     session.PathManager.initiatePayment(session.Datagram.Username, payment)
-
-    return nil
 }
 
 func (account *Account) CalculateCommittedAmounts() map[string]CommitTotals {
