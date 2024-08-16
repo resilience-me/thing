@@ -48,7 +48,7 @@ func main() {
 
 		// If the datagram is an ACK, route it using the AckRegistry
 		if datagram.Command == 0x00 {
-			ackKey := generateAckKey(NewAck(datagram))
+			ackKey := generateAckKey(datagram.Username, datagram.PeerUsername, datagram.PeerServerAddress, datagram.Counter)
 			transport.RouteAck(ackKey)
 			fmt.Println("ACK received and routed.")
 			continue
@@ -83,9 +83,10 @@ func main() {
 		// Route the session through the SessionManager
 		sessionManager.RouteSession(session)
 
-		// Send an ACK back to the determined address
-		ack := NewAck(datagram)
-		ackData := serializeDatagram(ack)
+		// Generate, sign, and serialize the ACK datagram
+		ackData := generateAndSignAckDatagram(datagram)
+
+		// Send the ACK back to the determined address
 		err = SendAck(ackData, ackAddr)
 		if err != nil {
 			fmt.Printf("Failed to send ACK to %s: %v\n", ackAddr, err)
