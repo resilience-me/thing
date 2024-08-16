@@ -42,13 +42,16 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 		    continue
 		}
 
-		var sessionConn *Conn = nil
+		var sessionConn *Conn
 
-		if datagram.Command&0x80 == 1 {
+		// Determine if the MSB of the first byte (Command) is 1 or 0
+		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
 			sessionConn = &Conn{
 				conn: conn,
 				addr: remoteAddr,
 			}
+		} else { // MSB is 0: Server connection
+			sessionConn = nil
 		}
 
 		// Create a new session with the appropriate Conn
