@@ -14,7 +14,7 @@ type Transport struct {
 
 // NewTransport creates a new Transport instance with a new AckRegistry
 func NewTransport() *Transport {
-	return &Transport{ackRegistry: NewAckRegistry()}
+	return &Transport{AckRegistry: NewAckRegistry()}
 }
 
 // Ack represents an acknowledgment packet
