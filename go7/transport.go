@@ -112,7 +112,7 @@ func SendWithRetry(ctx SendContext) error {
 	}
 
 	// Cleanup the ACK registration if we failed to get the ACK
-	ctx.AckRegistry.CleanupAck(ctx.PeerAccount.Username)
+	ctx.AckRegistry.CleanupAck(ctx.Username)
 	return fmt.Errorf("retransmission failed after %d attempts", ctx.MaxRetries)
 }
 
