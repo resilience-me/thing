@@ -51,38 +51,35 @@ func NewAckRegistry() *AckRegistry {
 type SendContext struct {
 	Data           []byte
 	DestinationAddr string
-	Ack            *Ack
+	AckKey         string
 	AckRegistry    *AckRegistry
 	MaxRetries     int
 }
 
 // RegisterAck registers an Ack and returns a channel to receive the trigger signal
-func (ar *AckRegistry) RegisterAck(ack *Ack) chan struct{} {
+func (ar *AckRegistry) RegisterAck(ackKey string) chan struct{} {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
-	key := generateAckKey(ack)
 	ch := make(chan struct{})
-	ar.waitingAcks[key] = ch
+	ar.waitingAcks[ackKey] = ch
 	return ch
 }
 
 // RouteAck routes an incoming ACK to the appropriate channel
-func (ar *AckRegistry) RouteAck(ack *Ack) {
+func (ar *AckRegistry) RouteAck(ackKey string) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
-	key := generateAckKey(ack)
-	if ch, exists := ar.waitingAcks[key]; exists {
+	if ch, exists := ar.waitingAcks[ackKey]; exists {
 		close(ch) // Signal the receipt of the ACK by closing the channel
-		delete(ar.waitingAcks, key)
+		delete(ar.waitingAcks, ackKey)
 	}
 }
 
 // CleanupAck removes an ACK from the registry after processing or timeout
-func (ar *AckRegistry) CleanupAck(ack *Ack) {
+func (ar *AckRegistry) CleanupAck(ackKey string) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
-	key := generateAckKey(ack)
-	delete(ar.waitingAcks, key)
+	delete(ar.waitingAcks, ackKey)
 }
 
 // SendWithRetry sends data with retransmission logic based on the provided SendContext
