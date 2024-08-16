@@ -146,7 +146,6 @@ func main() {
         log.Fatalf("Configuration failed: %v", err)
     }
 
-    // Direct user feedback to stdout, which is suitable for console messages.
     fmt.Printf("Server is running at address: %s\n", config.GetServerAddress())
 
     manager := &SessionManager{
@@ -163,32 +162,31 @@ func main() {
         log.Fatalf("Error starting TCP server: %v", err)
     }
 
-    fmt.Println("Listening on port 2012...") // Direct user feedback for server start
+    fmt.Println("Listening on port 2012...")
 
     // Goroutine to handle shutdown
     go manager.shutdownHandler(listener)
 
-    pm := pathfinding.PathManager{}
+    // Initialize the PathManager
+    pm := pathfinding.NewPathManager()
 
     for {
         select {
         case <-manager.shutdown:
-            fmt.Println("Server is shutting down...") // Direct user feedback for server shutdown
-            return // Exit the main loop and function
+            fmt.Println("Server is shutting down...")
+            return
 
         default:
             conn, err := listener.Accept()
             if err != nil {
                 log.Printf("Error accepting connection: %v", err)
-                continue // Directly continue in case of error
+                continue
             }
             manager.wg.Add(1)
-            go manager.handleConnection(conn)
+            go manager.handleConnection(conn, pm)
         }
     }
 
-
-    // Wait for all sessions to finish before exiting
     manager.wg.Wait()
     log.Println("All sessions and queues have been processed. Exiting.")
 }
