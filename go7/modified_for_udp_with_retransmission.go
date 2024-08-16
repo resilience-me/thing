@@ -69,14 +69,14 @@ func NewAckRegistry() *AckRegistry {
 	}
 }
 
-// generateSendKey creates a common key based on username, peer username, and peer server address
+// generateSendKey creates a common key based on the Datagram fields
 func generateSendKey(dg *Datagram) string {
 	return fmt.Sprintf("%s-%s-%s", dg.Username, dg.PeerUsername, dg.PeerServerAddress)
 }
 
-// generateAckKey creates a unique key for ACKs based on the base key and counter
+// generateAckKey creates a unique key for ACKs based on the Ack fields
 func generateAckKey(ack Ack) string {
-	return fmt.Sprintf(""%s-%s-%s-%d", ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
+	return fmt.Sprintf("%s-%s-%s-%d", ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
 }
 
 // generateCommandKey creates a unique key based on username for command handling
