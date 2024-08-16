@@ -7,6 +7,11 @@ import (
 	"sync"
 )
 
+type Conn struct {
+	conn *net.UDPConn  // Connection used to send/receive datagrams
+	addr *net.UDPAddr  // Source address from where the datagram was received
+}
+
 type Session struct {
 	Datagram    *Datagram
 	Conn        *Conn        // Pointer to Conn; can be nil
