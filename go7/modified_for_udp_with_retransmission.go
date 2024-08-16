@@ -23,7 +23,7 @@ type Datagram struct {
 }
 
 type Session struct {
-	Datagram    Datagram
+	Datagram    *Datagram
 	conn        *Conn          // Pointer to Conn; can be nil
 	ackRegistry *AckRegistry   // Pointer to the AckRegistry
 }
