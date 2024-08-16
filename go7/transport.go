@@ -64,8 +64,7 @@ func (ar *AckRegistry) RouteAck(ack *Ack) {
 	defer ar.mu.Unlock()
 	key := generateAckKey(ack)
 	if ch, exists := ar.waitingAcks[key]; exists {
-		ch <- ack
-		close(ch) // Close the channel after sending the ACK to avoid leaks
+		close(ch) // Signal receipt of the ACK by closing the channel
 		delete(ar.waitingAcks, key)
 	}
 }
@@ -105,8 +104,7 @@ func SendPacketWithRetry(session *Session, packet []byte, maxRetries int) error 
 		}
 
 		select {
-		case <-ackChan:
-			// ACK received, no need to compare counters as the registry ensures it's the correct one
+		case <-ackChan: // Waiting for the channel to be closed as a signal
 			return nil
 		case <-time.After(delay):
 			retries++
