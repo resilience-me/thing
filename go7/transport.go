@@ -47,7 +47,7 @@ type SendContext struct {
 }
 
 // RegisterAck registers an Ack and ensures only one active peerAccount channel per username
-func (ar *AckRegistry) RegisterAck(username string, peerAccount string) chan struct{} {
+func (ar *AckRegistry) RegisterAck(username string, peerAccount PeerAccount) chan struct{} {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
 	ch := make(chan struct{})
@@ -56,7 +56,7 @@ func (ar *AckRegistry) RegisterAck(username string, peerAccount string) chan str
 }
 
 // RouteAck routes an incoming ACK to the appropriate channel
-func (ar *AckRegistry) RouteAck(username string, peerAccount string) {
+func (ar *AckRegistry) RouteAck(username string, peerAccount PeerAccount) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
 	if entry, exists := ar.waitingAcks[username]; exists {
