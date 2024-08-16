@@ -17,8 +17,8 @@ func NewTransport() *Transport {
 	return &Transport{AckRegistry: NewAckRegistry()}
 }
 
-// AckEntry represents the channel and peerAccount associated with a waiting ACK
-type AckEntry struct {
+// Ack represents the channel and peerAccount associated with a waiting ACK
+type Ack struct {
 	peerAccount PeerAccount
 	ch          chan struct{}
 }
@@ -26,13 +26,13 @@ type AckEntry struct {
 // AckRegistry manages ACKs for different accounts
 type AckRegistry struct {
 	mu          sync.Mutex
-	waitingAcks map[string]*AckEntry
+	waitingAcks map[string]*Ack
 }
 
 // NewAckRegistry creates a new AckRegistry
 func NewAckRegistry() *AckRegistry {
 	return &AckRegistry{
-		waitingAcks: make(map[string]*AckEntry),
+		waitingAcks: make(map[string]*Ack),
 	}
 }
 
@@ -51,7 +51,7 @@ func (ar *AckRegistry) RegisterAck(username string, peerAccount string) chan str
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
 	ch := make(chan struct{})
-	ar.waitingAcks[username] = &AckEntry{peerAccount: peerAccount, ch: ch}
+	ar.waitingAcks[username] = &Ack{peerAccount: peerAccount, ch: ch}
 	return ch
 }
 
