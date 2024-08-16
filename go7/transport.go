@@ -98,7 +98,7 @@ func SendWithRetry(ctx SendContext) error {
 	for retries < ctx.MaxRetries {
 		// Send the serialized datagram
 		if _, err := sendConn.Write(ctx.Data); err != nil {
-			return fmt.Errorf("failed to send data to server '%s': %w", ctx.DestinationAddr, err)
+			return fmt.Errorf("failed to send data to server '%s': %w", addr.String(), err)
 		}
 
 		select {
