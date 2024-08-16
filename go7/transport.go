@@ -80,7 +80,7 @@ func SendWithRetry(ctx SendContext) error {
 	delay := 1 * time.Second
 
 	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", ctx.DestinationAddr)
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ctx.DestinationAddr, 2012))
 	if err != nil {
 		return fmt.Errorf("failed to resolve server address '%s': %w", ctx.DestinationAddr, err)
 	}
