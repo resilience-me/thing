@@ -24,10 +24,10 @@ func main() {
 	defer conn.Close()
 
 	// Start the server loop with everything inlined
-	startServer(conn, transport, sessionManager, port)
+	runServerLoop(conn, transport, sessionManager, port)
 }
 
-func startServer(conn *net.UDPConn, transport *Transport, sessionManager *SessionManager, port int) {
+func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *SessionManager, port int) {
 	buffer := make([]byte, 389) // Buffer sized according to datagram size
 
 	for {
