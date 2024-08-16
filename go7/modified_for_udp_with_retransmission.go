@@ -19,11 +19,15 @@ type Datagram struct {
 	Signature         [32]byte
 }
 
+type Conn struct {
+	conn *net.UDPConn  // Connection used to send/receive datagrams
+	addr *net.UDPAddr  // Source address from where the datagram was received
+}
+
 type Session struct {
-	Datagram    Datagram
-	conn        *net.UDPConn  // Connection used to receive the datagram
-	sourceAddr  *net.UDPAddr  // Source address from where the datagram was received
-	ackRegistry *AckRegistry  // Pointer to the AckRegistry
+	Datagram     Datagram
+	conn         Conn          // Contains both UDPConn and UDPAddr
+	ackRegistry  *AckRegistry  // Pointer to the AckRegistry
 }
 
 type Ack struct {
