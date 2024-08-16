@@ -25,6 +25,20 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 		// Parse the datagram
 		datagram := parseDatagram(buffer[:n])
 
+		// Validate the datagram based on its type (client or server)
+		if datagram.Command&0x80 == 0 { // Server session if MSB is 0
+			if err := validateServerDatagram(buffer, datagram); err != nil {
+				fmt.Printf("Error validating server datagram: %v\n", err)
+				continue
+			}
+		} else { // Client session if MSB is 1
+			errorMessage, err := validateClientDatagram(buffer, datagram)
+			if err != nil {
+				fmt.Printf("Error during datagram validation: %v\n", err)
+				continue
+			}
+		}
+
 		// Validate the counter to prevent replay attacks
 		err = ValidateCounter(datagram)
 		if err != nil {
@@ -42,16 +56,13 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 		    continue
 		}
 
-		var sessionConn *Conn
+		var sessionConn *Conn = nil
 
-		// Determine if the MSB of the first byte (Command) is 1 or 0
-		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
+		if datagram.Command&0x80 == 1 {
 			sessionConn = &Conn{
 				conn: conn,
 				addr: remoteAddr,
 			}
-		} else { // MSB is 0: Server connection
-			sessionConn = nil
 		}
 
 		// Create a new session with the appropriate Conn
@@ -88,3 +99,4 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 		}
 	}
 }
+
