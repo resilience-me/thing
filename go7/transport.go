@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+// Transport provides reliable transmission functionality over UDP
+type Transport struct {
+	ackRegistry *AckRegistry
+}
+
+// NewTransport creates a new Transport instance with a new AckRegistry
+func NewTransport() *Transport {
+	return &Transport{ackRegistry: NewAckRegistry()}
+}
+
 // Ack represents an acknowledgment packet
 type Ack struct {
 	Username          string
@@ -66,21 +76,6 @@ func (ar *AckRegistry) CleanupAck(ack *Ack) {
 	defer ar.mu.Unlock()
 	key := generateAckKey(ack)
 	delete(ar.waitingAcks, key)
-}
-
-// Transport provides reliable transmission functionality over UDP
-type Transport struct {
-	conn        *net.UDPConn
-	ackRegistry *AckRegistry
-}
-
-// NewTransport creates a new Transport instance with a new AckRegistry
-func NewTransport(conn *net.UDPConn) *Transport {
-	ackRegistry := NewAckRegistry()
-	return &Transport{
-		conn:        conn,
-		ackRegistry: ackRegistry,
-	}
 }
 
 // SendPacketWithRetry sends a packet with retransmission logic
