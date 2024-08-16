@@ -15,7 +15,7 @@ func GetCounter(dg *main.Datagram) (uint32, error) {
 // SetCounter sets the counter value.
 func SetCounter(dg *main.Datagram) error {
 	accountDir := database.GetAccountDir(dg)
-	return database.WriteUint32ToFile(accountDir, "counter.txt", datagram.Counter)
+	return database.WriteUint32ToFile(accountDir, "counter.txt", dg.Counter)
 }
 
 // ValidateCounter checks if the provided counter is greater than the stored counter value for counter.
