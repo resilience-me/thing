@@ -9,7 +9,7 @@ import (
 
 // Transport provides reliable transmission functionality over UDP
 type Transport struct {
-	ackRegistry *AckRegistry
+	*AckRegistry
 }
 
 // NewTransport creates a new Transport instance with a new AckRegistry
