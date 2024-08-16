@@ -1,5 +1,3 @@
-// work in progress, chat gpt helping out
-
 package main
 
 import (
@@ -8,6 +6,11 @@ import (
 	"sync"
 	"time"
 )
+
+type Conn struct {
+	conn *net.UDPConn  // Connection used to send/receive datagrams
+	addr *net.UDPAddr  // Source address from where the datagram was received
+}
 
 type Datagram struct {
 	Command           byte
@@ -19,15 +22,10 @@ type Datagram struct {
 	Signature         [32]byte
 }
 
-type Conn struct {
-	conn *net.UDPConn  // Connection used to send/receive datagrams
-	addr *net.UDPAddr  // Source address from where the datagram was received
-}
-
 type Session struct {
-	Datagram     Datagram
-	conn         Conn          // Contains both UDPConn and UDPAddr
-	ackRegistry  *AckRegistry  // Pointer to the AckRegistry
+	Datagram    Datagram
+	conn        Conn          // Encapsulates both UDPConn and UDPAddr
+	ackRegistry *AckRegistry  // Pointer to the AckRegistry
 }
 
 type Ack struct {
@@ -145,28 +143,29 @@ func (cd *CentralDispatcher) ListenAndServe() {
 			cd.ackRegistry.routeAck(ack)
 		case 0x80: // Client connection (MSB is 1)
 			datagram := deserializeDatagram(packet)
-			session := createSession(datagram, cd.conn, addr, cd.ackRegistry) // Include sourceAddr
-			cd.routeToCommandHandler(session, datagram, addr)
+			conn := Conn{conn: cd.conn, addr: addr} // Create Conn instance
+			session := createSession(datagram, conn, cd.ackRegistry)
+			cd.routeToCommandHandler(session, datagram)
 		}
 	}
 }
 
-func (cd *CentralDispatcher) routeToCommandHandler(session *Session, datagram Datagram, addr *net.UDPAddr) {
+func (cd *CentralDispatcher) routeToCommandHandler(session *Session, datagram Datagram) {
 	// Create a key for the mutex based on username for command handling
 	mutex := cd.syncManager.getMutex(generateCommandKey(datagram.Username))
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	// Process the command synchronously
-	handleCommand(session, datagram, addr)
+	handleCommand(session, datagram)
 }
 
-func handleCommand(session *Session, datagram Datagram, addr *net.UDPAddr) {
+func handleCommand(session *Session, datagram Datagram) {
 	fmt.Printf("Handling command %d for %s -> %s\n", datagram.Command, datagram.Username, datagram.PeerUsername)
 
 	// Example of sending a response back to the source
 	responseData := []byte("Response Data")
-	err := session.conn.WriteToUDP(responseData, addr)
+	err := session.conn.conn.WriteToUDP(responseData, session.conn.addr)
 	if err != nil {
 		fmt.Printf("Failed to send response: %v\n", err)
 	}
@@ -192,7 +191,7 @@ func sendPacketWithRetry(session *Session, packet []byte, maxRetries int) error 
 	ackChan := session.ackRegistry.registerAck(ack)
 
 	for retries < maxRetries {
-		if _, err := session.conn.WriteToUDP(packet, addr); err != nil {
+		if _, err := session.conn.conn.WriteToUDP(packet, addr); err != nil {
 			return fmt.Errorf("failed to send data to server '%s': %w", serverAddress, err)
 		}
 
@@ -228,12 +227,11 @@ func handleAccountPeerComm(sm *SyncManager, session *Session, datagram Datagram)
 	}
 }
 
-func createSession(datagram Datagram, conn *net.UDPConn, sourceAddr *net.UDPAddr, ackRegistry *AckRegistry) *Session {
-	// Creates a session, with the Datagram, connection, source address, and ack registry
+func createSession(datagram Datagram, conn Conn, ackRegistry *AckRegistry) *Session {
+	// Creates a session with the Datagram, Conn struct, and AckRegistry
 	return &Session{
 		Datagram:    datagram,
 		conn:        conn,
-		sourceAddr:  sourceAddr,
 		ackRegistry: ackRegistry,
 	}
 }
@@ -260,7 +258,8 @@ func main() {
 		PeerServerAddress: "192.168.1.1",
 		Counter:           1,
 	}
-	session := createSession(datagram, conn, nil, ackRegistry) // For client connections, sourceAddr would be set
+	connStruct := Conn{conn: conn, addr: nil} // For client connections, addr would be set
+	session := createSession(datagram, connStruct, ackRegistry)
 	handleAccountPeerComm(syncManager, session, datagram)
 }
 
