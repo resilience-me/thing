@@ -43,13 +43,13 @@ func NewAck(dg *Datagram) *Ack {
 // AckRegistry manages ACKs for different accounts
 type AckRegistry struct {
 	mu          sync.Mutex
-	waitingAcks map[string]chan *Ack
+	waitingAcks map[string]chan struct{}
 }
 
 // NewAckRegistry creates a new AckRegistry
 func NewAckRegistry() *AckRegistry {
 	return &AckRegistry{
-		waitingAcks: make(map[string]chan *Ack),
+		waitingAcks: make(map[string]chan struct{}),
 	}
 }
 
