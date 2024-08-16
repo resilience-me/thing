@@ -38,35 +38,37 @@ type SendContext struct {
 	MaxRetries      int
 }
 
-// Utility function to generate a unique key for ACKs based on the relevant fields
-func generateAckKey(username, peerUsername, peerServerAddress string, counter uint32) string {
-	return fmt.Sprintf("%s-%s-%s-%d", username, peerUsername, peerServerAddress, counter)
+type AckEntry struct {
+	peerAccount string
+	ch          chan struct{}
 }
 
-// RegisterAck registers an Ack and returns a channel to receive the trigger signal
-func (ar *AckRegistry) RegisterAck(ackKey string) chan struct{} {
+// RegisterAck registers an Ack and ensures only one active peerAccount channel per username
+func (ar *AckRegistry) RegisterAck(username string, peerAccount string) chan struct{} {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
 	ch := make(chan struct{})
-	ar.waitingAcks[ackKey] = ch
+	ar.waitingAcks[username] = &AckEntry{peerAccount: peerAccount, ch: ch}
 	return ch
 }
 
 // RouteAck routes an incoming ACK to the appropriate channel
-func (ar *AckRegistry) RouteAck(ackKey string) {
+func (ar *AckRegistry) RouteAck(username string, peerAccount string) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
-	if ch, exists := ar.waitingAcks[ackKey]; exists {
-		close(ch) // Signal the receipt of the ACK by closing the channel
-		delete(ar.waitingAcks, ackKey)
+	if entry, exists := ar.waitingAcks[username]; exists {
+		if entry.peerAccount == peerAccount {
+			close(entry.ch) // Signal the receipt of the ACK by closing the channel
+			delete(ar.waitingAcks, username)
+		}
 	}
 }
 
 // CleanupAck removes an ACK from the registry after processing or timeout
-func (ar *AckRegistry) CleanupAck(ackKey string) {
+func (ar *AckRegistry) CleanupAck(username string) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
-	delete(ar.waitingAcks, ackKey)
+	delete(ar.waitingAcks, username)
 }
 
 // SendWithRetry sends data with retransmission logic based on the provided SendContext
