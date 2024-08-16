@@ -56,12 +56,12 @@ type SendContext struct {
 	MaxRetries     int
 }
 
-// RegisterAck registers an Ack and returns a channel to receive it
-func (ar *AckRegistry) RegisterAck(ack *Ack) chan *Ack {
+// RegisterAck registers an Ack and returns a channel to receive the trigger signal
+func (ar *AckRegistry) RegisterAck(ack *Ack) chan struct{} {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
 	key := generateAckKey(ack)
-	ch := make(chan *Ack)
+	ch := make(chan struct{})
 	ar.waitingAcks[key] = ch
 	return ch
 }
