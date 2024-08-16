@@ -75,8 +75,8 @@ func (m *SessionManager) handleSession(session Session) {
 }
 
 // handleConnection reads datagrams from the connection and decides whether to handle a client or server connection.
-func (m *SessionManager) handleConnection(conn net.Conn) {
-    buf := make([]byte, 389) // Adjust the buffer size according to your actual data size
+func (m *SessionManager) handleConnection(conn net.Conn, pm *pathfinding.PathManager) {
+    buf := make([]byte, 389)
     _, err := io.ReadFull(conn, buf)
     if err != nil {
         log.Printf("Error reading datagram: %v\n", err)
@@ -86,7 +86,12 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
     }
 
     dg := parseDatagram(buf)
-    session := Session{Datagram: dg}
+
+    // Create the Session without initially setting Conn
+    session := Session{
+        Datagram:    dg,
+        PathManager: pm, // Pass the PathManager to the Session
+    }
 
     // Determine whether it's a client or server session
     if dg.Command&0x80 == 0 { // Client session if MSB is 0
@@ -98,9 +103,10 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
             m.wg.Done()
             return
         }
-        session.Conn = conn // Prepare session with connection for clients
-    } else { // Server session
-        conn.Close() // Close the connection directly
+        // Set Conn only for Client sessions
+        session.Conn = conn 
+    } else {
+        conn.Close()
         if err := validateServerDatagram(buf, dg); err != nil {
             log.Printf("Error validating server datagram: %v\n", err)
             m.wg.Done()
@@ -108,7 +114,6 @@ func (m *SessionManager) handleConnection(conn net.Conn) {
         }
     }
 
-    // Send the session to the session channel for further processing
     m.sessionCh <- session
 }
 
