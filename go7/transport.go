@@ -105,10 +105,9 @@ func SendPacketWithRetry(session *Session, packet []byte, maxRetries int) error 
 		}
 
 		select {
-		case receivedAck := <-ackChan:
-			if receivedAck.Counter == session.Datagram.Counter {
-				return nil
-			}
+		case <-ackChan:
+			// ACK received, no need to compare counters as the registry ensures it's the correct one
+			return nil
 		case <-time.After(delay):
 			retries++
 			delay *= 2 // Exponential backoff
