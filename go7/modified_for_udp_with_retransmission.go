@@ -144,13 +144,15 @@ func (cd *CentralDispatcher) ListenAndServe() {
 		case 0x80: // Client connection (MSB is 1)
 			datagram := deserializeDatagram(packet)
 			conn := Conn{conn: cd.conn, addr: addr} // Create Conn instance
-			session := createSession(datagram, conn, cd.ackRegistry)
-			cd.routeToCommandHandler(session, datagram)
+			cd.routeToCommandHandler(datagram, conn)
 		}
 	}
 }
 
-func (cd *CentralDispatcher) routeToCommandHandler(session *Session, datagram Datagram) {
+func (cd *CentralDispatcher) routeToCommandHandler(datagram Datagram, conn Conn) {
+	// Create the session inside the command handler
+	session := createSession(datagram, conn, cd.ackRegistry)
+
 	// Create a key for the mutex based on username for command handling
 	mutex := cd.syncManager.getMutex(generateCommandKey(datagram.Username))
 	mutex.Lock()
