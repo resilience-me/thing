@@ -17,6 +17,11 @@ func NewTransport() *Transport {
 	return &Transport{AckRegistry: NewAckRegistry()}
 }
 
+// Utility function to generate a unique key for ACKs based on the Ack fields
+func generateAckKey(ack *Ack) string {
+	return fmt.Sprintf("%s-%s-%s-%d", ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
+}
+
 // Ack represents an acknowledgment packet
 type Ack struct {
 	Username          string
@@ -122,9 +127,4 @@ func SendWithRetry(ctx SendContext) error {
 	// Cleanup the ACK registration if we failed to get the ACK
 	ctx.AckRegistry.CleanupAck(ctx.AckKey)
 	return fmt.Errorf("retransmission failed after %d attempts", ctx.MaxRetries)
-}
-
-// Utility function to generate a unique key for ACKs based on the Ack fields
-func generateAckKey(ack *Ack) string {
-	return fmt.Sprintf("%s-%s-%s-%d", ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
 }
