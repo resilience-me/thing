@@ -24,9 +24,9 @@ func SetCounterOut(dg *main.Datagram, value uint32) error {
 }
 
 // SetCounterIn sets the counter_in value.
-func SetCounterIn(dg *main.Datagram, value uint32) error {
+func SetCounterIn(dg *main.Datagram) error {
 	peerDir := database.GetPeerDir(dg)
-	return database.WriteUint32ToFile(peerDir, "counter_in.txt", value)
+	return database.WriteUint32ToFile(peerDir, "counter_in.txt", dg.Counter)
 }
 
 // ValidateCounterIn checks if the provided counter is greater than the stored counter_in value.
