@@ -77,8 +77,8 @@ func (ar *AckRegistry) CleanupAck(ack *Ack) {
 	delete(ar.waitingAcks, key)
 }
 
-// SendPacketWithRetry sends a packet with retransmission logic
-func SendPacketWithRetry(session *Session, packet []byte, maxRetries int) error {
+// SendWithRetry sends data with retransmission logic
+func SendWithRetry(session *Session, data []byte, maxRetries int) error {
 	retries := 0
 	delay := 1 * time.Second
 
@@ -88,7 +88,7 @@ func SendPacketWithRetry(session *Session, packet []byte, maxRetries int) error 
 		return fmt.Errorf("failed to resolve server address '%s': %w", serverAddress, err)
 	}
 
-	// Create a new UDP connection for sending the packet
+	// Create a new UDP connection for sending the data
 	sendConn, err := net.DialUDP("udp", nil, addr)
 	if err != nil {
 		return fmt.Errorf("failed to create UDP connection: %w", err)
@@ -99,7 +99,7 @@ func SendPacketWithRetry(session *Session, packet []byte, maxRetries int) error 
 	ackChan := session.AckRegistry.RegisterAck(ack)
 
 	for retries < maxRetries {
-		if _, err := sendConn.Write(packet); err != nil {
+		if _, err := sendConn.Write(data); err != nil {
 			return fmt.Errorf("failed to send data to server '%s': %w", serverAddress, err)
 		}
 
@@ -114,7 +114,7 @@ func SendPacketWithRetry(session *Session, packet []byte, maxRetries int) error 
 	}
 
 	session.AckRegistry.CleanupAck(ack)
-	return fmt.Errorf("packet retransmission failed after %d attempts", maxRetries)
+	return fmt.Errorf("retransmission failed after %d attempts", maxRetries)
 }
 
 // Utility function to generate a unique key for ACKs based on the Ack fields
