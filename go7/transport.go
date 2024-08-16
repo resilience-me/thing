@@ -17,8 +17,9 @@ func NewTransport() *Transport {
 	return &Transport{AckRegistry: NewAckRegistry()}
 }
 
+// AckEntry represents the channel and peerAccount associated with a waiting ACK
 type AckEntry struct {
-	peerAccount string
+	peerAccount PeerAccount
 	ch          chan struct{}
 }
 
