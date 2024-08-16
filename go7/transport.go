@@ -84,7 +84,7 @@ func NewTransport(conn *net.UDPConn) *Transport {
 }
 
 // SendPacketWithRetry sends a packet with retransmission logic
-func (t *Transport) SendPacketWithRetry(session *Session, packet []byte, maxRetries int) error {
+func SendPacketWithRetry(session *Session, packet []byte, maxRetries int) error {
 	retries := 0
 	delay := 1 * time.Second
 
@@ -94,12 +94,18 @@ func (t *Transport) SendPacketWithRetry(session *Session, packet []byte, maxRetr
 		return fmt.Errorf("failed to resolve server address '%s': %w", serverAddress, err)
 	}
 
-	ack := NewAck(session.Datagram)
+	// Create a new UDP connection for sending the packet
+	sendConn, err := net.DialUDP("udp", nil, addr)
+	if err != nil {
+		return fmt.Errorf("failed to create UDP connection: %w", err)
+	}
+	defer sendConn.Close()
 
-	ackChan := t.ackRegistry.RegisterAck(ack)
+	ack := NewAck(session.Datagram)
+	ackChan := session.AckRegistry.RegisterAck(ack)
 
 	for retries < maxRetries {
-		if _, err := t.conn.WriteToUDP(packet, addr); err != nil {
+		if _, err := sendConn.Write(packet); err != nil {
 			return fmt.Errorf("failed to send data to server '%s': %w", serverAddress, err)
 		}
 
@@ -115,7 +121,7 @@ func (t *Transport) SendPacketWithRetry(session *Session, packet []byte, maxRetr
 		}
 	}
 
-	t.ackRegistry.CleanupAck(ack)
+	session.AckRegistry.CleanupAck(ack)
 	return fmt.Errorf("packet retransmission failed after %d attempts", maxRetries)
 }
 
