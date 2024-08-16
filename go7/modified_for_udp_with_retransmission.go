@@ -75,8 +75,8 @@ func generateBaseKey(username, peerUsername, peerServerAddress string) string {
 }
 
 // generateAckKey creates a unique key for ACKs based on the base key and counter
-func generateAckKey(username, peerUsername, peerServerAddress string, counter uint32) string {
-	return fmt.Sprintf("%s-%d", generateBaseKey(username, peerUsername, peerServerAddress), counter)
+func generateAckKey(ack Ack) string {
+	return fmt.Sprintf("%s-%d", generateBaseKey(ack.Username, ack.PeerUsername, ack.PeerServerAddress), ack.Counter)
 }
 
 // generateCommandKey creates a unique key based on username for command handling
@@ -87,7 +87,7 @@ func generateCommandKey(username string) string {
 func (ar *AckRegistry) registerAck(ack Ack) chan Ack {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
-	key := generateAckKey(ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
+	key := generateAckKey(ack)
 	ch := make(chan Ack)
 	ar.waitingAcks[key] = ch
 	return ch
@@ -96,7 +96,7 @@ func (ar *AckRegistry) registerAck(ack Ack) chan Ack {
 func (ar *AckRegistry) routeAck(ack Ack) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
-	key := generateAckKey(ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
+	key := generateAckKey(ack)
 	if ch, exists := ar.waitingAcks[key]; exists {
 		ch <- ack
 		close(ch) // Close the channel after sending the ACK to avoid leaks
@@ -107,7 +107,7 @@ func (ar *AckRegistry) routeAck(ack Ack) {
 func (ar *AckRegistry) cleanupAck(ack Ack) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
-	key := generateAckKey(ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
+	key := generateAckKey(ack)
 	delete(ar.waitingAcks, key)
 }
 
