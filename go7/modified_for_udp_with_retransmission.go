@@ -143,13 +143,13 @@ func (cd *CentralDispatcher) ListenAndServe() {
 			cd.ackRegistry.routeAck(ack)
 		default: // All other cases
 			// Determine the value of conn based on the MSB of the messageType
-			var conn Conn
+			var conn *Conn
 			if messageType&0x80 == 0 {
 				// MSB is 0: Use the existing conn and addr
-				conn = Conn{conn: cd.conn, addr: addr}
+				conn = &Conn{conn: cd.conn, addr: addr}
 			} else {
-				// MSB is 1: Set both conn and addr to nil (empty)
-				conn = Conn{conn: nil, addr: nil}
+				// MSB is 1: Set conn to nil (no connection)
+				conn = nil
 			}
 			
 			datagram := deserializeDatagram(packet)
