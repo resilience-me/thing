@@ -168,7 +168,7 @@ func (cd *CentralDispatcher) routeToCommandHandler(datagram *Datagram, conn Conn
 	handleCommand(session)
 }
 
-func handleCommand(session *Session, datagram Datagram) {
+func handleCommand(session *Session) {
 	fmt.Printf("Handling command %d for %s -> %s\n", datagram.Command, datagram.Username, datagram.PeerUsername)
 
 	// Example of sending a response back to the source
