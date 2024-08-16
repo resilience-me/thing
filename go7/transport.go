@@ -48,6 +48,14 @@ func NewAckRegistry() *AckRegistry {
 	}
 }
 
+type SendContext struct {
+	Data           []byte
+	DestinationAddr string
+	Ack            *Ack
+	AckRegistry    *AckRegistry
+	MaxRetries     int
+}
+
 // RegisterAck registers an Ack and returns a channel to receive it
 func (ar *AckRegistry) RegisterAck(ack *Ack) chan *Ack {
 	ar.mu.Lock()
@@ -77,30 +85,31 @@ func (ar *AckRegistry) CleanupAck(ack *Ack) {
 	delete(ar.waitingAcks, key)
 }
 
-// SendWithRetry sends data with retransmission logic
-func SendWithRetry(session *Session, data []byte, maxRetries int) error {
+// SendWithRetry sends data with retransmission logic based on the provided SendContext
+func SendWithRetry(ctx SendContext) error {
 	retries := 0
 	delay := 1 * time.Second
 
-	serverAddress := session.Datagram.PeerServerAddress
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", serverAddress, 2012))
+	// Resolve the destination address to a UDP address
+	addr, err := net.ResolveUDPAddr("udp", ctx.DestinationAddr)
 	if err != nil {
-		return fmt.Errorf("failed to resolve server address '%s': %w", serverAddress, err)
+		return fmt.Errorf("failed to resolve server address '%s': %w", ctx.DestinationAddr, err)
 	}
 
-	// Create a new UDP connection for sending the data
+	// Create a new UDP connection for sending the datagram
 	sendConn, err := net.DialUDP("udp", nil, addr)
 	if err != nil {
 		return fmt.Errorf("failed to create UDP connection: %w", err)
 	}
 	defer sendConn.Close()
 
-	ack := NewAck(session.Datagram)
-	ackChan := session.AckRegistry.RegisterAck(ack)
+	// Register the ACK
+	ackChan := ctx.AckRegistry.RegisterAck(ctx.Ack)
 
-	for retries < maxRetries {
-		if _, err := sendConn.Write(data); err != nil {
-			return fmt.Errorf("failed to send data to server '%s': %w", serverAddress, err)
+	for retries < ctx.MaxRetries {
+		// Send the serialized datagram
+		if _, err := sendConn.Write(ctx.Data); err != nil {
+			return fmt.Errorf("failed to send data to server '%s': %w", ctx.DestinationAddr, err)
 		}
 
 		select {
@@ -109,12 +118,13 @@ func SendWithRetry(session *Session, data []byte, maxRetries int) error {
 		case <-time.After(delay):
 			retries++
 			delay *= 2 // Exponential backoff
-			fmt.Printf("Timeout waiting for ACK, retrying... (%d/%d)\n", retries, maxRetries)
+			fmt.Printf("Timeout waiting for ACK, retrying... (%d/%d)\n", retries, ctx.MaxRetries)
 		}
 	}
 
-	session.AckRegistry.CleanupAck(ack)
-	return fmt.Errorf("retransmission failed after %d attempts", maxRetries)
+	// Cleanup the ACK registration if we failed to get the ACK
+	ctx.AckRegistry.CleanupAck(ctx.Ack)
+	return fmt.Errorf("retransmission failed after %d attempts", ctx.MaxRetries)
 }
 
 // Utility function to generate a unique key for ACKs based on the Ack fields
