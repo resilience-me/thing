@@ -35,12 +35,13 @@ func NewAckRegistry() *AckRegistry {
 	}
 }
 
+// SendContext contains the data and metadata for sending a datagram
 type SendContext struct {
-	Data            []byte
-	DestinationAddr string
-	AckKey          string
-	AckRegistry     *AckRegistry
-	MaxRetries      int
+	Data           []byte
+	DestinationAddr *net.UDPAddr
+	PeerAccount    PeerAccount
+	AckRegistry    *AckRegistry
+	MaxRetries     int
 }
 
 // RegisterAck registers an Ack and ensures only one active peerAccount channel per username
