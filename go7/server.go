@@ -22,38 +22,22 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 
 		fmt.Printf("Received %d bytes from %s\n", n, remoteAddr.String())
 
-		// Parse the datagram
-		datagram := parseDatagram(buffer[:n])
-
-		// Validate the datagram based on its type (client or server)
-		if datagram.Command&0x80 == 0 { // Server session if MSB is 0
-			if err := validateServerDatagram(buffer, datagram); err != nil {
-				fmt.Printf("Error validating server datagram: %v\n", err)
-				continue
-			}
-		} else { // Client session if MSB is 1
-			errorMessage, err := validateClientDatagram(buffer, datagram)
-			if err != nil {
-				fmt.Printf("Error during datagram validation: %v\n", err)
-				continue
-			}
-		}
-
-		// Validate the counter to prevent replay attacks
-		err = ValidateCounter(datagram)
+		// Validate the datagram
+		datagram, err := ValidateDatagram(buffer[:n])
 		if err != nil {
-			fmt.Printf("Invalid counter detected: %v\n", err)
+			fmt.Printf("Datagram validation failed: %v\n", err)
 			continue
 		}
 
+		// Handle ACK datagrams separately
 		if datagram.Command == 0x00 {
-		    peerAccount := PeerAccount{
-		        Username:      datagram.PeerUsername,
-		        ServerAddress: datagram.PeerServerAddress,
-		    }
-		    transport.RouteAck(datagram.Username, peerAccount)
-		    fmt.Println("ACK received and routed.")
-		    continue
+			peerAccount := PeerAccount{
+				Username:      datagram.PeerUsername,
+				ServerAddress: datagram.PeerServerAddress,
+			}
+			transport.RouteAck(datagram.Username, peerAccount)
+			fmt.Println("ACK received and routed.")
+			continue
 		}
 
 		var sessionConn *Conn = nil
@@ -75,6 +59,7 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 		// Route the session through the SessionManager
 		sessionManager.RouteSession(session)
 
+		// Determine the ACK address
 		var ackAddr *net.UDPAddr
 
 		if datagram.Command&0x80 == 1 {
@@ -99,4 +84,3 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 		}
 	}
 }
-
