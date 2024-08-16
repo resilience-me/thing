@@ -50,13 +50,19 @@ func main() {
 		// If MSB is 1, it's a client connection, so set Conn to nil
 		// If MSB is 0, it's a server connection, so include the Conn with the address
 		var sessionConn *Conn
+		var ackAddr string
+
 		if buffer[0]&0x80 == 0 { // MSB is 0: Server connection
 			sessionConn = &Conn{
 				conn: conn,
 				addr: remoteAddr,
 			}
+			// Send ACK to the server address specified in the datagram
+			ackAddr = fmt.Sprintf("%s:%d", datagram.PeerServerAddress, port)
 		} else { // MSB is 1: Client connection
 			sessionConn = nil
+			// Send ACK back to the client address from which the datagram was received
+			ackAddr = remoteAddr.String()
 		}
 
 		// Create a new session with the appropriate Conn
@@ -68,5 +74,21 @@ func main() {
 
 		// Route the session through the SessionManager
 		sessionManager.RouteSession(session)
+
+		// Determine if the datagram is an ACK (e.g., Command 0x00)
+		if datagram.Command == 0x00 {
+			fmt.Println("Received an ACK, no response necessary.")
+			continue
+		}
+
+		// Otherwise, send an ACK back to the determined address
+		ack := NewAck(datagram)
+		ackData := serializeDatagram(ack)
+		err = SendAck(ackData, ackAddr)
+		if err != nil {
+			fmt.Printf("Failed to send ACK to %s: %v\n", ackAddr, err)
+		} else {
+			fmt.Printf("Sent ACK to %s\n", ackAddr)
+		}
 	}
 }
