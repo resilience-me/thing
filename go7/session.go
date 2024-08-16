@@ -70,10 +70,3 @@ func (sm *SessionManager) handleSession(session *Session) {
 	// Simulate session handling
 	// For example, send a datagram, wait for an ack, etc.
 }
-
-// MainLoop is the main loop that handles incoming sessions
-func (sm *SessionManager) MainLoop(incomingSessions <-chan *Session) {
-	for session := range incomingSessions {
-		sm.RouteSession(session)
-	}
-}
