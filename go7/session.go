@@ -7,6 +7,12 @@ import (
 	"sync"
 )
 
+type Session struct {
+	Datagram    *Datagram
+	Conn        *Conn        // Pointer to Conn; can be nil
+	AckRegistry *AckRegistry // Pointer to the AckRegistry
+}
+
 // SessionManager manages sessions and their state
 type SessionManager struct {
 	activeHandlers map[string]bool
@@ -70,22 +76,4 @@ func (sm *SessionManager) MainLoop(incomingSessions <-chan *Session) {
 	for session := range incomingSessions {
 		sm.RouteSession(session)
 	}
-}
-
-func main() {
-	sessionManager := NewSessionManager()
-
-	// Channel simulating incoming sessions
-	incomingSessions := make(chan *Session)
-
-	// Start the main loop
-	go sessionManager.MainLoop(incomingSessions)
-
-	// Simulate adding sessions
-	for i := 0; i < 10; i++ {
-		session := &Session{Datagram: &Datagram{Username: fmt.Sprintf("user%d", i%3)}}
-		incomingSessions <- session
-	}
-
-	close(incomingSessions)
 }
