@@ -46,6 +46,14 @@ func main() {
 		// Parse the datagram
 		datagram := parseDatagram(buffer[:n])
 
+		// If the datagram is an ACK, route it using the AckRegistry
+		if datagram.Command == 0x00 {
+			ackKey := generateAckKey(NewAck(datagram))
+			transport.RouteAck(ackKey)
+			fmt.Println("ACK received and routed.")
+			continue
+		}
+
 		// Determine if the MSB of the first byte (Command) is 1 or 0
 		// If MSB is 1, it's a client connection, so set Conn to nil
 		// If MSB is 0, it's a server connection, so include the Conn with the address
@@ -58,7 +66,7 @@ func main() {
 				addr: remoteAddr,
 			}
 			// Send ACK to the server address specified in the datagram
-			ackAddr = datagram.PeerServerAddress
+			ackAddr = fmt.Sprintf("%s:%d", datagram.PeerServerAddress, port)
 		} else { // MSB is 1: Client connection
 			sessionConn = nil
 			// Send ACK back to the client address from which the datagram was received
@@ -75,13 +83,7 @@ func main() {
 		// Route the session through the SessionManager
 		sessionManager.RouteSession(session)
 
-		// Determine if the datagram is an ACK (e.g., Command 0x00)
-		if datagram.Command == 0x00 {
-			fmt.Println("Received an ACK, no response necessary.")
-			continue
-		}
-
-		// Otherwise, send an ACK back to the determined address
+		// Send an ACK back to the determined address
 		ack := NewAck(datagram)
 		ackData := serializeDatagram(ack)
 		err = SendAck(ackData, ackAddr)
