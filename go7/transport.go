@@ -74,8 +74,9 @@ type Transport struct {
 	ackRegistry *AckRegistry
 }
 
-// NewTransport creates a new Transport instance
-func NewTransport(conn *net.UDPConn, ackRegistry *AckRegistry) *Transport {
+// NewTransport creates a new Transport instance with a new AckRegistry
+func NewTransport(conn *net.UDPConn) *Transport {
+	ackRegistry := NewAckRegistry()
 	return &Transport{
 		conn:        conn,
 		ackRegistry: ackRegistry,
