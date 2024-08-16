@@ -38,11 +38,12 @@ func NewAckRegistry() *AckRegistry {
 
 // SendContext contains the data and metadata for sending a datagram
 type SendContext struct {
-	Data           []byte
+	Data            []byte
 	DestinationAddr *net.UDPAddr
-	PeerAccount    PeerAccount
-	AckRegistry    *AckRegistry
-	MaxRetries     int
+	Username        string
+	PeerAccount     PeerAccount
+	AckRegistry     *AckRegistry
+	MaxRetries      int
 }
 
 // RegisterAck registers an Ack and ensures only one active peerAccount channel per username
@@ -92,7 +93,7 @@ func SendWithRetry(ctx SendContext) error {
 	defer sendConn.Close()
 
 	// Register the ACK channel using the username and peerAccount
-	ackChan := ctx.AckRegistry.RegisterAck(ctx.PeerAccount.Username, ctx.PeerAccount)
+	ackChan := ctx.AckRegistry.RegisterAck(ctx.Username, ctx.PeerAccount)
 
 	for retries < ctx.MaxRetries {
 		// Send the serialized datagram
