@@ -128,3 +128,31 @@ func SendWithRetry(ctx SendContext) error {
 	ctx.AckRegistry.CleanupAck(ctx.AckKey)
 	return fmt.Errorf("retransmission failed after %d attempts", ctx.MaxRetries)
 }
+
+// send is a lower-level function that sends data to a specified address
+func send(data []byte, destinationAddr string) error {
+	// Resolve the destination address using the provided address
+	addr, err := net.ResolveUDPAddr("udp", destinationAddr)
+	if err != nil {
+		return fmt.Errorf("failed to resolve server address '%s': %w", destinationAddr, err)
+	}
+
+	// Create a new UDP connection for sending the data
+	conn, err := net.DialUDP("udp", nil, addr)
+	if err != nil {
+		return fmt.Errorf("failed to create UDP connection: %w", err)
+	}
+	defer conn.Close()
+
+	// Send the data
+	if _, err := conn.Write(data); err != nil {
+		return fmt.Errorf("failed to send data to server '%s': %w", destinationAddr, err)
+	}
+
+	return nil
+}
+
+// SendAck is a wrapper around the lower-level send function, specifically for ACKs
+func SendAck(data []byte, destinationAddr string) error {
+	return send(data, destinationAddr)
+}
