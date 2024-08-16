@@ -159,7 +159,7 @@ func (cd *CentralDispatcher) routeToCommandHandler(datagram Datagram, conn Conn)
 	defer mutex.Unlock()
 
 	// Process the command synchronously
-	handleCommand(session, datagram)
+	handleCommand(session)
 }
 
 func handleCommand(session *Session, datagram Datagram) {
