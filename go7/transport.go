@@ -76,26 +76,20 @@ func SendWithRetry(ctx SendContext) error {
 	retries := 0
 	delay := 1 * time.Second
 
-	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", ctx.DestinationAddr)
-	if err != nil {
-		return fmt.Errorf("failed to resolve server address '%s': %w", ctx.DestinationAddr, err)
-	}
-
 	// Create a new UDP connection for sending the datagram
-	sendConn, err := net.DialUDP("udp", nil, addr)
+	sendConn, err := net.DialUDP("udp", nil, ctx.DestinationAddr)
 	if err != nil {
 		return fmt.Errorf("failed to create UDP connection: %w", err)
 	}
 	defer sendConn.Close()
 
-	// Register the ACK using the provided AckKey
-	ackChan := ctx.AckRegistry.RegisterAck(ctx.AckKey)
+	// Register the ACK using the provided AckKey and PeerAccount
+	ackChan := ctx.AckRegistry.RegisterAck(ctx.AckKey, ctx.PeerAccount)
 
 	for retries < ctx.MaxRetries {
 		// Send the serialized datagram
 		if _, err := sendConn.Write(ctx.Data); err != nil {
-			return fmt.Errorf("failed to send data to server '%s': %w", ctx.DestinationAddr, err)
+			return fmt.Errorf("failed to send data to server '%s': %w", ctx.DestinationAddr.String(), err)
 		}
 
 		select {
