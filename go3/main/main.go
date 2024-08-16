@@ -14,8 +14,9 @@ import (
 
 // Session struct represents a network session with an optional connection
 type Session struct {
-    Datagram *Datagram // Using the same name for the identifier and the type
-    Conn     net.Conn  // Connection, can be nil if no network connection is associated
+    Datagram    *Datagram              // Using the same name for the identifier and the type
+    Conn        net.Conn               // Connection, can be nil if no network connection is associated
+    PathManager *pathfinding.PathManager // Reference to the PathManager
 }
 
 // SessionManager manages the processing of sessions
