@@ -17,16 +17,21 @@ func NewTransport() *Transport {
 	return &Transport{AckRegistry: NewAckRegistry()}
 }
 
+type AckEntry struct {
+	peerAccount string
+	ch          chan struct{}
+}
+
 // AckRegistry manages ACKs for different accounts
 type AckRegistry struct {
 	mu          sync.Mutex
-	waitingAcks map[string]chan struct{}
+	waitingAcks map[string]*AckEntry
 }
 
 // NewAckRegistry creates a new AckRegistry
 func NewAckRegistry() *AckRegistry {
 	return &AckRegistry{
-		waitingAcks: make(map[string]chan struct{}),
+		waitingAcks: make(map[string]*AckEntry),
 	}
 }
 
@@ -36,11 +41,6 @@ type SendContext struct {
 	AckKey          string
 	AckRegistry     *AckRegistry
 	MaxRetries      int
-}
-
-type AckEntry struct {
-	peerAccount string
-	ch          chan struct{}
 }
 
 // RegisterAck registers an Ack and ensures only one active peerAccount channel per username
