@@ -10,7 +10,7 @@ import (
 type Session struct {
 	Datagram    *Datagram
 	Conn        *Conn        // Pointer to Conn; can be nil
-	Transport   *Transport // Pointer to the AckRegistry
+	Transport   *Transport   // Reference to Transport
 }
 
 // SessionManager manages sessions and their state
