@@ -24,8 +24,8 @@ type Datagram struct {
 
 type Session struct {
 	Datagram    Datagram
-	conn        Conn          // Encapsulates both UDPConn and UDPAddr
-	ackRegistry *AckRegistry  // Pointer to the AckRegistry
+	conn        *Conn          // Pointer to Conn; can be nil
+	ackRegistry *AckRegistry   // Pointer to the AckRegistry
 }
 
 type Ack struct {
