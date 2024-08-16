@@ -17,24 +17,6 @@ func NewTransport() *Transport {
 	return &Transport{AckRegistry: NewAckRegistry()}
 }
 
-// Ack represents an acknowledgment packet
-type Ack struct {
-	Username          string
-	PeerUsername      string
-	PeerServerAddress string
-	Counter           uint32
-}
-
-// NewAck creates a new Ack from a given Datagram
-func NewAck(dg *Datagram) *Ack {
-	return &Ack{
-		Username:          dg.Username,
-		PeerUsername:      dg.PeerUsername,
-		PeerServerAddress: dg.PeerServerAddress,
-		Counter:           dg.Counter,
-	}
-}
-
 // AckRegistry manages ACKs for different accounts
 type AckRegistry struct {
 	mu          sync.Mutex
@@ -57,8 +39,8 @@ type SendContext struct {
 }
 
 // Utility function to generate a unique key for ACKs based on the Ack fields
-func generateAckKey(ack *Ack) string {
-	return fmt.Sprintf("%s-%s-%s-%d", ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
+func generateAckKey(username, peerUsername, peerServerAddress string, counter uint32) string {
+	return fmt.Sprintf("%s-%s-%s-%d", username, peerUsername, peerServerAddress, counter)
 }
 
 // RegisterAck registers an Ack and returns a channel to receive the trigger signal
