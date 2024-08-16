@@ -28,6 +28,14 @@ type Session struct {
 	ackRegistry *AckRegistry   // Pointer to the AckRegistry
 }
 
+func (cd *CentralDispatcher) newSession(datagram *Datagram, conn *Conn) *Session {
+	return &Session{
+		Datagram:    datagram,
+		Conn:        conn,
+		ackRegistry: cd.ackRegistry,
+	}
+}
+
 type Ack struct {
 	Username          string
 	PeerUsername      string
@@ -126,7 +134,7 @@ func NewCentralDispatcher(conn *net.UDPConn, ackRegistry *AckRegistry, syncManag
 }
 
 func (cd *CentralDispatcher) ListenAndServe() {
-	buffer := make([]byte, 1024)
+	buffer := make([]byte, 389)
 	for {
 		n, addr, err := cd.conn.ReadFromUDP(buffer)
 		if err != nil {
@@ -157,7 +165,7 @@ func (cd *CentralDispatcher) ListenAndServe() {
 
 func (cd *CentralDispatcher) routeToCommandHandler(datagram *Datagram, conn Conn) {
 	// Create the session inside the command handler
-	session := &Session{datagram, conn, cd.ackRegistry}
+	session := cd.newSession(datagram, conn)
 
 	// Create a key for the mutex based on username for command handling
 	mutex := cd.syncManager.getMutex(generateCommandKey(datagram.Username))
@@ -232,15 +240,6 @@ func handleAccountPeerComm(sm *SyncManager, session *Session, datagram Datagram)
 	// Send the packet with retries
 	if err := sendPacketWithRetry(session, packet, 5); err != nil {
 		fmt.Printf("Failed to send packet for %s to %s: %v\n", datagram.Username, datagram.PeerUsername, err)
-	}
-}
-
-func createSession(datagram Datagram, conn Conn, ackRegistry *AckRegistry) *Session {
-	// Creates a session with the Datagram, Conn struct, and AckRegistry
-	return &Session{
-		Datagram:    datagram,
-		conn:        conn,
-		ackRegistry: ackRegistry,
 	}
 }
 
