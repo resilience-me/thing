@@ -31,14 +31,14 @@ func NewAckRegistry() *AckRegistry {
 }
 
 type SendContext struct {
-	Data           []byte
+	Data            []byte
 	DestinationAddr string
-	AckKey         string
-	AckRegistry    *AckRegistry
-	MaxRetries     int
+	AckKey          string
+	AckRegistry     *AckRegistry
+	MaxRetries      int
 }
 
-// Utility function to generate a unique key for ACKs based on the Ack fields
+// Utility function to generate a unique key for ACKs based on the relevant fields
 func generateAckKey(username, peerUsername, peerServerAddress string, counter uint32) string {
 	return fmt.Sprintf("%s-%s-%s-%d", username, peerUsername, peerServerAddress, counter)
 }
