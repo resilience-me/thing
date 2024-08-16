@@ -72,7 +72,7 @@ func (ar *AckRegistry) RouteAck(ack *Ack) {
 	defer ar.mu.Unlock()
 	key := generateAckKey(ack)
 	if ch, exists := ar.waitingAcks[key]; exists {
-		close(ch) // Signal receipt of the ACK by closing the channel
+		close(ch) // Signal the receipt of the ACK by closing the channel
 		delete(ar.waitingAcks, key)
 	}
 }
