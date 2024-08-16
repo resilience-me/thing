@@ -43,6 +43,16 @@ type Ack struct {
 	Counter           uint32
 }
 
+func newAck(dg *Datagram) *Ack {
+	ack := &Ack{
+		Username:          dg.Username,
+		PeerUsername:      dg.PeerUsername,
+		PeerServerAddress: dg.PeerServerAddress,
+		Counter:           dg.Counter,
+	}
+	return ack
+}
+
 // SyncManager manages synchronization for different accounts
 type SyncManager struct {
 	mu       sync.Mutex
