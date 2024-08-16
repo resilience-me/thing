@@ -1,5 +1,3 @@
-// written together with chat gpt, work in progress
-
 package main
 
 import (
@@ -27,12 +25,18 @@ func main() {
 	}
 	defer conn.Close()
 
-	buffer := make([]byte, 1024) // Buffer to hold incoming datagrams
+	buffer := make([]byte, 389) // Buffer sized according to datagram size
 
 	for {
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			fmt.Printf("Error reading from UDP connection: %v\n", err)
+			continue
+		}
+
+		// Ensure that exactly 389 bytes were received
+		if n != 389 {
+			fmt.Printf("Unexpected datagram size: received %d bytes, expected 389 bytes\n", n)
 			continue
 		}
 
