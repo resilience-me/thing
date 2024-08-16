@@ -100,8 +100,8 @@ func SendWithRetry(ctx SendContext) error {
 	}
 	defer sendConn.Close()
 
-	// Register the ACK
-	ackChan := ctx.AckRegistry.RegisterAck(ctx.Ack)
+	// Register the ACK using the provided AckKey
+	ackChan := ctx.AckRegistry.RegisterAck(ctx.AckKey)
 
 	for retries < ctx.MaxRetries {
 		// Send the serialized datagram
@@ -120,7 +120,7 @@ func SendWithRetry(ctx SendContext) error {
 	}
 
 	// Cleanup the ACK registration if we failed to get the ACK
-	ctx.AckRegistry.CleanupAck(ctx.Ack)
+	ctx.AckRegistry.CleanupAck(ctx.AckKey)
 	return fmt.Errorf("retransmission failed after %d attempts", ctx.MaxRetries)
 }
 
