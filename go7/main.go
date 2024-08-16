@@ -58,7 +58,7 @@ func main() {
 				addr: remoteAddr,
 			}
 			// Send ACK to the server address specified in the datagram
-			ackAddr = fmt.Sprintf("%s:%d", datagram.PeerServerAddress, port)
+			ackAddr = datagram.PeerServerAddress
 		} else { // MSB is 1: Client connection
 			sessionConn = nil
 			// Send ACK back to the client address from which the datagram was received
