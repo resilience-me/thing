@@ -151,7 +151,7 @@ func (cd *CentralDispatcher) ListenAndServe() {
 
 func (cd *CentralDispatcher) routeToCommandHandler(datagram Datagram, conn Conn) {
 	// Create the session inside the command handler
-	session := createSession(datagram, conn, cd.ackRegistry)
+	session := &Session{datagram, conn, cd.ackRegistry}
 
 	// Create a key for the mutex based on username for command handling
 	mutex := cd.syncManager.getMutex(generateCommandKey(datagram.Username))
