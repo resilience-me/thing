@@ -1,6 +1,7 @@
 package db_server
 
 import (
+	"ripple/main"
 	"ripple/database"
 )
 
