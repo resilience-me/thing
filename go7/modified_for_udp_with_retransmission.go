@@ -24,15 +24,15 @@ type Datagram struct {
 
 type Session struct {
 	Datagram    *Datagram
-	conn        *Conn          // Pointer to Conn; can be nil
-	ackRegistry *AckRegistry   // Pointer to the AckRegistry
+	Conn        *Conn          // Pointer to Conn; can be nil
+	AckRegistry *AckRegistry   // Pointer to the AckRegistry
 }
 
 func (cd *CentralDispatcher) newSession(datagram *Datagram, conn *Conn) *Session {
 	return &Session{
 		Datagram:    datagram,
 		Conn:        conn,
-		ackRegistry: cd.ackRegistry,
+		AckRegistry: cd.ackRegistry,
 	}
 }
 
@@ -78,12 +78,12 @@ func (sm *SyncManager) getMutex(key string) *sync.Mutex {
 // AckRegistry manages ACKs for different accounts
 type AckRegistry struct {
 	mu          sync.Mutex
-	waitingAcks map[string]chan Ack
+	waitingAcks map[string]chan *Ack
 }
 
 func NewAckRegistry() *AckRegistry {
 	return &AckRegistry{
-		waitingAcks: make(map[string]chan Ack),
+		waitingAcks: make(map[string]chan *Ack),
 	}
 }
 
@@ -93,7 +93,7 @@ func generateSendKey(dg *Datagram) string {
 }
 
 // generateAckKey creates a unique key for ACKs based on the Ack fields
-func generateAckKey(ack Ack) string {
+func generateAckKey(ack *Ack) string {
 	return fmt.Sprintf("%s-%s-%s-%d", ack.Username, ack.PeerUsername, ack.PeerServerAddress, ack.Counter)
 }
 
@@ -102,16 +102,16 @@ func generateCommandKey(username string) string {
 	return username
 }
 
-func (ar *AckRegistry) registerAck(ack Ack) chan Ack {
+func (ar *AckRegistry) registerAck(ack *Ack) chan *Ack {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
 	key := generateAckKey(ack)
-	ch := make(chan Ack)
+	ch := make(chan *Ack)
 	ar.waitingAcks[key] = ch
 	return ch
 }
 
-func (ar *AckRegistry) routeAck(ack Ack) {
+func (ar *AckRegistry) routeAck(ack *Ack) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
 	key := generateAckKey(ack)
@@ -122,7 +122,7 @@ func (ar *AckRegistry) routeAck(ack Ack) {
 	}
 }
 
-func (ar *AckRegistry) cleanupAck(ack Ack) {
+func (ar *AckRegistry) cleanupAck(ack *Ack) {
 	ar.mu.Lock()
 	defer ar.mu.Unlock()
 	key := generateAckKey(ack)
@@ -173,7 +173,7 @@ func (cd *CentralDispatcher) ListenAndServe() {
 	}
 }
 
-func (cd *CentralDispatcher) routeToCommandHandler(datagram *Datagram, conn Conn) {
+func (cd *CentralDispatcher) routeToCommandHandler(datagram *Datagram, conn *Conn) {
 	// Create the session inside the command handler
 	session := cd.newSession(datagram, conn)
 
@@ -187,13 +187,15 @@ func (cd *CentralDispatcher) routeToCommandHandler(datagram *Datagram, conn Conn
 }
 
 func handleCommand(session *Session) {
-	fmt.Printf("Handling command %d for %s -> %s\n", datagram.Command, datagram.Username, datagram.PeerUsername)
+	fmt.Printf("Handling command %d for %s -> %s\n", session.Datagram.Command, session.Datagram.Username, session.Datagram.PeerUsername)
 
 	// Example of sending a response back to the source
-	responseData := []byte("Response Data")
-	err := session.conn.conn.WriteToUDP(responseData, session.conn.addr)
-	if err != nil {
-		fmt.Printf("Failed to send response: %v\n", err)
+	if session.conn != nil {
+		responseData := []byte("Response Data")
+		err := session.conn.conn.WriteToUDP(responseData, session.conn.addr)
+		if err != nil {
+			fmt.Printf("Failed to send response: %v\n", err)
+		}
 	}
 }
 
@@ -207,12 +209,7 @@ func sendPacketWithRetry(session *Session, packet []byte, maxRetries int) error 
 		return fmt.Errorf("failed to resolve server address '%s': %w", serverAddress, err)
 	}
 
-	ack := Ack{
-		Username:          session.Datagram.Username,
-		PeerUsername:      session.Datagram.PeerUsername,
-		PeerServerAddress: session.Datagram.PeerServerAddress,
-		Counter:           session.Datagram.Counter,
-	}
+	ack := newAck(session.Datagram)
 
 	ackChan := session.ackRegistry.registerAck(ack)
 
@@ -237,9 +234,9 @@ func sendPacketWithRetry(session *Session, packet []byte, maxRetries int) error 
 	return fmt.Errorf("packet retransmission failed after %d attempts", maxRetries)
 }
 
-func handleAccountPeerComm(sm *SyncManager, session *Session, datagram Datagram) {
+func handleAccountPeerComm(sm *SyncManager, session *Session, datagram *Datagram) {
 	// Create a key for the mutex based on username, peer username, and peer server address
-	key := generateBaseKey(datagram.Username, datagram.PeerUsername, datagram.PeerServerAddress)
+	key := generateSendKey(datagram)
 	mutex := sm.getMutex(key)
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -268,29 +265,29 @@ func main() {
 	go dispatcher.ListenAndServe()
 
 	// Example usage of handleAccountPeerComm
-	datagram := Datagram{
+	datagram := &Datagram{
 		Command:           0x02,
 		Username:          "account1",
 		PeerUsername:      "peer1",
 		PeerServerAddress: "192.168.1.1",
 		Counter:           1,
 	}
-	connStruct := Conn{conn: conn, addr: nil} // For client connections, addr would be set
-	session := createSession(datagram, connStruct, ackRegistry)
+	connStruct := &Conn{conn: conn, addr: nil} // For client connections, addr would be set
+	session := dispatcher.newSession(datagram, connStruct)
 	handleAccountPeerComm(syncManager, session, datagram)
 }
 
-func deserializeAck(data []byte) Ack {
+func deserializeAck(data []byte) *Ack {
 	// Simplified deserialization logic
-	return Ack{}
+	return &Ack{}
 }
 
-func deserializeDatagram(data []byte) Datagram {
+func deserializeDatagram(data []byte) *Datagram {
 	// Simplified deserialization logic
-	return Datagram{}
+	return &Datagram{}
 }
 
-func serializeDatagram(d Datagram) []byte {
+func serializeDatagram(dg *Datagram) []byte {
 	// Simplified serialization logic
 	return []byte{}
 }
