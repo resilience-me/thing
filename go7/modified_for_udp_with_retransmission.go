@@ -137,13 +137,22 @@ func (cd *CentralDispatcher) ListenAndServe() {
 		packet := buffer[:n]
 		messageType := packet[0] // Assuming the first byte indicates the message type
 
-		switch messageType & 0x80 { // Check the MSB
-		case 0x00: // Server connection (MSB is 0)
+		switch messageType {
+		case 0x00: // Specific case for 0x00
 			ack := deserializeAck(packet)
 			cd.ackRegistry.routeAck(ack)
-		case 0x80: // Client connection (MSB is 1)
+		default: // All other cases
+			// Determine the value of conn based on the MSB of the messageType
+			var conn Conn
+			if messageType&0x80 == 0 {
+				// MSB is 0: Use the existing conn and addr
+				conn = Conn{conn: cd.conn, addr: addr}
+			} else {
+				// MSB is 1: Set both conn and addr to nil (empty)
+				conn = Conn{conn: nil, addr: nil}
+			}
+			
 			datagram := deserializeDatagram(packet)
-			conn := Conn{conn: cd.conn, addr: addr} // Create Conn instance
 			cd.routeToCommandHandler(datagram, conn)
 		}
 	}
