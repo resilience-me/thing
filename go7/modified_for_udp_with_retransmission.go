@@ -150,12 +150,12 @@ func (cd *CentralDispatcher) ListenAndServe() {
 			}
 			
 			datagram := deserializeDatagram(packet)
-			cd.routeToCommandHandler(datagram, conn)
+			cd.routeToCommandHandler(&datagram, conn)
 		}
 	}
 }
 
-func (cd *CentralDispatcher) routeToCommandHandler(datagram Datagram, conn Conn) {
+func (cd *CentralDispatcher) routeToCommandHandler(datagram *Datagram, conn Conn) {
 	// Create the session inside the command handler
 	session := &Session{datagram, conn, cd.ackRegistry}
 
