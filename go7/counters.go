@@ -4,42 +4,40 @@ import (
 	"fmt"
 )
 
-// ValidateCounter checks if the datagram's counter is valid by comparing it to the last known counter.
+// ValidateCounter checks if the datagram's counter is valid by comparing it to the last known counter for client connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
 func ValidateCounter(datagram *Datagram) error {
-	var lastCounter uint32
-	var counterError error
-
-	// Determine the correct counter based on the command type
-	if datagram.Command == 0x00 { // ACK datagram
-	} else if datagram.Command&0x80 == 0 { // MSB is 0: Server connection
-		lastCounter, counterError = GetCounterIn(datagram)
-	} else { // MSB is 1: Client connection
-		lastCounter, counterError = GetCounter(datagram)
+	prevCounter, err := GetCounter(datagram)
+	if err != nil {
+		return fmt.Errorf("error retrieving counter: %v", err)
 	}
 
-	if counterError != nil {
-		return fmt.Errorf("error retrieving counter: %v", counterError)
+	if datagram.Counter <= prevCounter {
+		return fmt.Errorf("replay detected or old datagram: Counter %d is not greater than the last seen counter %d", datagram.Counter, prevCounter)
 	}
 
-	// Validate the counter to prevent replay attacks
-	if datagram.Counter <= lastCounter {
-		return fmt.Errorf("replay detected or old datagram: Counter %d is not greater than the last seen counter %d", datagram.Counter, lastCounter)
+	if err := SetCounter(datagram); err != nil {
+		return fmt.Errorf("failed to set counter: %v", err)
 	}
 
-	// Set the counter to the value in the datagram to prevent replay attacks
-	if datagram.Command == 0x00 { // ACK datagram
-	} else if datagram.Command&0x80 == 0 { // Server connection
-		err := SetCounterIn(datagram)
-		if err != nil {
-			return fmt.Errorf("failed to set in counter: %v", err)
-		}
-	} else { // Client connection
-		err := SetCounter(datagram)
-		if err != nil {
-			return fmt.Errorf("failed to set counter: %v", err)
-		}
+	return nil
+}
+
+// ValidateCounterIn checks if the datagram's counter is valid by comparing it to the last known counter for server connections.
+// If valid, it sets the counter to the value in the datagram to prevent replay attacks.
+func ValidateCounterIn(datagram *Datagram) error {
+	prevCounter, err := GetCounterIn(datagram)
+	if err != nil {
+		return fmt.Errorf("error retrieving in-counter: %v", err)
 	}
 
-	return nil // Counter is valid and set
+	if datagram.Counter <= prevCounter {
+		return fmt.Errorf("replay detected or old datagram: Counter %d is not greater than the last seen in-counter %d", datagram.Counter, prevCounter)
+	}
+
+	if err := SetCounterIn(datagram); err != nil {
+		return fmt.Errorf("failed to set in-counter: %v", err)
+	}
+
+	return nil
 }
