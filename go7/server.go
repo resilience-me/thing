@@ -33,11 +33,21 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			continue
 		}
 
-		// Validate the datagram
-		if err := ValidateDatagram(buffer[:n], datagram); err != nil {
-			fmt.Printf("Datagram validation failed: %v\n", err)
-			continue
-		}
+	        // Validate the datagram based on its type (client or server)
+	        if datagram.Command&0x80 == 0 { // Server session if MSB is 0
+	            if err := validateServerDatagram(buffer, datagram); err != nil {
+	                fmt.Printf("Error validating server datagram: %v\n", err)
+	                continue
+	            }
+	        } else { // Client session if MSB is 1
+	            errorMessage, err := validateClientDatagram(buffer, datagram)
+	            if err != nil {
+	                fmt.Printf("Error validating client datagram: %v\n", err)
+	                // Optionally, send an error response to the client
+	                // sendErrorResponse(errorMessage, remoteAddr)
+	                continue
+	            }
+	        }
 
 		var sessionConn *Conn = nil
 
