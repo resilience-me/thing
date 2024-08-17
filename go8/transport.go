@@ -6,21 +6,14 @@ import (
 	"time"
 )
 
-// SendContext contains the data and metadata for sending a datagram
-type SendContext struct {
-	Data            []byte
-	DestinationAddr string
-	MaxRetries      int
-}
-
 // SendWithRetry sends data with retransmission logic and continuously listens for an acknowledgment
-func SendWithRetry(ctx SendContext) error {
+func SendWithRetry(data []byte, destinationAddr string, maxRetries int) error {
 	ackChan := make(chan bool, 1)
 
 	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ctx.DestinationAddr, Port))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, Port))
 	if err != nil {
-		return fmt.Errorf("failed to resolve server address '%s': %w", ctx.DestinationAddr, err)
+		return fmt.Errorf("failed to resolve server address '%s': %w", destinationAddr, err)
 	}
 
 	// Create a new UDP connection for sending the datagram
@@ -36,9 +29,9 @@ func SendWithRetry(ctx SendContext) error {
 	retries := 0
 	delay := 1 * time.Second
 
-	for retries < ctx.MaxRetries {
+	for retries < maxRetries {
 		// Send the datagram
-		if _, err := sendConn.Write(ctx.Data); err != nil {
+		if _, err := sendConn.Write(data); err != nil {
 			return fmt.Errorf("failed to send data to server '%s': %w", addr.String(), err)
 		}
 
@@ -50,11 +43,11 @@ func SendWithRetry(ctx SendContext) error {
 		case <-time.After(delay):
 			retries++
 			delay *= 2 // Exponential backoff
-			fmt.Printf("Timeout or invalid ACK, retrying... (%d/%d)\n", retries, ctx.MaxRetries)
+			fmt.Printf("Timeout or invalid ACK, retrying... (%d/%d)\n", retries, maxRetries)
 		}
 	}
 
-	return fmt.Errorf("retransmission failed after %d attempts", ctx.MaxRetries)
+	return fmt.Errorf("retransmission failed after %d attempts", maxRetries)
 }
 
 // listenForAck continuously listens for an acknowledgment
