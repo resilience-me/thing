@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *SessionManager) {
+func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 	buffer := make([]byte, 389) // Buffer sized according to datagram size
 
 	for {
@@ -22,33 +22,29 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 
 		fmt.Printf("Received %d bytes from %s\n", n, remoteAddr.String())
 
-		// Parse the datagram
-		datagram := parseDatagram(buffer)
-
-		// Handle ACK datagrams separately
-		if datagram.Command == 0x00 {
-			ackKey := generateAckKey(datagram.Username, datagram.PeerUsername, datagram.PeerServerAddress, datagram.Counter)
-			transport.RouteAck(ackKey)
-			fmt.Println("ACK received and routed.")
+		// Send an acknowledgment back to the client as soon as possible
+		if err := SendAck(conn, remoteAddr); err != nil {
+			fmt.Printf("Failed to send ACK: %v\n", err)
 			continue
 		}
 
-		// Validate the datagram
-		if err := ValidateDatagram(dg); err != nil {
+		// Parse the datagram
+		datagram := parseDatagram(buffer)
+
+		// Application layer validation
+		if err := ValidateDatagram(buffer, datagram); err != nil {
 			fmt.Printf("Error validating datagram: %v\n", err)
 			continue
 		}
 
-		// Validate the datagram
-		alreadyInQueue, err := ValidateAndIncrementCounter(dg)
-		if err != nil {
+		// Validate and increment counter (for business logic, not transport)
+		if _, err := ValidateAndIncrementCounter(datagram); err != nil {
 			fmt.Printf("Error validating counter: %v\n", err)
 			continue
 		}
 
+		// Only create a Conn if this is a client connection
 		var sessionConn *Conn
-
-		// Determine if the datagram is from a server or client
 		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
 			sessionConn = &Conn{
 				conn: conn,
@@ -56,27 +52,10 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			}
 		}
 
-		// Send ack for datagram based on its type (client or server)
-		if datagram.Command&0x80 == 0 { // Server session if MSB is 0
-			// Send ACK to server
-			if err := SendServerAck(datagram); err != nil {
-				fmt.Printf("Failed to send server ACK: %v\n", err)
-			}
-		} else { // Client session if MSB is 1
-			// Send an ACK with a success status to the client
-			if err := SendClientAck(sessionConn); err != nil {
-				fmt.Printf("Failed to send client ACK: %v\n", err)
-			}
-		}
-
-		if alreadyInQueue {
-			continue
-		} 
-		// Create a new session with the appropriate Conn
+		// Create a new session with the appropriate Conn (which could be nil)
 		session := &Session{
-			Datagram:  datagram,
-			Conn:      sessionConn,
-			Transport: transport, // Associate the Transport instance with the session
+			Datagram: datagram,
+			Conn:     sessionConn,
 		}
 
 		// Route the session through the SessionManager
