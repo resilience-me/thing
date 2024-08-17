@@ -6,14 +6,18 @@ import (
 
 // Retry levels based on importance
 const (
-	LowImportance    = 5  // 5 retries for low importance messages
-	HighImportance   = 12 // 12 retries for high importance messages
+	LowImportance    = 5  // 5 retries for standard messages
+	HighImportance   = 12 // 12 retries for priority messages
 )
 
-// Wrapper for SendWithRetry using a fixed port from config
+// Default Send with standard importance (5 retries)
 func Send(data []byte, destinationAddr string) error {
-	const maxRetries = 5
-	return SendWithRetry(data, destinationAddr, config.Port, maxRetries)
+	return SendWithRetry(data, destinationAddr, config.Port, LowImportance)
+}
+
+// Send with priority importance (12 retries)
+func SendPriority(data []byte, destinationAddr string) error {
+	return SendWithRetry(data, destinationAddr, config.Port, HighImportance)
 }
 
 // Wrapper for SendAck that takes a Conn struct
