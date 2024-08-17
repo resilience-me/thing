@@ -20,7 +20,7 @@ func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int
 	// Generate a unique 32-bit identifier for this transmission
 	identifier := atomic.AddUint32(&identifierCounter, 1)
 
-	// Convert the identifier to a 4-byte slice (organizationally placed here for clarity)
+	// Convert the identifier to a 4-byte slice
 	idBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(idBytes, identifier)
 
