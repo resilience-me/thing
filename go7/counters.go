@@ -12,7 +12,6 @@ func ValidateCounter(datagram *Datagram) error {
 
 	// Determine the correct counter based on the command type
 	if datagram.Command == 0x00 { // ACK datagram
-		lastCounter, counterError = GetCounterOut(datagram)
 	} else if datagram.Command&0x80 == 0 { // MSB is 0: Server connection
 		lastCounter, counterError = GetCounterIn(datagram)
 	} else { // MSB is 1: Client connection
