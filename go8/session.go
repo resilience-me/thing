@@ -11,9 +11,8 @@ type Conn struct {
 }
 
 type Session struct {
-	Datagram    *Datagram
-	Conn        *Conn        // Pointer to Conn; can be nil
-	Transport   *Transport   // Reference to Transport
+	Datagram *Datagram // The datagram associated with this session
+	Conn     *Conn     // Pointer to Conn; can be nil if not applicable
 }
 
 // SessionManager manages sessions and their state
