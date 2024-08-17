@@ -24,8 +24,8 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 
 		// Create a Conn object for the acknowledgment and potential session
 		remoteConn := &Conn{
-			conn: conn,
-			addr: remoteAddr,
+			UDPConn: conn,
+			addr:    remoteAddr,
 		}
 
 		// Send an acknowledgment back to the client as soon as possible
@@ -48,7 +48,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 			if err != nil {
 				fmt.Printf("Error validating client datagram: %v\n", err)
 				// Send an error response to the client
-				sendErrorResponse(errorMessage, remoteConn)
+				SendErrorResponse(errorMessage, remoteConn)
 				continue
 			}
 		}
