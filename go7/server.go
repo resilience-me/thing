@@ -22,18 +22,20 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 
 		fmt.Printf("Received %d bytes from %s\n", n, remoteAddr.String())
 
-		// Validate the datagram
-		datagram, err := ValidateDatagram(buffer[:n])
-		if err != nil {
-			fmt.Printf("Datagram validation failed: %v\n", err)
-			continue
-		}
+		// Parse the datagram
+		datagram := parseDatagram(buffer)
 
 		// Handle ACK datagrams separately
 		if datagram.Command == 0x00 {
 			ackKey := generateAckKey(datagram.Username, datagram.PeerUsername, datagram.PeerServerAddress, datagram.Counter)
 			transport.RouteAck(ackKey)
 			fmt.Println("ACK received and routed.")
+			continue
+		}
+
+		// Validate the datagram
+		if err := ValidateDatagram(buffer[:n], datagram); err != nil {
+			fmt.Printf("Datagram validation failed: %v\n", err)
 			continue
 		}
 
