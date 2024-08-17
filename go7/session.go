@@ -1,5 +1,3 @@
-// writing together with chat gpt, work in progress
-
 package main
 
 import (
