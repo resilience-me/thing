@@ -40,7 +40,7 @@ func ValidateCounter(datagram *Datagram) error {
 	return validateClientCounter(dg) // Client session if MSB is 1
 }
 
-func updateClientCounter(datagram *Datagram) error {
+func UpdateClientCounter(datagram *Datagram) error {
 	if err := SetCounter(datagram); err != nil {
 		return fmt.Errorf("failed to set counter: %v", err)
 	}
@@ -48,17 +48,10 @@ func updateClientCounter(datagram *Datagram) error {
 	return nil
 }
 
-func updateServerCounter(datagram *Datagram) error {
+func UpdateServerCounter(datagram *Datagram) error {
 	if err := SetCounterIn(datagram); err != nil {
 		return fmt.Errorf("failed to set in-counter: %v", err)
 	}
 
 	return nil
-}
-
-func UpdateCounter(datagram *Datagram) error {
-	if datagram.Command&0x80 == 0 { // Server session if MSB is 0
-		return updateServerCounter(dg)
-	}
-	return updateClientCounter(dg) // Client session if MSB is 1
 }
