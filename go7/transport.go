@@ -135,10 +135,10 @@ func send(data []byte, destinationAddr string) error {
 	return nil
 }
 
-// SendAck is a wrapper around the lower-level send function, specifically for ACKs
+// SendServerAck sends an ACK datagram
 func SendServerAck(datagram Datagram) error {
-	// placeholder, add code here later
-	return send(data, destinationAddr)
+	ackDatagram := generateAndSignAckDatagram(datagram)
+	return send(ackDatagram, datagram.PeerServerAddress)
 }
 
 // SendClientAck sends an ACK with a status and an optional message to the client.
