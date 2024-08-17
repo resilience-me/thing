@@ -41,17 +41,29 @@ func ValidateCounter(datagram *Datagram) error {
 }
 
 func UpdateClientCounter(datagram *Datagram) error {
+	prevCounter, err := GetCounter(datagram)
+	if err != nil {
+		return fmt.Errorf("error retrieving counter: %v", err)
+	}
+	if datagram.Counter == prevCounter {
+		return nil
+	}
 	if err := SetCounter(datagram); err != nil {
 		return fmt.Errorf("failed to set counter: %v", err)
 	}
-
 	return nil
 }
 
 func UpdateServerCounter(datagram *Datagram) error {
+	prevCounter, err := GetCounterIn(datagram)
+	if err != nil {
+		return fmt.Errorf("error retrieving in-counter: %v", err)
+	}
+	if datagram.Counter == prevCounter {
+		return nil
+	}
 	if err := SetCounterIn(datagram); err != nil {
 		return fmt.Errorf("failed to set in-counter: %v", err)
 	}
-
 	return nil
 }
