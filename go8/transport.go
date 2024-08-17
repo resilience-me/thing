@@ -6,60 +6,50 @@ import (
 	"time"
 )
 
-// SendWithRetry sends data with retransmission logic and continuously listens for an acknowledgment
-func SendWithRetry(data []byte, destinationAddr string, maxRetries int) error {
-	ackChan := make(chan bool, 1)
-
-	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, Port))
-	if err != nil {
-		return fmt.Errorf("failed to resolve server address '%s': %w", destinationAddr, err)
-	}
-
-	// Create a new UDP connection for sending the datagram
-	sendConn, err := net.DialUDP("udp", nil, addr)
-	if err != nil {
-		return fmt.Errorf("failed to create UDP connection: %w", err)
-	}
-	defer sendConn.Close()
-
-	// Start a goroutine to listen for the acknowledgment
-	go listenForAck(sendConn, ackChan)
-
+// SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
+func SendWithRetry(ctx SendContext) error {
 	retries := 0
 	delay := 1 * time.Second
 
-	for retries < maxRetries {
+	// Resolve the destination address to a UDP address
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ctx.DestinationAddr, Port))
+	if err != nil {
+		return fmt.Errorf("failed to resolve server address '%s': %w", ctx.DestinationAddr, err)
+	}
+
+	for retries < ctx.MaxRetries {
+		// Create a new UDP connection for sending the datagram
+		sendConn, err := net.DialUDP("udp", nil, addr)
+		if err != nil {
+			return fmt.Errorf("failed to create UDP connection: %w", err)
+		}
+
 		// Send the datagram
-		if _, err := sendConn.Write(data); err != nil {
+		if _, err := sendConn.Write(ctx.Data); err != nil {
+			sendConn.Close()
 			return fmt.Errorf("failed to send data to server '%s': %w", addr.String(), err)
 		}
 
-		select {
-		case ackReceived := <-ackChan:
-			if ackReceived {
-				return nil // ACK received successfully, exit the function
-			}
-		case <-time.After(delay):
-			retries++
-			delay *= 2 // Exponential backoff
-			fmt.Printf("Timeout or invalid ACK, retrying... (%d/%d)\n", retries, maxRetries)
-		}
-	}
+		// Set a deadline for the read operation
+		sendConn.SetReadDeadline(time.Now().Add(delay))
 
-	return fmt.Errorf("retransmission failed after %d attempts", maxRetries)
-}
-
-// listenForAck continuously listens for an acknowledgment
-func listenForAck(conn *net.UDPConn, ackChan chan bool) {
-	for {
+		// Wait for the acknowledgment
 		ack := make([]byte, 1)
-		_, _, err := conn.ReadFromUDP(ack)
+		_, _, err = sendConn.ReadFromUDP(ack)
+		sendConn.Close()
+
 		if err == nil && ack[0] == AckByte {
-			ackChan <- true
-			return
+			// ACK received successfully
+			return nil
 		}
+
+		// No ACK or an error occurred, retry
+		retries++
+		delay *= 2 // Exponential backoff
+		fmt.Printf("Timeout or invalid ACK, retrying... (%d/%d)\n", retries, ctx.MaxRetries)
 	}
+
+	return fmt.Errorf("retransmission failed after %d attempts", ctx.MaxRetries)
 }
 
 // SendAck sends a simple acknowledgment (0xFF) using the provided Conn object
