@@ -18,24 +18,24 @@ func SendWithRetry(data []byte, destinationAddr string, maxRetries int) error {
 	}
 
 	// Create a single UDP connection for all attempts
-	sendConn, err := net.DialUDP("udp", nil, addr)
+	conn, err := net.DialUDP("udp", nil, addr)
 	if err != nil {
 		return fmt.Errorf("failed to create UDP connection: %w", err)
 	}
-	defer sendConn.Close()
+	defer conn.Close()
 
 	for retries < maxRetries {
 		// Send the datagram
-		if _, err := sendConn.Write(data); err != nil {
+		if _, err := conn.Write(data); err != nil {
 			return fmt.Errorf("failed to send data to server '%s': %w", addr.String(), err)
 		}
 
 		// Set a deadline for the read operation
-		sendConn.SetReadDeadline(time.Now().Add(delay))
+		conn.SetReadDeadline(time.Now().Add(delay))
 
 		// Wait for the acknowledgment
 		ack := make([]byte, 1)
-		_, _, err = sendConn.ReadFromUDP(ack)
+		_, _, err = conn.ReadFromUDP(ack)
 
 		if err == nil && ack[0] == AckCode {
 			// ACK received successfully
