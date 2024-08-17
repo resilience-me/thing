@@ -33,7 +33,7 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			continue
 		}
 
-		var sessionConn *Conn = nil
+		var sessionConn *Conn
 
 		// Determine if the datagram is from a server or client
 		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
@@ -43,21 +43,21 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			}
 		}
 
-	        // Validate the datagram based on its type (client or server)
-	        if datagram.Command&0x80 == 0 { // Server session if MSB is 0
-	            if err := validateServerDatagram(buffer, datagram); err != nil {
-	                fmt.Printf("Error validating server datagram: %v\n", err)
-	                continue
-	            }
-	        } else { // Client session if MSB is 1
-	            errorMessage, err := validateClientDatagram(buffer, datagram)
-	            if err != nil {
-	                fmt.Printf("Error validating client datagram: %v\n", err)
-	                // Send an error response to the client
-	                sendErrorResponse(errorMessage, sessionConn)
-	                continue
-	            }
-	        }
+		// Validate the datagram based on its type (client or server)
+		if datagram.Command&0x80 == 0 { // Server session if MSB is 0
+			if err := validateServerDatagram(buffer, datagram); err != nil {
+				fmt.Printf("Error validating server datagram: %v\n", err)
+				continue
+			}
+		} else { // Client session if MSB is 1
+			errorMessage, err := validateClientDatagram(buffer, datagram)
+			if err != nil {
+				fmt.Printf("Error validating client datagram: %v\n", err)
+				// Send an error response to the client
+				sendErrorResponse(errorMessage, sessionConn)
+				continue
+			}
+		}
 
 		// Create a new session with the appropriate Conn
 		session := &Session{
@@ -69,21 +69,17 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 		// Route the session through the SessionManager
 		sessionManager.RouteSession(session)
 
-		if datagram.Command&0x80 == 0 {
-			ackAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", datagram.PeerServerAddress, port))
-			if err != nil {
-				fmt.Printf("Failed to resolve server address: %v\n", err)
-				continue
-			}
+		// Handle server ACKs separately
+		if datagram.Command&0x80 == 0 { // Server session
 			// Generate, sign, and serialize the ACK datagram
 			ackData := generateAndSignAckDatagram(datagram)
-	
-			// Send the ACK back to the determined address
-			err = SendAck(ackData, ackAddr)
+
+			// Send the ACK back to the determined address (handled within SendAck)
+			err = SendAck(ackData, datagram.PeerServerAddress)
 			if err != nil {
-				fmt.Printf("Failed to send ACK to %s: %v\n", ackAddr.String(), err)
+				fmt.Printf("Failed to send ACK to %s: %v\n", datagram.PeerServerAddress, err)
 			} else {
-				fmt.Printf("Sent ACK to %s\n", ackAddr.String())
+				fmt.Printf("Sent ACK to %s:%d\n", datagram.PeerServerAddress, 2012)
 			}
 		}
 	}
