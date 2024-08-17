@@ -41,7 +41,7 @@ func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
     }
 
     // Validate the counter
-    if err := ValidateCounter(dg); err != nil {
+    if err := ValidateAndIncrementClientCounter(dg); err != nil {
         return "Invalid counter", fmt.Errorf("counter validation failed: %w", err)
     }
 
@@ -60,7 +60,7 @@ func validateServerDatagram(buf []byte, dg *Datagram) error {
     }
 
     // Validate the counter
-    if err := ValidateCounterIn(dg); err != nil {
+    if err := ValidateAndIncrementServerCounter(dg); err != nil {
         return fmt.Errorf("counter validation failed: %w", err)
     }
 
