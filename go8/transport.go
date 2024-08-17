@@ -7,26 +7,26 @@ import (
 )
 
 // SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
-func SendWithRetry(ctx SendContext) error {
+func SendWithRetry(data []byte, destinationAddr string, maxRetries int) error {
 	retries := 0
 	delay := 1 * time.Second
 
 	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ctx.DestinationAddr, Port))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, Port))
 	if err != nil {
-		return fmt.Errorf("failed to resolve server address '%s': %w", ctx.DestinationAddr, err)
+		return fmt.Errorf("failed to resolve server address '%s': %w", destinationAddr, err)
 	}
 
-	for retries < ctx.MaxRetries {
-		// Create a new UDP connection for sending the datagram
-		sendConn, err := net.DialUDP("udp", nil, addr)
-		if err != nil {
-			return fmt.Errorf("failed to create UDP connection: %w", err)
-		}
+	// Create a single UDP connection for all attempts
+	sendConn, err := net.DialUDP("udp", nil, addr)
+	if err != nil {
+		return fmt.Errorf("failed to create UDP connection: %w", err)
+	}
+	defer sendConn.Close()
 
+	for retries < maxRetries {
 		// Send the datagram
-		if _, err := sendConn.Write(ctx.Data); err != nil {
-			sendConn.Close()
+		if _, err := sendConn.Write(data); err != nil {
 			return fmt.Errorf("failed to send data to server '%s': %w", addr.String(), err)
 		}
 
@@ -36,9 +36,8 @@ func SendWithRetry(ctx SendContext) error {
 		// Wait for the acknowledgment
 		ack := make([]byte, 1)
 		_, _, err = sendConn.ReadFromUDP(ack)
-		sendConn.Close()
 
-		if err == nil && ack[0] == AckByte {
+		if err == nil && ack[0] == AckCode {
 			// ACK received successfully
 			return nil
 		}
@@ -46,10 +45,10 @@ func SendWithRetry(ctx SendContext) error {
 		// No ACK or an error occurred, retry
 		retries++
 		delay *= 2 // Exponential backoff
-		fmt.Printf("Timeout or invalid ACK, retrying... (%d/%d)\n", retries, ctx.MaxRetries)
+		fmt.Printf("Timeout or invalid ACK, retrying... (%d/%d)\n", retries, maxRetries)
 	}
 
-	return fmt.Errorf("retransmission failed after %d attempts", ctx.MaxRetries)
+	return fmt.Errorf("retransmission failed after %d attempts", maxRetries)
 }
 
 // SendAck sends a simple acknowledgment (0xFF) using the provided Conn object
