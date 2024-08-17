@@ -1,19 +1,28 @@
-package udpr
+package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"net"
+	"sync/atomic"
 	"time"
 )
 
-const (
-	AckCode = 0xFF // Acknowledgment code used to confirm data receipt over UDP
-)
+// Global counter for generating unique 32-bit identifiers
+var identifierCounter uint32
 
 // SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
 func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int) error {
 	retries := 0
 	delay := 1 * time.Second
+
+	// Generate a unique 32-bit identifier for this transmission
+	identifier := atomic.AddUint32(&identifierCounter, 1)
+
+	// Convert the identifier to a 4-byte slice (organizationally placed here for clarity)
+	idBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(idBytes, identifier)
 
 	// Resolve the destination address to a UDP address
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, port))
@@ -28,9 +37,12 @@ func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int
 	}
 	defer conn.Close()
 
+	// Create the packet with the 4-byte identifier
+	packet := append(idBytes, data...)
+
 	for retries < maxRetries {
-		// Send the datagram
-		if _, err := conn.Write(data); err != nil {
+		// Send the datagram with the identifier
+		if _, err := conn.Write(packet); err != nil {
 			return fmt.Errorf("failed to send data to server '%s': %w", addr.String(), err)
 		}
 
@@ -38,15 +50,15 @@ func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int
 		conn.SetReadDeadline(time.Now().Add(delay))
 
 		// Wait for the acknowledgment
-		ack := make([]byte, 1)
+		ack := make([]byte, 4)
 		_, _, err = conn.ReadFromUDP(ack)
 
-		if err == nil && ack[0] == AckCode {
-			// ACK received successfully
+		if err == nil && bytes.Equal(ack, idBytes) {
+			// Correct ACK received successfully
 			return nil
 		}
 
-		// No ACK or an error occurred, retry
+		// No correct ACK or an error occurred, retry
 		retries++
 		delay *= 2 // Exponential backoff
 		fmt.Printf("Timeout or invalid ACK, retrying... (%d/%d)\n", retries, maxRetries)
@@ -55,11 +67,10 @@ func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int
 	return fmt.Errorf("retransmission failed after %d attempts", maxRetries)
 }
 
-// SendAck sends a simple acknowledgment (0xFF) using the provided Conn object
-func SendAck(conn *Conn) error {
-	ack := []byte{AckCode} // ACK value
-
-	if _, err := conn.WriteToUDP(ack, conn.addr); err != nil {
+// SendAck sends a simple acknowledgment with the byte slice identifier
+func SendAck(conn *net.UDPConn, addr *net.UDPAddr, idBytes []byte) error {
+	// Directly send the identifier as the ACK
+	if _, err := conn.WriteToUDP(idBytes, addr); err != nil {
 		return fmt.Errorf("failed to send ACK: %w", err)
 	}
 	return nil
