@@ -141,26 +141,12 @@ func SendServerAck(datagram Datagram) error {
 	return send(ackDatagram, datagram.PeerServerAddress)
 }
 
-// SendClientAck sends a basic ACK to the client.
+// SendClientAck sends an ACK to the client.
 func SendClientAck(conn *Conn) error {
-	ackStatus := []byte{0x80} // Base ACK value
+	ackStatus := []byte{0x80} // ACK value
 
 	if _, err := conn.conn.WriteToUDP(ackStatus, conn.addr); err != nil {
 		return fmt.Errorf("failed to send client ACK: %w", err)
 	}
 	return nil
 }
-
-// SendClientAckWithError sends an ACK with an error status and an optional message to the client.
-func SendClientAckWithError(conn *Conn, message string) error {
-	ackStatus := []byte{0x81} // ACK value with error
-
-	// Combine the ACK status and message
-	ackData := append(ackStatus, []byte(message)...)
-
-	if _, err := conn.conn.WriteToUDP(ackData, conn.addr); err != nil {
-		return fmt.Errorf("failed to send client ACK with error: %w", err)
-	}
-	return nil
-}
-
