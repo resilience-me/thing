@@ -55,7 +55,7 @@ func SendWithRetry(data []byte, destinationAddr string, maxRetries int) error {
 func SendAck(conn *Conn) error {
 	ack := []byte{AckCode} // ACK value
 
-	if _, err := conn.conn.WriteToUDP(ack, conn.addr); err != nil {
+	if _, err := conn.WriteToUDP(ack, conn.addr); err != nil {
 		return fmt.Errorf("failed to send ACK: %w", err)
 	}
 	return nil
