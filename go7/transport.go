@@ -76,7 +76,7 @@ func SendWithRetry(ctx SendContext) error {
 	delay := 1 * time.Second
 
 	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ctx.DestinationAddr, 2012))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ctx.DestinationAddr, Port))
 	if err != nil {
 		return fmt.Errorf("failed to resolve server address '%s': %w", ctx.DestinationAddr, err)
 	}
@@ -115,7 +115,7 @@ func SendWithRetry(ctx SendContext) error {
 // send is a lower-level function that sends data to a specified address
 func send(data []byte, destinationAddr string) error {
 	// Resolve the destination address using the provided address
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, 2012))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, Port))
 	if err != nil {
 		return fmt.Errorf("failed to resolve server address '%s': %w", destinationAddr, err)
 	}
