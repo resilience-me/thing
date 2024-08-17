@@ -66,28 +66,3 @@ func validateServerDatagram(buf []byte, dg *Datagram) error {
 
     return nil
 }
-
-// ValidateDatagram parses and validates the received datagram based on its type (client or server)
-// It also validates the counter to prevent replay attacks.
-func ValidateDatagram(buf []byte, dg *Datagram) error {
-
-	// Validate the datagram based on its type (client or server)
-	if dg.Command&0x80 == 0 { // Server session if MSB is 0
-		if err := validateServerDatagram(buf, dg); err != nil {
-			return fmt.Errorf("error validating server datagram: %v", err)
-		}
-	} else { // Client session if MSB is 1
-		errorMessage, err := validateClientDatagram(buf, dg)
-		if err != nil {
-			return fmt.Errorf("error during client datagram validation: %v", err)
-		}
-	}
-
-	// Validate the counter to prevent replay attacks
-	if err := ValidateCounter(dg); err != nil {
-		return fmt.Errorf("invalid counter detected: %v", err)
-	}
-
-	// Return the validated datagram
-	return nil
-}
