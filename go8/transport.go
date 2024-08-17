@@ -69,11 +69,11 @@ func listenForAck(conn *net.UDPConn, ackChan chan bool) {
 	}
 }
 
-// SendAck sends a simple acknowledgment (0x00) to the specified address
-func SendAck(conn *net.UDPConn, addr *net.UDPAddr) error {
+// SendAck sends a simple acknowledgment (0x00) using the provided Conn object
+func SendAck(conn *Conn) error {
 	ack := []byte{AckByte} // ACK value
 
-	if _, err := conn.WriteToUDP(ack, addr); err != nil {
+	if _, err := conn.conn.WriteToUDP(ack, conn.addr); err != nil {
 		return fmt.Errorf("failed to send ACK: %w", err)
 	}
 	return nil
