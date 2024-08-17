@@ -49,13 +49,23 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 				fmt.Printf("Error validating server datagram: %v\n", err)
 				continue
 			}
+			// Send ACK to server
+			if err := SendServerAck(datagram); err != nil {
+				fmt.Printf("Failed to send server ACK: %v\n", err)
+			}
 		} else { // Client session if MSB is 1
 			errorMessage, err := validateClientDatagram(buffer, datagram)
 			if err != nil {
 				fmt.Printf("Error validating client datagram: %v\n", err)
-				// Send an error response to the client
-				sendErrorResponse(errorMessage, sessionConn)
+				// Send an ACK with an error status and message to the client
+				if err := SendClientAck(sessionConn, false, errorMessage); err != nil {
+					fmt.Printf("Failed to send client error ACK: %v\n", err)
+				}
 				continue
+			}
+			// Send an ACK with a success status to the client
+			if err := SendClientAck(sessionConn, true, ""); err != nil {
+				fmt.Printf("Failed to send client success ACK: %v\n", err)
 			}
 		}
 
@@ -68,19 +78,5 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 
 		// Route the session through the SessionManager
 		sessionManager.RouteSession(session)
-
-		// Handle server ACKs separately
-		if datagram.Command&0x80 == 0 { // Server session
-			// Generate, sign, and serialize the ACK datagram
-			ackData := generateAndSignAckDatagram(datagram)
-
-			// Send the ACK back to the determined address (handled within SendAck)
-			err = SendAck(ackData, datagram.PeerServerAddress)
-			if err != nil {
-				fmt.Printf("Failed to send ACK to %s: %v\n", datagram.PeerServerAddress, err)
-			} else {
-				fmt.Printf("Sent ACK to %s:%d\n", datagram.PeerServerAddress, Port)
-			}
-		}
 	}
 }
