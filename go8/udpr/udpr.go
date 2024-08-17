@@ -11,12 +11,12 @@ const (
 )
 
 // SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
-func SendWithRetry(data []byte, destinationAddr string, maxRetries int) error {
+func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int) error {
 	retries := 0
 	delay := 1 * time.Second
 
 	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, Port))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, port))
 	if err != nil {
 		return fmt.Errorf("failed to resolve server address '%s': %w", destinationAddr, err)
 	}
