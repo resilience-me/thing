@@ -33,6 +33,16 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			continue
 		}
 
+		var sessionConn *Conn = nil
+
+		// Determine if the datagram is from a server or client
+		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
+			sessionConn = &Conn{
+				conn: conn,
+				addr: remoteAddr,
+			}
+		}
+
 	        // Validate the datagram based on its type (client or server)
 	        if datagram.Command&0x80 == 0 { // Server session if MSB is 0
 	            if err := validateServerDatagram(buffer, datagram); err != nil {
@@ -44,20 +54,10 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 	            if err != nil {
 	                fmt.Printf("Error validating client datagram: %v\n", err)
 	                // Optionally, send an error response to the client
-	                // sendErrorResponse(errorMessage, remoteAddr)
+	                sendErrorResponse(errorMessage, sessionConn)
 	                continue
 	            }
 	        }
-
-		var sessionConn *Conn = nil
-
-		// Determine if the datagram is from a server or client
-		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
-			sessionConn = &Conn{
-				conn: conn,
-				addr: remoteAddr,
-			}
-		}
 
 		// Create a new session with the appropriate Conn
 		session := &Session{
