@@ -1,9 +1,13 @@
-package main
+package udpr
 
 import (
 	"fmt"
 	"net"
 	"time"
+)
+
+const (
+	AckCode = 0xFF // Acknowledgment code used to confirm data receipt over UDP
 )
 
 // SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
