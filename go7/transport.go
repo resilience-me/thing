@@ -139,3 +139,19 @@ func send(data []byte, destinationAddr string) error {
 func SendAck(data []byte, destinationAddr string) error {
 	return send(data, destinationAddr)
 }
+
+// SendClientAck sends an ACK with a status and an optional message to the client.
+func SendClientAck(conn *Conn, success bool, message string) error {
+	var ackStatus byte = 0x80 // Base ACK value
+
+	if !success {
+		ackStatus |= 0x01 // If there's an error, set the LSB to 1
+	}
+
+	ackData := append([]byte{ackStatus}, []byte(message)...) // Initialize and append message if provided
+
+	if _, err := conn.conn.WriteToUDP(ackData, conn.addr); err != nil {
+		return fmt.Errorf("failed to send client ACK: %w", err)
+	}
+	return nil
+}
