@@ -39,6 +39,13 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			continue
 		}
 
+		// Validate the datagram
+		alreadyInQueue, err := ValidateAndIncrementCounter(dg)
+		if err != nil {
+			fmt.Printf("Error validating counter: %v\n", err)
+			continue
+		}
+
 		var sessionConn *Conn
 
 		// Determine if the datagram is from a server or client
@@ -62,11 +69,7 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			}
 		}
 
-		inQueue, err := isAlreadyQueued(datagram)
-		if err != nil {
-			continue	
-		}
-		if inQueue {
+		if alreadyInQueue {
 			continue
 		} 
 		// Create a new session with the appropriate Conn
