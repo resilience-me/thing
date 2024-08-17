@@ -62,6 +62,13 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			}
 		}
 
+		inQueue, err := isAlreadyQueued(datagram)
+		if err != nil {
+			continue	
+		}
+		if inQueue {
+			continue
+		} 
 		// Create a new session with the appropriate Conn
 		session := &Session{
 			Datagram:  datagram,
