@@ -49,10 +49,6 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 				fmt.Printf("Error validating server datagram: %v\n", err)
 				continue
 			}
-			// Send ACK to server
-			if err := SendServerAck(datagram); err != nil {
-				fmt.Printf("Failed to send server ACK: %v\n", err)
-			}
 		} else { // Client session if MSB is 1
 			errorMessage, err := validateClientDatagram(buffer, datagram)
 			if err != nil {
@@ -63,6 +59,15 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 				}
 				continue
 			}
+		}
+
+		// Send ack for datagram based on its type (client or server)
+		if datagram.Command&0x80 == 0 { // Server session if MSB is 0
+			// Send ACK to server
+			if err := SendServerAck(datagram); err != nil {
+				fmt.Printf("Failed to send server ACK: %v\n", err)
+			}
+		} else { // Client session if MSB is 1
 			// Send an ACK with a success status to the client
 			if err := SendClientAck(sessionConn, true, ""); err != nil {
 				fmt.Printf("Failed to send client success ACK: %v\n", err)
