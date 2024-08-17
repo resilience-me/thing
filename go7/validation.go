@@ -40,11 +40,6 @@ func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
         return "Error verifying HMAC", errors.New("HMAC verification failed")
     }
 
-    // Validate the counter
-    if err := ValidateAndIncrementClientCounter(dg); err != nil {
-        return "Invalid counter", fmt.Errorf("counter validation failed: %w", err)
-    }
-
     return "", nil
 }
 
@@ -57,11 +52,6 @@ func validateServerDatagram(buf []byte, dg *Datagram) error {
 
     if !verifyHMAC(buf, secretKey) {
         return errors.New("HMAC verification failed")
-    }
-
-    // Validate the counter
-    if err := ValidateAndIncrementServerCounter(dg); err != nil {
-        return fmt.Errorf("counter validation failed: %w", err)
     }
 
     return nil
