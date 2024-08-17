@@ -9,7 +9,7 @@ import (
 func SendSuccessResponse(data []byte, conn *Conn) error {
     response := append([]byte{0}, data...) // Combine success indicator and message
 
-    if _, err := conn.conn.WriteToUDP(response, conn.addr); err != nil { // Send combined response using the stored UDP connection and address
+    if _, err := conn.WriteToUDP(response, conn.addr); err != nil { // Send combined response using the stored UDP connection and address
         return fmt.Errorf("error sending success response: %w", err) // Return detailed error
     }
 
@@ -20,7 +20,7 @@ func SendSuccessResponse(data []byte, conn *Conn) error {
 func SendErrorResponse(message string, conn *Conn) error {
     response := append([]byte{1}, []byte(message)...) // Combine error indicator (e.g., '1') and message
 
-    if _, err := conn.conn.WriteToUDP(response, conn.addr); err != nil { // Send combined response using the stored UDP connection and address
+    if _, err := conn.WriteToUDP(response, conn.addr); err != nil { // Send combined response using the stored UDP connection and address
         return fmt.Errorf("error sending error response: %w", err) // Return detailed error
     }
 
