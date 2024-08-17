@@ -31,18 +31,16 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 
 		// Handle ACK datagrams separately
 		if datagram.Command == 0x00 {
-			peerAccount := PeerAccount{
-				Username:      datagram.PeerUsername,
-				ServerAddress: datagram.PeerServerAddress,
-			}
-			transport.RouteAck(datagram.Username, peerAccount)
+			ackKey := generateAckKey(datagram.Username, datagram.PeerUsername, datagram.PeerServerAddress, datagram.Counter)
+			transport.RouteAck(ackKey)
 			fmt.Println("ACK received and routed.")
 			continue
 		}
 
 		var sessionConn *Conn = nil
 
-		if datagram.Command&0x80 == 1 {
+		// Determine if the datagram is from a server or client
+		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
 			sessionConn = &Conn{
 				conn: conn,
 				addr: remoteAddr,
@@ -61,14 +59,13 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 
 		// Determine the ACK address
 		var ackAddr *net.UDPAddr
-
-		if datagram.Command&0x80 == 1 {
+		if datagram.Command&0x80 == 0 { // Server connection
 			ackAddr, err = net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", datagram.PeerServerAddress, port))
 			if err != nil {
 				fmt.Printf("Failed to resolve server address: %v\n", err)
 				continue
 			}
-		} else {
+		} else { // Client connection
 			ackAddr = remoteAddr
 		}
 
