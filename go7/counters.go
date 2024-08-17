@@ -31,3 +31,11 @@ func ValidateServerCounter(datagram *Datagram) error {
 
 	return nil
 }
+
+// Validate the counter based on its type (client or server)
+func ValidateCounter(datagram *Datagram) error {
+	if datagram.Command&0x80 == 0 { // Server session if MSB is 0
+		return ValidateServerCounter(dg)
+	}
+	return ValidateClientCounter(dg) // Client session if MSB is 1
+}
