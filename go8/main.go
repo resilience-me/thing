@@ -6,8 +6,7 @@ import (
 )
 
 func main() {
-	// Initialize the necessary components
-	transport := NewTransport()
+	// Initialize the session manager
 	sessionManager := NewSessionManager()
 
 	// Set up the UDP server
@@ -23,5 +22,5 @@ func main() {
 	defer conn.Close()
 
 	// Start the server loop
-	runServerLoop(conn, transport, sessionManager)
+	runServerLoop(conn, sessionManager)
 }
