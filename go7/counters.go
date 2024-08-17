@@ -41,3 +41,30 @@ func ValidateAndIncrementServerCounter(datagram *Datagram) error {
 	}
 	return nil
 }
+
+func CheckClientCounterParity(datagram *Datagram) (bool, error) {
+	prevCounter, err := GetCounter(datagram)
+	if err != nil {
+		return false, fmt.Errorf("error retrieving counter: %v", err)
+	}
+	if datagram.Counter == prevCounter {
+		return true, nil
+	}
+}
+
+func CheckServerCounterParity(datagram *Datagram) (bool, error) {
+	prevCounter, err := GetCounterIn(datagram)
+	if err != nil {
+		return false, fmt.Errorf("error retrieving in-counter: %v", err)
+	}
+	if datagram.Counter == prevCounter {
+		return true, nil
+	}
+}
+
+func CheckCounterParity(dg *Datagram) (bool, error) {
+	if dg.Command&0x80 == 0 { // Server session if MSB is 0
+		return CheckServerCounterParity(dg)
+	} 
+	return CheckClientCounterParity(dg) // Client session if MSB is 1
+}
