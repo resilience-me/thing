@@ -6,13 +6,13 @@ import (
 )
 
 type Conn struct {
-	conn *net.UDPConn  // Connection used to send/receive datagrams
-	addr *net.UDPAddr  // Source address from where the datagram was received
+	*net.UDPConn         // Embedding UDPConn to promote its methods
+	addr *net.UDPAddr    // Keeping addr as a separate field
 }
 
 type Session struct {
 	Datagram *Datagram // The datagram associated with this session
-	*Conn              // Embedded Conn; can be nil if not applicable
+	Conn     *Conn     // Pointer to Conn; can be nil if not applicable
 }
 
 // SessionManager manages sessions and their state
