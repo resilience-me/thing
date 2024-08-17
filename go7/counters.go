@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-// ValidateCounter checks if the datagram's counter is valid by comparing it to the last known counter for client connections.
+// ValidateAndIncrementClientCounter checks if the datagram's counter is valid by comparing it to the last known counter for client connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
-func ValidateCounter(datagram *Datagram) error {
+func ValidateAndIncrementClientCounter(datagram *Datagram) error {
 	prevCounter, err := GetCounter(datagram)
 	if err != nil {
 		return fmt.Errorf("error retrieving counter: %v", err)
@@ -23,9 +23,9 @@ func ValidateCounter(datagram *Datagram) error {
 	return nil
 }
 
-// ValidateCounterIn checks if the datagram's counter is valid by comparing it to the last known counter for server connections.
+// ValidateAndIncrementServerCounter checks if the datagram's counter is valid by comparing it to the last known counter for server connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
-func ValidateCounterIn(datagram *Datagram) error {
+func ValidateAndIncrementServerCounter(datagram *Datagram) error {
 	prevCounter, err := GetCounterIn(datagram)
 	if err != nil {
 		return fmt.Errorf("error retrieving in-counter: %v", err)
