@@ -62,7 +62,7 @@ func listenForAck(conn *net.UDPConn, ackChan chan bool) {
 	}
 }
 
-// SendAck sends a simple acknowledgment (0x00) using the provided Conn object
+// SendAck sends a simple acknowledgment (0xFF) using the provided Conn object
 func SendAck(conn *Conn) error {
 	ack := []byte{AckByte} // ACK value
 
