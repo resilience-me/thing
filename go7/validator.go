@@ -24,7 +24,7 @@ func checkUserAndPeerExist(dg *Datagram) (string, error) {
     return "", nil // No error, directories exist
 }
 
-// validateClientDatagram validates the client datagram
+// validateClientDatagram validates the client datagram and checks the counter
 func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
     errorMessage, err := checkUserAndPeerExist(dg)
     if err != nil {
@@ -40,10 +40,15 @@ func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
         return "Error verifying HMAC", errors.New("HMAC verification failed")
     }
 
+    // Validate the counter
+    if err := ValidateCounter(dg); err != nil {
+        return "Invalid counter", fmt.Errorf("counter validation failed: %w", err)
+    }
+
     return "", nil
 }
 
-// validateServerDatagram validates the server datagram
+// validateServerDatagram validates the server datagram and checks the counter
 func validateServerDatagram(buf []byte, dg *Datagram) error {
     secretKey, err := loadServerSecretKey(dg)
     if err != nil {
@@ -52,6 +57,11 @@ func validateServerDatagram(buf []byte, dg *Datagram) error {
 
     if !verifyHMAC(buf, secretKey) {
         return errors.New("HMAC verification failed")
+    }
+
+    // Validate the counter
+    if err := ValidateCounterIn(dg); err != nil {
+        return fmt.Errorf("counter validation failed: %w", err)
     }
 
     return nil
