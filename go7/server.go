@@ -33,6 +33,11 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			continue
 		}
 
+		// Validate the counter
+		if err := ValidateCounter(dg); err != nil {
+			continue
+		}
+
 		var sessionConn *Conn
 
 		// Determine if the datagram is from a server or client
