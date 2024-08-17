@@ -136,7 +136,8 @@ func send(data []byte, destinationAddr string) error {
 }
 
 // SendAck is a wrapper around the lower-level send function, specifically for ACKs
-func SendAck(data []byte, destinationAddr string) error {
+func SendServerAck(datagram Datagram) error {
+	// placeholder, add code here later
 	return send(data, destinationAddr)
 }
 
