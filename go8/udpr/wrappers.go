@@ -12,5 +12,5 @@ func Send(data []byte, destinationAddr string) error {
 
 // Wrapper for SendAck that takes a Conn struct
 func Ack(idBytes []byte, c *Conn) error {
-	return SendAck(c.UDPConn, c.addr, idBytes)
+	return SendAck(idBytes, c.UDPConn, c.addr)
 }
