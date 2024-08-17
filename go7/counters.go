@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-// ValidateClientCounter checks if the datagram's counter is valid by comparing it to the last known counter for client connections.
+// validateClientCounter checks if the datagram's counter is valid by comparing it to the last known counter for client connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
-func ValidateClientCounter(datagram *Datagram) error {
+func validateClientCounter(datagram *Datagram) error {
 	prevCounter, err := GetCounter(datagram)
 	if err != nil {
 		return fmt.Errorf("error retrieving counter: %v", err)
@@ -18,9 +18,9 @@ func ValidateClientCounter(datagram *Datagram) error {
 	return nil
 }
 
-// ValidateServerCounter checks if the datagram's counter is valid by comparing it to the last known counter for server connections.
+// validateServerCounter checks if the datagram's counter is valid by comparing it to the last known counter for server connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
-func ValidateServerCounter(datagram *Datagram) error {
+func validateServerCounter(datagram *Datagram) error {
 	prevCounter, err := GetCounterIn(datagram)
 	if err != nil {
 		return fmt.Errorf("error retrieving in-counter: %v", err)
@@ -35,7 +35,30 @@ func ValidateServerCounter(datagram *Datagram) error {
 // Validate the counter based on its type (client or server)
 func ValidateCounter(datagram *Datagram) error {
 	if datagram.Command&0x80 == 0 { // Server session if MSB is 0
-		return ValidateServerCounter(dg)
+		return validateServerCounter(dg)
 	}
-	return ValidateClientCounter(dg) // Client session if MSB is 1
+	return validateClientCounter(dg) // Client session if MSB is 1
+}
+
+func updateClientCounter(datagram *Datagram) error {
+	if err := SetCounter(datagram); err != nil {
+		return fmt.Errorf("failed to set counter: %v", err)
+	}
+
+	return nil
+}
+
+func updateServerCounter(datagram *Datagram) error {
+	if err := SetCounterIn(datagram); err != nil {
+		return fmt.Errorf("failed to set in-counter: %v", err)
+	}
+
+	return nil
+}
+
+func UpdateCounter(datagram *Datagram) error {
+	if datagram.Command&0x80 == 0 { // Server session if MSB is 0
+		return updateServerCounter(dg)
+	}
+	return updateClientCounter(dg) // Client session if MSB is 1
 }
