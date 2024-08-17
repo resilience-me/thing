@@ -22,23 +22,20 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 
 		fmt.Printf("Received %d bytes from %s\n", n, remoteAddr.String())
 
+		// Create a Conn object for the acknowledgment and potential session
+		remoteConn := &Conn{
+			conn: conn,
+			addr: remoteAddr,
+		}
+
 		// Send an acknowledgment back to the client as soon as possible
-		if err := SendAck(conn, remoteAddr); err != nil {
+		if err := SendAck(remoteConn); err != nil {
 			fmt.Printf("Failed to send ACK: %v\n", err)
 			continue
 		}
 
 		// Parse the datagram
 		datagram := parseDatagram(buffer)
-
-		// Only create a Conn if this is a client connection
-		var sessionConn *Conn
-		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
-			sessionConn = &Conn{
-				conn: conn,
-				addr: remoteAddr,
-			}
-		}
 
 		// Validate the datagram based on its type (client or server)
 		if datagram.Command&0x80 == 0 { // Server session if MSB is 0
@@ -51,15 +48,19 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 			if err != nil {
 				fmt.Printf("Error validating client datagram: %v\n", err)
 				// Send an error response to the client
-				sendErrorResponse(errorMessage, sessionConn)
+				sendErrorResponse(errorMessage, remoteConn)
 				continue
 			}
 		}
 
-		// Create a new session with the appropriate Conn (which could be nil)
+		// Create a new session
 		session := &Session{
 			Datagram: datagram,
-			Conn:     sessionConn,
+		}
+
+		// If this is a client connection, associate the Conn with the session
+		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
+			session.Conn = remoteConn
 		}
 
 		// Route the session through the SessionManager
