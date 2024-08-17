@@ -35,10 +35,3 @@ func ValidateAndIncrementServerCounter(datagram *Datagram) error {
 	}
 	return nil
 }
-
-func ValidateAndIncrementCounter(datagram *Datagram) error {
-	if datagram.Command&0x80 == 0 { // Server session if MSB is 0
-		return ValidateAndIncrementServerCounter(datagram)
-	} 
-	return ValidateAndIncrementClientCounter(datagram) // Client session if MSB is 1
-}
