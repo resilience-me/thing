@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *SessionManager, port int) {
+func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *SessionManager) {
 	buffer := make([]byte, 389) // Buffer sized according to datagram size
 
 	for {
@@ -79,7 +79,7 @@ func runServerLoop(conn *net.UDPConn, transport *Transport, sessionManager *Sess
 			if err != nil {
 				fmt.Printf("Failed to send ACK to %s: %v\n", datagram.PeerServerAddress, err)
 			} else {
-				fmt.Printf("Sent ACK to %s:%d\n", datagram.PeerServerAddress, 2012)
+				fmt.Printf("Sent ACK to %s:%d\n", datagram.PeerServerAddress, Port)
 			}
 		}
 	}
