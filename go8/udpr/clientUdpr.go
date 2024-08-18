@@ -61,5 +61,5 @@ func pollAck(ackMgr *AckManager, idBytes []byte) bool {
 	ackMgr.mu.Lock()
 	_, exists := ackMgr.ackRegistry[string(idBytes)]
 	ackMgr.mu.Unlock()
-	return !exists
+	return !exists // Return true if ACK is NOT present (i.e., we should retry)
 }
