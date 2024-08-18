@@ -18,6 +18,14 @@ const (
 // Global counter for generating unique 32-bit identifiers
 var identifierCounter uint32
 
+// preparePacket generates a unique identifier and prepares the packet
+func newAck() []byte {
+	identifier := atomic.AddUint32(&identifierCounter, 1)
+	idBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(idBytes, identifier)
+	return idBytes
+}
+
 // sendWithRetry sends data with retries and checks for acknowledgment using the provided check function
 func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, idBytes []byte, maxRetries int, checkAck func(delay time.Duration) bool) error {
 	delay := initialDelay
@@ -45,12 +53,4 @@ func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, idBytes []
 	}
 
 	return fmt.Errorf("retransmission failed after %d attempts", maxRetries)
-}
-
-// preparePacket generates a unique identifier and prepares the packet
-func newAck() []byte {
-	identifier := atomic.AddUint32(&identifierCounter, 1)
-	idBytes := make([]byte, 4)
-	binary.BigEndian.PutUint32(idBytes, identifier)
-	return idBytes
 }
