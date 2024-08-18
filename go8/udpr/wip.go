@@ -10,20 +10,6 @@ import (
 	"sync/atomic"
 )
 
-// SendWithRetryClient sends data with retries and waits for an acknowledgment using AckManager
-func SendWithRetryClient(c *Client, data []byte, maxRetries int) error {
-	packet, idBytes := preparePacket(data)
-	registerAck(c.ackManager, idBytes)
-
-	return sendWithRetry(c.UDPConn, c.addr, packet, idBytes, maxRetries, func(delay time.Duration) bool {
-		// Wait for an ACK or timeout within the checkAck function
-		time.Sleep(delay)
-
-		// Check if the ACK has been received
-		return pollAck(c.ackManager, idBytes)
-	})
-}
-
 // SendWithRetry sends data with retries and waits for an acknowledgment using direct check
 func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries int) error {
 	packet, idBytes := preparePacket(data)
@@ -47,7 +33,7 @@ const (
 var identifierCounter uint32
 
 // sendWithRetry sends data with retries and checks for acknowledgment using the provided check function
-func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, packet []byte, idBytes []byte, maxRetries int, checkAck func(delay time.Duration) bool) error {
+func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, packet []byte, maxRetries int, checkAck func(delay time.Duration) bool) error {
 	delay := initialDelay
 
 	for retries := 0; retries < maxRetries; retries++ {
