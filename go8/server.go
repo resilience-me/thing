@@ -5,13 +5,21 @@ import (
 	"net"
 )
 
-func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
+func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackMgr *AckManager) {
 	buffer := make([]byte, 393) // Combined buffer size (389 data + 4 ACK)
 
 	for {
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			fmt.Printf("Error reading from UDP connection: %v\n", err)
+			continue
+		}
+
+		if n == 4 {
+			// Handle client acknowledgment
+			ackMgr.mu.Lock()
+			delete(ackMgr.ackRegistry, string(buffer[:4]))
+			ackMgr.mu.Unlock()
 			continue
 		}
 
