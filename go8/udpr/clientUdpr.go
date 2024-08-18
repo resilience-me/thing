@@ -9,6 +9,19 @@ import (
 	"sync/atomic"
 )
 
+// AckManager manages acknowledgment registrations and checks
+type AckManager struct {
+	mu           sync.Mutex
+	ackRegistry  map[string]struct{}
+}
+
+// NewAckManager initializes a new AckManager
+func NewAckManager() *AckManager {
+	return &AckManager{
+		ackRegistry: make(map[string]struct{}),
+	}
+}
+
 // SendWithRetryClient sends data with retries and waits for an acknowledgment
 func SendWithRetryClient(c *Client, data []byte, maxRetries int) error {
 	delay := 1 * time.Second
