@@ -6,7 +6,7 @@ import (
 )
 
 // SendSuccessResponse sends a success message using the provided Conn with retry logic.
-func SendSuccessResponse(data []byte, conn *Conn) error {
+func SendSuccessResponse(conn *Conn, data []byte) error {
 	response := append([]byte{0}, data...) // Combine success indicator and message
 
 	if err := udpr.SendWithRetry(conn.UDPConn, conn.addr, response, udpr.HighImportance); err != nil {
