@@ -41,5 +41,5 @@ func SendPriority(destinationAddr string, data []byte) error {
 
 // Wrapper for SendAck that takes a Conn struct
 func Ack(idBytes []byte, c *Conn) error {
-	return SendAck(idBytes, c.UDPConn, c.addr)
+	return SendAck(c.UDPConn, c.addr, idBytes)
 }
