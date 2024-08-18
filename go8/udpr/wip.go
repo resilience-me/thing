@@ -58,10 +58,17 @@ func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries
 	})
 }
 
+const (
+	initialDelay = 1 * time.Second	   // Initial delay duration
+	maxDelay = 16 * time.Second 	   // Maximum delay duration
+)
+
+// Global counter for generating unique 32-bit identifiers
+var identifierCounter uint32
+
 // sendWithRetry sends data with retries and checks for acknowledgment using the provided check function
 func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, packet []byte, idBytes []byte, maxRetries int, checkAck func(delay time.Duration) bool) error {
-	delay := 1 * time.Second
-	maxDelay := 10 * time.Second
+	delay := initialDelay
 
 	for retries := 0; retries < maxRetries; retries++ {
 		_, err := conn.WriteToUDP(packet, addr)
@@ -110,6 +117,3 @@ func pollAck(ackMgr *AckManager, idBytes []byte) bool {
 	_, exists := ackMgr.ackRegistry[string(idBytes)]
 	return !exists // Return true if ACK is NOT present (i.e., we should retry)
 }
-
-// Global counter for generating unique 32-bit identifiers
-var identifierCounter uint32
