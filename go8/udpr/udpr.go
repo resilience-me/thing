@@ -16,8 +16,8 @@ const (
 // Global counter for generating unique 32-bit identifiers
 var identifierCounter uint32
 
-// preparePacket generates a unique identifier and prepares the packet
-func newAck() []byte {
+// generateAck generates a unique identifier and prepares the packet
+func generateAck() []byte {
 	identifier := atomic.AddUint32(&identifierCounter, 1)
 	idBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(idBytes, identifier)
