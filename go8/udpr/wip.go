@@ -102,18 +102,3 @@ func preparePacket(data []byte) ([]byte, []byte) {
 	packet := append(idBytes, data...)
 	return packet, idBytes
 }
-
-// registerAck adds the ACK identifier to the registry
-func registerAck(ackMgr *AckManager, idBytes []byte) {
-	ackMgr.mu.Lock()
-	defer ackMgr.mu.Unlock()
-	ackMgr.ackRegistry[string(idBytes)] = struct{}{}
-}
-
-// pollAck checks if the ACK identifier is present in the registry
-func pollAck(ackMgr *AckManager, idBytes []byte) bool {
-	ackMgr.mu.Lock()
-	defer ackMgr.mu.Unlock()
-	_, exists := ackMgr.ackRegistry[string(idBytes)]
-	return !exists // Return true if ACK is NOT present (i.e., we should retry)
-}
