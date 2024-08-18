@@ -51,7 +51,7 @@ func SendPriorityClient(client *Client, data []byte) error {
 	return SendWithRetryClient(client, data, HighImportance)
 }
 
-// Wrapper for SendAck that takes a Conn struct
-func Ack(c *Conn, idBytes []byte) error {
-	return SendAck(c.UDPConn, c.addr, idBytes)
+// Wrapper for SendAck
+func Ack(conn *net.UDPConn, addr *net.UDPAddr, idBytes []byte) error {
+	return SendAck(conn, addr, idBytes)
 }
