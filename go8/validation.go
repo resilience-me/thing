@@ -25,27 +25,23 @@ func checkUserAndPeerExist(dg *Datagram) (string, error) {
 }
 
 // validateClientDatagram validates the client datagram and checks the counter
-func validateClientDatagram(buf []byte, dg *Datagram) (string, error) {
-    errorMessage, err := checkUserAndPeerExist(dg)
-    if err != nil {
-        return errorMessage, fmt.Errorf("user and peer existence check failed: %w", err)
-    }
+func validateClientDatagram(buf []byte, dg *Datagram) error {
 
     secretKey, err := loadClientSecretKey(dg)
     if err != nil {
-        return "Error loading client secret key", fmt.Errorf("loading client secret key failed: %w", err)
+        return fmt.Errorf("loading client secret key failed: %w", err)
     }
 
     if !verifyHMAC(buf, secretKey) {
-        return "Error verifying HMAC", errors.New("HMAC verification failed")
+        return errors.New("HMAC verification failed")
     }
 
     // Validate the counter
     if err := ValidateAndIncrementClientCounter(dg); err != nil {
-        return "Invalid counter", fmt.Errorf("counter validation failed: %w", err)
+        return fmt.Errorf("counter validation failed: %w", err)
     }
 
-    return "", nil
+    return nil
 }
 
 // validateServerDatagram validates the server datagram and checks the counter
