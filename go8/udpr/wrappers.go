@@ -10,8 +10,8 @@ const (
 	HighImportance   = 12 // 12 retries for priority messages
 )
 
-// SendWithResolvedAddressAndConn resolves the address, creates a new UDP connection, and sends data with retries.
-func SendWithResolvedAddressAndConn(address string, data []byte, maxRetries int) error {
+// SendWithResolvedAddress resolves the address, creates a new UDP connection, and sends data with retries.
+func SendWithResolvedAddress(address string, data []byte, maxRetries int) error {
 	// Resolve the destination address to a UDP address
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", address, config.Port))
 	if err != nil {
@@ -26,17 +26,27 @@ func SendWithResolvedAddressAndConn(address string, data []byte, maxRetries int)
 	defer conn.Close()
 
 	// Call the SendWithRetry function with the resolved address and the newly created connection
-	return SendWithRetry(conn, addr, data, maxRetries)
+	return SendWithRetryServer(conn, addr, data, maxRetries)
 }
 
 // Default Send with standard importance (5 retries)
-func Send(destinationAddr string, data []byte) error {
-	return SendWithResolvedAddressAndConn(destinationAddr, data, LowImportance)
+func SendServer(destinationAddr string, data []byte) error {
+	return SendWithResolvedAddress(destinationAddr, data, LowImportance)
 }
 
 // Send with priority importance (12 retries)
-func SendPriority(destinationAddr string, data []byte) error {
-	return SendWithResolvedAddressAndConn(destinationAddr, data, HighImportance)
+func SendPriorityServer(destinationAddr string, data []byte) error {
+	return SendWithResolvedAddress(destinationAddr, data, HighImportance)
+}
+
+// Default Send with standard importance (5 retries)
+func SendClient(client *Client, data []byte) error {
+	return SendWithRetryClient(client, data, LowImportance)
+}
+
+// Send with priority importance (12 retries)
+func SendPriorityClient(c *Client, data []byte) error {
+	return SendWithRetryClient(client, data, HighImportance)
 }
 
 // Wrapper for SendAck that takes a Conn struct
