@@ -13,7 +13,7 @@ import (
 var identifierCounter uint32
 
 // SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
-func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int) error {
+func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries int) error {
 	retries := 0
 	delay := 1 * time.Second
 
@@ -24,26 +24,13 @@ func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int
 	idBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(idBytes, identifier)
 
-	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", destinationAddr, port))
-	if err != nil {
-		return fmt.Errorf("failed to resolve server address '%s': %w", destinationAddr, err)
-	}
-
-	// Create a single UDP connection for all attempts
-	conn, err := net.DialUDP("udp", nil, addr)
-	if err != nil {
-		return fmt.Errorf("failed to create UDP connection: %w", err)
-	}
-	defer conn.Close()
-
 	// Create the packet with the 4-byte identifier
 	packet := append(idBytes, data...)
 
 	for retries < maxRetries {
 		// Send the datagram with the identifier
-		if _, err := conn.Write(packet); err != nil {
-			return fmt.Errorf("failed to send data to server '%s': %w", addr.String(), err)
+		if _, err := conn.WriteToUDP(packet, addr); err != nil {
+			return fmt.Errorf("failed to send data to %s: %w", addr.String(), err)
 		}
 
 		// Set a deadline for the read operation
@@ -51,7 +38,7 @@ func SendWithRetry(data []byte, destinationAddr string, port int, maxRetries int
 
 		// Wait for the acknowledgment
 		ack := make([]byte, 4)
-		_, _, err = conn.ReadFromUDP(ack)
+		_, _, err := conn.ReadFromUDP(ack)
 
 		if err == nil && bytes.Equal(ack, idBytes) {
 			// Correct ACK received successfully
