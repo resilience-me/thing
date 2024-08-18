@@ -34,7 +34,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 			addr:    remoteAddr,
 		}
 
-		// Send an acknowledgment back to the client as soon as possible
+		// Send an acknowledgment
 		if err := Ack(remoteConn, ackBuffer); err != nil {
 			fmt.Printf("Failed to send ACK: %v\n", err)
 			continue
