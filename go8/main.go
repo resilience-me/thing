@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	// Initialize the session manager and ackManager
+	// Initialize the session manager and ack manager
 	sessionManager := NewSessionManager()
 	ackManager := NewAckManager()
 
