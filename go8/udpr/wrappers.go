@@ -1,6 +1,8 @@
 package udpr
 
 import (
+	"fmt"
+	"net"
 	"ripple/config"
 )
 
@@ -45,7 +47,7 @@ func SendClient(client *Client, data []byte) error {
 }
 
 // Send with priority importance (12 retries)
-func SendPriorityClient(c *Client, data []byte) error {
+func SendPriorityClient(client *Client, data []byte) error {
 	return SendWithRetryClient(client, data, HighImportance)
 }
 
