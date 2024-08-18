@@ -1,4 +1,4 @@
-package handlers
+package main
 
 import (
 	"fmt"
@@ -6,11 +6,10 @@ import (
 )
 
 // SendSuccessResponse sends a success message using the provided Conn with retry logic.
-func SendSuccessResponse(client *Client, data []byte) error {
+func SendSuccessResponse(data []byte, conn *Conn) error {
 	response := append([]byte{0}, data...) // Combine success indicator and message
 
-	// Use the SendClient wrapper for standard priority
-	if err := udpr.SendClient(client, response); err != nil {
+	if err := udpr.SendWithRetry(conn.UDPConn, conn.addr, response, udpr.HighImportance); err != nil {
 		return fmt.Errorf("error sending success response: %w", err) // Return detailed error
 	}
 
@@ -18,11 +17,10 @@ func SendSuccessResponse(client *Client, data []byte) error {
 }
 
 // SendErrorResponse sends an error message using the provided Conn with retry logic.
-func SendErrorResponse(client *Client, message string) error {
+func SendErrorResponse(message string, conn *Conn) error {
 	response := append([]byte{1}, []byte(message)...) // Combine error indicator and message
 
-	// Use the SendClient wrapper for standard priority
-	if err := udpr.SendClient(client, response); err != nil {
+	if err := udpr.SendWithRetry(conn.UDPConn, conn.addr, response, udpr.HighImportance); err != nil {
 		return fmt.Errorf("error sending error response: %w", err) // Return detailed error
 	}
 
