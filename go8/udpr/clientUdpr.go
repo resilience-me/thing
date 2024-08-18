@@ -24,7 +24,7 @@ func NewAckManager() *AckManager {
 
 // SendWithRetryClient sends data with retries and waits for an acknowledgment using AckManager
 func SendWithRetryClient(c *Client, data []byte, maxRetries int) error {
-	packet, idBytes := preparePacket(data)
+	idBytes := newAck()
 	registerAck(c.ackManager, idBytes)
 
 	return sendWithRetry(c.UDPConn, c.addr, packet, idBytes, maxRetries, func(delay time.Duration) bool {
