@@ -6,8 +6,8 @@ import (
 )
 
 type Session struct {
-	Datagram *Datagram // The datagram associated with this session
-	Conn     *Conn     // Pointer to Conn; can be nil if not applicable
+	Datagram *Datagram   // The datagram associated with this session
+	Client   *Client     // Pointer to Conn; can be nil if not applicable
 }
 
 // SessionManager manages sessions and their state
