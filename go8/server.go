@@ -6,7 +6,7 @@ import (
 )
 
 func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
-	buffer := make([]byte, 389) // Buffer sized according to datagram size
+	buffer := make([]byte, 393) // Combined buffer size (389 data + 4 ACK)
 
 	for {
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
@@ -22,6 +22,12 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 
 		fmt.Printf("Received %d bytes from %s\n", n, remoteAddr.String())
 
+		// Extract the ACK part (first 4 bytes)
+		ackBuffer := buffer[:4]
+		
+		// Extract the datagram part (remaining bytes)
+		dataBuffer := buffer[4:n]
+
 		// Create a Conn object for the acknowledgment and potential session
 		remoteConn := &Conn{
 			UDPConn: conn,
@@ -29,16 +35,16 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		}
 
 		// Send an acknowledgment back to the client as soon as possible
-		if err := SendAck(remoteConn); err != nil {
+		if err := Ack(remoteConn, ackBuffer); err != nil {
 			fmt.Printf("Failed to send ACK: %v\n", err)
 			continue
 		}
 
 		// Parse the datagram
-		datagram := parseDatagram(buffer)
+		datagram := parseDatagram(dataBuffer)
 
 		// Validate the datagram
-		if err := validateDatagram(buffer, datagram); err != nil {
+		if err := validateDatagram(dataBuffer, datagram); err != nil {
 			fmt.Printf("Error validating  datagram: %v\n", err)
 			continue
 		}
