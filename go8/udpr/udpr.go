@@ -54,3 +54,12 @@ func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, idBytes []
 
 	return fmt.Errorf("retransmission failed after %d attempts", maxRetries)
 }
+
+// SendAck sends a simple acknowledgment with the byte slice identifier
+func SendAck(conn *net.UDPConn, addr *net.UDPAddr, idBytes []byte) error {
+	// Directly send the identifier as the ACK
+	if _, err := conn.WriteToUDP(idBytes, addr); err != nil {
+		return fmt.Errorf("failed to send ACK: %w", err)
+	}
+	return nil
+}
