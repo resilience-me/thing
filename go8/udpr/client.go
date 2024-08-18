@@ -40,6 +40,13 @@ func pollAck(ackMgr *AckManager, idBytes []byte) bool {
 	return !exists // Return true if ACK is NOT present (i.e., we should retry)
 }
 
+// receivedAck removes an ACK identifier from the registry
+func ReceivedAck(ackMgr *AckManager, idBytes []byte) bool {
+	ackMgr.mu.Lock()
+	delete(ackMgr.ackRegistry, string(idBytes))
+	ackMgr.mu.Unlock()
+}
+
 // SendWithRetryClient sends data with retries and waits for an acknowledgment using AckManager
 func SendWithRetryClient(c *Client, data []byte, maxRetries int) error {
 	idBytes := generateAck()
