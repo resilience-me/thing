@@ -26,7 +26,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		ackBuffer := buffer[:4]
 		
 		// Extract the datagram part (remaining bytes)
-		dataBuffer := buffer[4:n]
+		dataBuffer := buffer[4:]
 
 		// Create a Conn object for the acknowledgment and potential session
 		remoteConn := &Conn{
