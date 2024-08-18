@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+// Client represents a UDP client with connection and ACK manager
+type Client struct {
+	UDPConn    *net.UDPConn
+	addr       *net.UDPAddr
+	ackManager *AckManager
+}
+
 // AckManager manages acknowledgment registrations and checks
 type AckManager struct {
 	mu           sync.Mutex
