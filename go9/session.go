@@ -5,9 +5,14 @@ import (
 	"sync"
 )
 
+type Conn struct {
+	*net.UDPConn         // Embedding UDPConn to promote its methods
+	addr *net.UDPAddr    // Keeping addr as a separate field
+}
+
 type Session struct {
-	Datagram *Datagram   // The datagram associated with this session
-	Client   *Client     // Pointer to Conn; can be nil if not applicable
+	Datagram *Datagram // The datagram associated with this session
+	Conn     *Conn     // Pointer to Conn; can be nil if not applicable
 }
 
 // SessionManager manages sessions and their state
