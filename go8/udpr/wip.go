@@ -38,8 +38,6 @@ func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, idBytes []
 		}
 
 		// ACK not received, retry
-		fmt.Println("Retrying...")
-		retries++
 		if delay < maxDelay {
 			delay *= 2 // Exponential backoff
 		}
