@@ -1,7 +1,6 @@
 package udpr
 
 import (
-	"net"
 	"sync"
 	"time"
 )
