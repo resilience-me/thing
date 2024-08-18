@@ -33,8 +33,11 @@ const (
 var identifierCounter uint32
 
 // sendWithRetry sends data with retries and checks for acknowledgment using the provided check function
-func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, packet []byte, maxRetries int, checkAck func(delay time.Duration) bool) error {
+func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, idBytes []byte, maxRetries int, checkAck func(delay time.Duration) bool) error {
 	delay := initialDelay
+
+	// Create the packet with the 4-byte identifier
+	packet := append(idBytes, data...)
 
 	for retries := 0; retries < maxRetries; retries++ {
 		_, err := conn.WriteToUDP(packet, addr)
