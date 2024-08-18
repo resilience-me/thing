@@ -10,20 +10,6 @@ import (
 	"sync/atomic"
 )
 
-// SendWithRetry sends data with retries and waits for an acknowledgment using direct check
-func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries int) error {
-	packet, idBytes := preparePacket(data)
-	return sendWithRetry(conn, addr, packet, idBytes, maxRetries, func(delay time.Duration) bool {
-		ack := make([]byte, 4)
-		conn.SetReadDeadline(time.Now().Add(delay)) // Set the timeout for the read operation
-		_, _, err := conn.ReadFromUDP(ack)
-		if err != nil {
-			return false
-		}
-		return bytes.Equal(ack, idBytes)
-	})
-}
-
 const (
 	initialDelay = 1 * time.Second	   // Initial delay duration
 	maxDelay = 16 * time.Second 	   // Maximum delay duration
