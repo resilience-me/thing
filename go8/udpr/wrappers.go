@@ -13,9 +13,9 @@ const (
 // SendWithResolvedAddressAndConn resolves the address, creates a new UDP connection, and sends data with retries.
 func SendWithResolvedAddressAndConn(address string, data []byte, maxRetries int) error {
 	// Resolve the destination address to a UDP address
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", address, port))
+	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", address, config.Port))
 	if err != nil {
-		return fmt.Errorf("failed to resolve address '%s:%d': %w", address, port, err)
+		return fmt.Errorf("failed to resolve address '%s:%d': %w", address, config.Port, err)
 	}
 
 	// Create a UDP connection with an ephemeral local port
@@ -30,13 +30,13 @@ func SendWithResolvedAddressAndConn(address string, data []byte, maxRetries int)
 }
 
 // Default Send with standard importance (5 retries)
-func Send(data []byte, destinationAddr string) error {
-	return SendWithRetry(data, destinationAddr, config.Port, LowImportance)
+func Send(destinationAddr string, data []byte) error {
+	return SendWithResolvedAddressAndConn(destinationAddr, data, LowImportance)
 }
 
 // Send with priority importance (12 retries)
-func SendPriority(data []byte, destinationAddr string) error {
-	return SendWithRetry(data, destinationAddr, config.Port, HighImportance)
+func SendPriority(destinationAddr string, data []byte) error {
+	return SendWithResolvedAddressAndConn(destinationAddr, data, HighImportance)
 }
 
 // Wrapper for SendAck that takes a Conn struct
