@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"ripple/config"
+	"ripple/udpr"
 )
 
 func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackManager *AckManager) {
@@ -17,10 +18,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackManager
 		}
 
 		if n == 4 {
-			// Handle client acknowledgment
-			ackManager.mu.Lock()
-			delete(ackManager.ackRegistry, string(buffer[:4]))
-			ackManager.mu.Unlock()
+			udpr.ReceivedAck(ackManager, buffer[:4])
 			continue
 		}
 
