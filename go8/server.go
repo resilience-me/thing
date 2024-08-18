@@ -47,8 +47,8 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 			errorMessage, err := validateClientDatagram(buffer, datagram)
 			if err != nil {
 				fmt.Printf("Error validating client datagram: %v\n", err)
-				// Send an error response to the client
-				SendErrorResponse(errorMessage, remoteConn)
+				// Send an error response to the client in a separate goroutine
+				go SendErrorResponse(errorMessage, remoteConn)
 				continue
 			}
 		}
@@ -67,3 +67,4 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		sessionManager.RouteSession(session)
 	}
 }
+
