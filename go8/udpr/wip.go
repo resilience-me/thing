@@ -61,10 +61,9 @@ func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, packet []byte, maxRetri
 }
 
 // preparePacket generates a unique identifier and prepares the packet
-func preparePacket(data []byte) ([]byte, []byte) {
+func newAck() []byte {
 	identifier := atomic.AddUint32(&identifierCounter, 1)
 	idBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(idBytes, identifier)
-	packet := append(idBytes, data...)
-	return packet, idBytes
+	return idBytes
 }
