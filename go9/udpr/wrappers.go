@@ -1,8 +1,6 @@
 package udpr
 
 import (
-	"fmt"
-	"net"
 	"ripple/config"
 )
 
@@ -12,8 +10,8 @@ const (
 	HighImportance   = 12 // 12 retries for priority messages
 )
 
-// SendWithResolvedAddress resolves the address, creates a new UDP connection, and sends data with retries.
-func SendWithResolvedAddress(address string, data []byte, maxRetries int) error {
+// SendWithResolvedAddressAndConn resolves the address, creates a new UDP connection, and sends data with retries.
+func SendWithResolvedAddressAndConn(address string, data []byte, maxRetries int) error {
 	// Resolve the destination address to a UDP address
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", address, config.Port))
 	if err != nil {
@@ -28,25 +26,20 @@ func SendWithResolvedAddress(address string, data []byte, maxRetries int) error 
 	defer conn.Close()
 
 	// Call the SendWithRetry function with the resolved address and the newly created connection
-	return SendWithRetryServer(conn, addr, data, maxRetries)
+	return SendWithRetry(conn, addr, data, maxRetries)
 }
 
 // Default Send with standard importance (5 retries)
-func SendServer(destinationAddr string, data []byte) error {
-	return SendWithResolvedAddress(destinationAddr, data, LowImportance)
+func Send(destinationAddr string, data []byte) error {
+	return SendWithResolvedAddressAndConn(destinationAddr, data, LowImportance)
 }
 
 // Send with priority importance (12 retries)
-func SendPriorityServer(destinationAddr string, data []byte) error {
-	return SendWithResolvedAddress(destinationAddr, data, HighImportance)
+func SendPriority(destinationAddr string, data []byte) error {
+	return SendWithResolvedAddressAndConn(destinationAddr, data, HighImportance)
 }
 
-// Default Send with standard importance (5 retries)
-func SendClient(client *Client, data []byte) error {
-	return SendWithRetryClient(client, data, LowImportance)
-}
-
-// Send with priority importance (12 retries)
-func SendPriorityClient(client *Client, data []byte) error {
-	return SendWithRetryClient(client, data, HighImportance)
+// Wrapper for SendAck that takes a Conn struct
+func Ack(c *Conn, idBytes []byte) error {
+	return SendAck(c.UDPConn, c.addr, idBytes)
 }
