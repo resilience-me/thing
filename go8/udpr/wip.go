@@ -10,26 +10,6 @@ import (
 	"sync/atomic"
 )
 
-// Client represents a UDP client with connection and ACK manager
-type Client struct {
-	UDPConn    *net.UDPConn
-	addr       *net.UDPAddr
-	ackManager *AckManager
-}
-
-// AckManager manages acknowledgment registrations and checks
-type AckManager struct {
-	mu           sync.Mutex
-	ackRegistry  map[string]struct{}
-}
-
-// NewAckManager initializes a new AckManager
-func NewAckManager() *AckManager {
-	return &AckManager{
-		ackRegistry: make(map[string]struct{}),
-	}
-}
-
 // SendWithRetryClient sends data with retries and waits for an acknowledgment using AckManager
 func SendWithRetryClient(c *Client, data []byte, maxRetries int) error {
 	packet, idBytes := preparePacket(data)
