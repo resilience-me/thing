@@ -6,9 +6,8 @@ import (
 )
 
 func main() {
-	// Initialize the session manager and ack manager
+	// Initialize the session manager
 	sessionManager := NewSessionManager()
-	ackManager := NewAckManager()
 
 	// Set up the UDP server
 	addr := net.UDPAddr{
@@ -23,5 +22,5 @@ func main() {
 	defer conn.Close()
 
 	// Start the server loop
-	runServerLoop(conn, sessionManager, ackManager)
+	runServerLoop(conn, sessionManager)
 }
