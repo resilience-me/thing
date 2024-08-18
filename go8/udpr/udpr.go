@@ -12,6 +12,9 @@ import (
 // Global counter for generating unique 32-bit identifiers
 var identifierCounter uint32
 
+// Maximum delay duration
+const maxDelay = 16 * time.Second
+
 // SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
 func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries int) error {
 	retries := 0
@@ -47,7 +50,9 @@ func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries
 
 		// No correct ACK or an error occurred, retry
 		retries++
-		delay *= 2 // Exponential backoff
+		if delay < maxDelay {
+			delay *= 2 // Exponential backoff
+		}
 		fmt.Printf("Timeout or invalid ACK, retrying... (%d/%d)\n", retries, maxRetries)
 	}
 
