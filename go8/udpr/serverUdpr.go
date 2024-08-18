@@ -2,7 +2,6 @@ package udpr
 
 import (
 	"bytes"
-	"fmt"
 	"net"
 	"time"
 )
