@@ -36,12 +36,6 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackMgr *Ac
 		// Extract the datagram part (remaining bytes)
 		dataBuffer := buffer[4:]
 
-		// Create a Conn object for the acknowledgment and potential session
-		remoteConn := &Conn{
-			UDPConn: conn,
-			addr:    remoteAddr,
-		}
-
 		// Send an acknowledgment
 		if err := Ack(remoteConn, ackBuffer); err != nil {
 			fmt.Printf("Failed to send ACK: %v\n", err)
@@ -64,7 +58,11 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackMgr *Ac
 
 		// If this is a client connection, associate the Conn with the session
 		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
-			session.Conn = remoteConn
+			session.Conn := &Client{
+				UDPConn:     conn,
+				Addr:        remoteAddr,
+				AckManager:  ackMgr
+			}
 		}
 
 		// Route the session through the SessionManager
