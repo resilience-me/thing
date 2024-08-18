@@ -6,7 +6,7 @@ import (
 	"ripple/config"
 )
 
-func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackMgr *AckManager) {
+func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackManager *AckManager) {
 	buffer := make([]byte, 393) // Combined buffer size (389 data + 4 ACK)
 
 	for {
@@ -18,9 +18,9 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackMgr *Ac
 
 		if n == 4 {
 			// Handle client acknowledgment
-			ackMgr.mu.Lock()
-			delete(ackMgr.ackRegistry, string(buffer[:4]))
-			ackMgr.mu.Unlock()
+			ackManager.mu.Lock()
+			delete(ackManager.ackRegistry, string(buffer[:4]))
+			ackManager.mu.Unlock()
 			continue
 		}
 
@@ -62,7 +62,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackMgr *Ac
 			session.Conn := &Client{
 				UDPConn:     conn,
 				Addr:        remoteAddr,
-				AckManager:  ackMgr
+				AckManager:  ackManager,
 			}
 		}
 
