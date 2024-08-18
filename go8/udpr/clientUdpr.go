@@ -32,7 +32,7 @@ func SendWithRetryClient(c *Client, data []byte, maxRetries int) error {
 		time.Sleep(delay)
 
 		// Check if the ACK has been received
-		if !pollAck(c.ackManager, idBytes) {
+		if pollAck(c.ackManager, idBytes) {
 			// ACK received
 			return nil
 		}
