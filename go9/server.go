@@ -3,24 +3,15 @@ package main
 import (
 	"fmt"
 	"net"
-	"ripple/config"
 )
 
-func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackManager *AckManager) {
+func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 	buffer := make([]byte, 393) // Combined buffer size (389 data + 4 ACK)
 
 	for {
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			fmt.Printf("Error reading from UDP connection: %v\n", err)
-			continue
-		}
-
-		if n == 4 {
-			// Handle client acknowledgment
-			ackManager.mu.Lock()
-			delete(ackManager.ackRegistry, string(buffer[:4]))
-			ackManager.mu.Unlock()
 			continue
 		}
 
@@ -37,8 +28,14 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackManager
 		// Extract the datagram part (remaining bytes)
 		dataBuffer := buffer[4:]
 
+		// Create a Conn object for the acknowledgment and potential session
+		remoteConn := &Conn{
+			UDPConn: conn,
+			addr:    remoteAddr,
+		}
+
 		// Send an acknowledgment
-		if err := udpr.SendAck(conn, remoteAddr, ackBuffer); err != nil {
+		if err := Ack(remoteConn, ackBuffer); err != nil {
 			fmt.Printf("Failed to send ACK: %v\n", err)
 			continue
 		}
@@ -59,15 +56,10 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, ackManager
 
 		// If this is a client connection, associate the Conn with the session
 		if datagram.Command&0x80 == 1 { // MSB is 1: Client connection
-			session.Conn := &Client{
-				UDPConn:     conn,
-				Addr:        remoteAddr,
-				AckManager:  ackManager,
-			}
+			session.Conn = remoteConn
 		}
 
 		// Route the session through the SessionManager
 		sessionManager.RouteSession(session)
 	}
 }
-
