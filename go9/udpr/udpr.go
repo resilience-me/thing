@@ -1,49 +1,55 @@
 package udpr
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"net"
-	"time"
 	"sync/atomic"
-)
-
-const (
-	initialDelay = 1 * time.Second	   // Initial delay duration
-	maxDelay = 16 * time.Second 	   // Maximum delay duration
+	"time"
 )
 
 // Global counter for generating unique 32-bit identifiers
 var identifierCounter uint32
 
-// generateAck generates a unique identifier and prepares the packet
-func generateAck() []byte {
+// Maximum delay duration
+const maxDelay = 16 * time.Second
+
+// SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
+func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries int) error {
+	retries := 0
+	delay := 1 * time.Second
+
+	// Generate a unique 32-bit identifier for this transmission
 	identifier := atomic.AddUint32(&identifierCounter, 1)
+
+	// Convert the identifier to a 4-byte slice
 	idBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(idBytes, identifier)
-	return idBytes
-}
-
-// sendWithRetry sends data with retries and checks for acknowledgment using the provided check function
-func sendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, idBytes []byte, maxRetries int, checkAck func(delay time.Duration) bool) error {
-	delay := initialDelay
 
 	// Create the packet with the 4-byte identifier
 	packet := append(idBytes, data...)
 
-	for retries := 0; retries < maxRetries; retries++ {
-		_, err := conn.WriteToUDP(packet, addr)
-		if err != nil {
-			return fmt.Errorf("failed to send data: %w", err)
+	for retries < maxRetries {
+		// Send the datagram with the identifier
+		if _, err := conn.WriteToUDP(packet, addr); err != nil {
+			return fmt.Errorf("failed to send data to %s: %w", addr.String(), err)
 		}
 
-		// Check for ACK with the provided check function
-		if checkAck(delay) {
-			// ACK received
+		// Set a deadline for the read operation
+		conn.SetReadDeadline(time.Now().Add(delay))
+
+		// Wait for the acknowledgment
+		ack := make([]byte, 4)
+		_, _, err := conn.ReadFromUDP(ack)
+
+		if err == nil && bytes.Equal(ack, idBytes) {
+			// Correct ACK received successfully
 			return nil
 		}
 
-		// ACK not received, retry
+		// No correct ACK or an error occurred, retry
+		retries++
 		if delay < maxDelay {
 			delay *= 2 // Exponential backoff
 		}
