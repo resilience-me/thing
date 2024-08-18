@@ -2,10 +2,8 @@ package udpr
 
 import (
 	"bytes"
-	"encoding/binary"
 	"fmt"
 	"net"
-	"sync/atomic"
 	"time"
 )
 
