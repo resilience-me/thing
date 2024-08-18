@@ -1,12 +1,9 @@
 package udpr
 
 import (
-	"encoding/binary"
-	"fmt"
 	"net"
 	"sync"
 	"time"
-	"sync/atomic"
 )
 
 // AckManager manages acknowledgment registrations and checks
