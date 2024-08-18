@@ -37,20 +37,10 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		// Parse the datagram
 		datagram := parseDatagram(buffer)
 
-		// Validate the datagram based on its type (client or server)
-		if datagram.Command&0x80 == 0 { // Server session if MSB is 0
-			if err := validateServerDatagram(buffer, datagram); err != nil {
-				fmt.Printf("Error validating server datagram: %v\n", err)
-				continue
-			}
-		} else { // Client session if MSB is 1
-			errorMessage, err := validateClientDatagram(buffer, datagram)
-			if err != nil {
-				fmt.Printf("Error validating client datagram: %v\n", err)
-				// Send an error response to the client in a separate goroutine
-				go SendErrorResponse(errorMessage, remoteConn)
-				continue
-			}
+		// Validate the datagram
+		if err := validateDatagram(buffer, datagram); err != nil {
+			fmt.Printf("Error validating  datagram: %v\n", err)
+			continue
 		}
 
 		// Create a new session
