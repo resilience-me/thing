@@ -42,7 +42,7 @@ func pollAck(ackMgr *AckManager, idBytes []byte) bool {
 
 // SendWithRetryClient sends data with retries and waits for an acknowledgment using AckManager
 func SendWithRetryClient(c *Client, data []byte, maxRetries int) error {
-	idBytes := newAck()
+	idBytes := generateAck()
 	registerAck(c.ackManager, idBytes)
 
 	return sendWithRetry(c.UDPConn, c.Addr, packet, idBytes, maxRetries, func(delay time.Duration) bool {
