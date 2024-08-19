@@ -1,9 +1,6 @@
 package main
 
-import (
-    "encoding/binary"
-    "errors"       // For creating error messages
-)
+import "encoding/binary"
 
 // bytesToTrimmedString trims null characters from byte slices for proper string conversion.
 func bytesToTrimmedString(data []byte) string {
