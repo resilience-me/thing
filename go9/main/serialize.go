@@ -41,7 +41,7 @@ func DeserializeDatagram(buf []byte) *Datagram {
 
     // Copy data into fixed-size arrays for Arguments and Signature
     copy(datagram.Arguments[:], buf[97:353])
-    copy(datagram.Signature[:], buf[357:389])  // Ensure the signature is exactly 32 bytes
+    copy(datagram.Signature[:], buf[357:389])
 
     return datagram
 }
