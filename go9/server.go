@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net"
+	"ripple/auth"
+	"ripple/udpr"
 )
 
 func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
@@ -35,7 +37,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		}
 
 		// Send an acknowledgment
-		if err := Ack(remoteConn, ackBuffer); err != nil {
+		if err := udpr.Ack(remoteConn, ackBuffer); err != nil {
 			fmt.Printf("Failed to send ACK: %v\n", err)
 			continue
 		}
@@ -44,7 +46,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		datagram := parseDatagram(dataBuffer)
 
 		// Validate the datagram
-		if err := validateDatagram(dataBuffer, datagram); err != nil {
+		if err := auth.ValidateDatagram(dataBuffer, datagram); err != nil {
 			fmt.Printf("Error validating  datagram: %v\n", err)
 			continue
 		}
