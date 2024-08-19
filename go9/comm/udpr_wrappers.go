@@ -2,6 +2,7 @@ package comm
 
 import (
 	"ripple/config"
+	"ripple/udpr"
 )
 
 // Retry levels based on importance
@@ -26,7 +27,7 @@ func SendWithResolvedAddressAndConn(address string, data []byte, maxRetries int)
 	defer conn.Close()
 
 	// Call the SendWithRetry function with the resolved address and the newly created connection
-	return SendWithRetry(conn, addr, data, maxRetries)
+	return udpr.SendWithRetry(conn, addr, data, maxRetries)
 }
 
 // Default Send with standard importance (5 retries)
@@ -37,4 +38,9 @@ func Send(destinationAddr string, data []byte) error {
 // Send with priority importance (12 retries)
 func SendPriority(destinationAddr string, data []byte) error {
 	return SendWithResolvedAddressAndConn(destinationAddr, data, HighImportance)
+}
+
+// Wrapper for udpr.SendAck
+func SendAck(conn *net.UDPConn, addr *net.UDPAddr, idBytes []byte) error {
+	return udpr.SendAck(conn, addr, idBytes)
 }
