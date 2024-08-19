@@ -1,4 +1,4 @@
-package udpr
+package comm
 
 import (
 	"ripple/config"
