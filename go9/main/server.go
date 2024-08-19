@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 	"ripple/auth"
-	"ripple/udpr"
+	"ripple/comm"
 )
 
 func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
@@ -31,7 +31,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		dataBuffer := buffer[4:]
 
 		// Send an acknowledgment
-		if err := udpr.SendAck(conn, remoteAddr, ackBuffer); err != nil {
+		if err := comm.SendAck(conn, remoteAddr, ackBuffer); err != nil {
 			fmt.Printf("Failed to send ACK: %v\n", err)
 			continue
 		}
