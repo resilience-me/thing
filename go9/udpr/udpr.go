@@ -19,7 +19,6 @@ const (
 
 // SendWithRetry sends data with retransmission logic and waits for a simple acknowledgment
 func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries int) error {
-	delay := initialDelay
 
 	// Generate a unique 32-bit identifier for this transmission
 	identifier := atomic.AddUint32(&identifierCounter, 1)
@@ -30,6 +29,8 @@ func SendWithRetry(conn *net.UDPConn, addr *net.UDPAddr, data []byte, maxRetries
 
 	// Create the packet with the 4-byte identifier
 	packet := append(idBytes, data...)
+
+	delay := initialDelay
 
 	for retries := 0; retries <= maxRetries; retries++ {
 		// Send the datagram with the identifier
