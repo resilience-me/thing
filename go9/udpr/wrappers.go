@@ -38,8 +38,3 @@ func Send(destinationAddr string, data []byte) error {
 func SendPriority(destinationAddr string, data []byte) error {
 	return SendWithResolvedAddressAndConn(destinationAddr, data, HighImportance)
 }
-
-// Wrapper for SendAck that takes a Conn struct
-func Ack(c *Conn, idBytes []byte) error {
-	return SendAck(c.UDPConn, c.addr, idBytes)
-}
