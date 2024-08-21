@@ -1,9 +1,6 @@
 package comm
 
-import (
-	"fmt"
-	"ripple/udpr"
-)
+import "fmt"
 
 // SendSuccessResponse sends a success message using the provided address with retry logic.
 func SendSuccessResponse(data []byte, addr *net.UDPAddr) error {
