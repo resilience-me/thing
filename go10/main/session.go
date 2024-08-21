@@ -74,7 +74,7 @@ func (sm *SessionManager) handleSession(session *Session) {
 	if datagram.Command&0xC0 == 0 { // Bit 7 (MSB) is 0: Client connection, bit 6 is 0: validate peer account exists
 	    if errorMessage, err := auth.ValidatePeerExists(datagram); err != nil {
 	        log.Printf("Error vaslidating peer existence for user %s: %v", datagram.Username, err)
-	        main.SendErrorResponse(errorMessage, session.Conn)
+	        comm.SendErrorResponse(errorMessage, session.Conn)
 	        return
 	    }
 	}
