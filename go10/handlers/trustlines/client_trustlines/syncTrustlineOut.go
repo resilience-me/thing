@@ -19,16 +19,19 @@ func SyncTrustlineOut(session main.Session) {
         return
     }
 
-    // Initialize the datagram
-    dg, err := handlers.InitializeDatagram(datagram)
+    // Retrieve and increment the counter_out value
+    counterOut, err := db_trustlines.GetAndIncrementCounterOut(datagram)
     if err != nil {
-        log.Printf("Error initializing datagram in SyncTrustlineOut for user %s: %v", datagram.Username, err)
+        log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
+        comm.SendErrorResponse("Failed to update counter_out.", session.Conn)
         return
     }
 
+    dgOut := types.NewDatagram(datagram.PeerUsername, datagram.Username, counterOut)
+
     if isSynced {
         // Trustline is already synced, so prepare a SetTimestamp command
-        dg.Command = main.ServerTrustlines_SetTimestamp
+        dgOut.Command = main.ServerTrustlines_SetTimestamp
     } else {
         // Trustline is not synced, proceed with sending the trustline
         trustline, err := db_trustlines.GetTrustlineOut(datagram)
@@ -37,13 +40,13 @@ func SyncTrustlineOut(session main.Session) {
             comm.SendErrorResponse("Failed to retrieve trustline.", session.Conn)
             return
         }
-        dg.Command = main.ServerTrustlines_SetTrustline
-        binary.BigEndian.PutUint32(dg.Arguments[:4], trustline)
-        binary.BigEndian.PutUint32(dg.Arguments[4:8], syncCounter)
+        dgOut.Command = main.ServerTrustlines_SetTrustline
+        binary.BigEndian.PutUint32(dgOut.Arguments[:4], trustline)
+        binary.BigEndian.PutUint32(dgOut.Arguments[4:8], syncCounter)
     }
 
     // Send the prepared datagram
-    if err := comm.SignAndSendDatagram(session, dg); err != nil {
+    if err := comm.SignAndSendDatagram(session, dgOut); err != nil {
         log.Printf("Failed to send datagram in SyncTrustlineOut for user %s: %v", datagram.Username, err)
         return
     }
