@@ -67,13 +67,13 @@ func SignDatagram(dg *types.Datagram, peerServerAddress string) ([]byte, error) 
     }
 
     // Load the secret key for HMAC generation
-    secretKey, err := auth.LoadServerSecretKeyOut(dg, peerServerAddress)
+    secretKey, err := LoadServerSecretKeyOut(dg, peerServerAddress)
     if err != nil {
         return nil, fmt.Errorf("failed to load server secret key: %w", err)
     }
 
     // Generate HMAC for the serialized data
-    signature, err := auth.GenerateHMAC(serializedData, secretKey)
+    signature, err := GenerateHMAC(serializedData, secretKey)
     if err != nil {
         return nil, fmt.Errorf("failed to generate HMAC: %w", err)
     }
