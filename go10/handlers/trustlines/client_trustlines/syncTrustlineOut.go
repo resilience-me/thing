@@ -15,19 +15,17 @@ func SyncTrustlineOut(session main.Session) {
     syncCounter, isSynced, err := trustlines.GetSyncStatus(datagram)
     if err != nil {
         log.Printf("Failed to retrieve sync status in SyncTrustlineOut for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to retrieve sync status.", session.Conn)
+        comm.SendErrorResponse("Failed to retrieve sync status.", session.Addr)
         return
     }
 
-    // Retrieve and increment the counter_out value
-    counterOut, err := db_trustlines.GetAndIncrementCounterOut(datagram)
+    // Initialize the datagram
+    dgOut, err := handlers.InitializeDatagram(datagram)
     if err != nil {
-        log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to update counter_out.", session.Conn)
+        log.Printf("Error initializing datagram for user %s: %v", datagram.Username, err)
+        comm.SendErrorResponse("Error initializing datagram.", session.Addr)
         return
     }
-
-    dgOut := types.NewDatagram(datagram.PeerUsername, datagram.Username, counterOut)
 
     if isSynced {
         // Trustline is already synced, so prepare a SetTimestamp command
@@ -37,7 +35,7 @@ func SyncTrustlineOut(session main.Session) {
         trustline, err := db_trustlines.GetTrustlineOut(datagram)
         if err != nil {
             log.Printf("Error getting trustline for user %s in SyncTrustlineOut: %v", datagram.Username, err)
-            comm.SendErrorResponse("Failed to retrieve trustline.", session.Conn)
+            comm.SendErrorResponse("Failed to retrieve trustline.", session.Addr)
             return
         }
         dgOut.Command = main.ServerTrustlines_SetTrustline
