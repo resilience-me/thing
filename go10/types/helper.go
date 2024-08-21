@@ -1,8 +1,8 @@
 package types
 
 import (
-    "bytes"
     "encoding/binary"
+    "syscall" // Imported to use syscall.Clen for finding the length of a null-terminated byte slice.
 )
 
 // uint32ToBytes converts a uint32 value to a byte slice.
