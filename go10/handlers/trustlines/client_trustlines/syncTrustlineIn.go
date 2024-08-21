@@ -2,11 +2,9 @@ package client_trustlines
 
 import (
     "log"
-    "ripple/main"
-    "ripple/handlers"
-    "ripple/trustlines"             // Import the trustlines package for counter validation
-    "ripple/database/db_trustlines" // Handles database-related operations
     "encoding/binary"
+    "ripple/main"
+    "ripple/database/db_trustlines"
     "ripple/comm"
     "ripple/types"
     "ripple/config"
