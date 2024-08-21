@@ -1,11 +1,6 @@
-package main
+package types
 
 import "encoding/binary"
-
-// bytesToTrimmedString trims null characters from byte slices for proper string conversion.
-func bytesToTrimmedString(data []byte) string {
-    return string(bytes.TrimRight(data, "\x00"))
-}
 
 // SerializeDatagram converts a Datagram struct to a byte slice.
 func SerializeDatagram(dg *Datagram) ([]byte, error) {
@@ -28,9 +23,9 @@ func DeserializeDatagram(buf []byte) *Datagram {
     // Assuming buf is already confirmed to be of the correct length
     datagram := &Datagram{
         Command:           buf[0],
-        Username:          bytesToTrimmedString(buf[1:33]),
-        PeerUsername:      bytesToTrimmedString(buf[33:65]),
-        PeerServerAddress: bytesToTrimmedString(buf[65:97]),
+        Username:          BytesToString(buf[1:33]),
+        PeerUsername:      BytesToString(buf[33:65]),
+        PeerServerAddress: BytesToString(buf[65:97]),
         Arguments:         [256]byte{},
         Counter:           binary.BigEndian.Uint32(buf[353:357]),
         Signature:         [32]byte{},
