@@ -25,7 +25,7 @@ func loadClientSecretKey(dg *Datagram) ([]byte, error) {
     return loadSecretKeyFromDir(keyDir)
 }
 
-func loadServerSecretKey(dg *Datagram) ([]byte, error) {
+func LoadServerSecretKey(dg *Datagram) ([]byte, error) {
     keyDir := database.GetPeerDir(dg)
     return loadSecretKeyFromDir(keyDir)
 }
