@@ -8,14 +8,9 @@ import (
 	"ripple/types"
 )
 
-type Conn struct {
-	*net.UDPConn         // Embedding UDPConn to promote its methods
-	addr *net.UDPAddr    // Keeping addr as a separate field
-}
-
 type Session struct {
 	Datagram *types.Datagram // The datagram associated with this session
-	Conn     *Conn     // Pointer to Conn; can be nil if not applicable
+	addr *net.UDPAdd
 }
 
 // SessionManager manages sessions and their state
