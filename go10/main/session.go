@@ -43,6 +43,7 @@ func (sm *SessionManager) RouteSession(session *Session) {
 		// Active handler exists, queue the session
 		sm.queues[username] = append(sm.queues[username], session)
 	}
+	sm.wg.Add(1)
 }
 
 // CloseSession processes the next session in the queue after a session finishes
@@ -59,6 +60,7 @@ func (sm *SessionManager) CloseSession(username string) {
 		// No more sessions in the queue, mark handler as inactive
 		delete(sm.activeHandlers, username)
 	}
+	sm.wg.Done()
 }
 
 // handleSession processes a session and then triggers the next one
