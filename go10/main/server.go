@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"sync/atomic"
 	"ripple/auth"
 	"ripple/comm"
 	"ripple/types"
