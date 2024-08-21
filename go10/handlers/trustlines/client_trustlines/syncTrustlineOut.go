@@ -11,19 +11,19 @@ import (
 func SyncTrustlineOut(session main.Session) {
     datagram := session.Datagram
 
-    // Retrieve the syncCounter and sync status
-    syncCounter, isSynced, err := trustlines.GetSyncStatus(datagram)
-    if err != nil {
-        log.Printf("Failed to retrieve sync status in SyncTrustlineOut for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to retrieve sync status.", session.Addr)
-        return
-    }
-
     // Prepare the datagram
     dgOut, err := handlers.PrepareDatagramWithReceipient(datagram)
     if err != nil {
         log.Printf("Error preparing datagram for user %s: %v", datagram.Username, err)
         comm.SendErrorResponse("Error preparing datagram.", session.Addr)
+        return
+    }
+
+    // Retrieve the syncCounter and sync status
+    syncCounter, isSynced, err := trustlines.GetSyncStatus(datagram)
+    if err != nil {
+        log.Printf("Failed to retrieve sync status in SyncTrustlineOut for user %s: %v", datagram.Username, err)
+        comm.SendErrorResponse("Failed to retrieve sync status.", session.Addr)
         return
     }
 
