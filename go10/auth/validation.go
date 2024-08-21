@@ -56,11 +56,11 @@ func validateServerDatagram(buf []byte, dg *Datagram) error {
     return nil
 }
 
-// validateDatagram validates a datagram based on whether it's for a server or client session.
+// validateDatagram validates a datagram based on whether it's for a client or server session.
 func ValidateDatagram(buf []byte, dg *Datagram) error {
-	if dg.Command&0x80 == 0 { // Server session if MSB is 0
-		return validateServerDatagram(buf, dg)
-	} else {  // Client session if MSB is 1
+	if dg.Command&0x80 == 0 { // Client session if MSB is 0
 		return validateClientDatagram(buf, dg)
+	} else {  // Server session if MSB is 1
+		return validateServerDatagram(buf, dg)
 	}
 }
