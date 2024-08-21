@@ -19,11 +19,11 @@ func SyncTrustlineOut(session main.Session) {
         return
     }
 
-    // Initialize the datagram
+    // Prepare the datagram
     dgOut, err := handlers.PrepareDatagram(datagram)
     if err != nil {
-        log.Printf("Error initializing datagram for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Error initializing datagram.", session.Addr)
+        log.Printf("Error preparing datagram for user %s: %v", datagram.Username, err)
+        comm.SendErrorResponse("Error preparing datagram.", session.Addr)
         return
     }
 
