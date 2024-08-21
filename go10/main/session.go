@@ -76,8 +76,9 @@ func (sm *SessionManager) handleSession(session *Session) {
 	fmt.Printf("Handling session for user: %s\n", username)
 
 
-	// If this is a client connection and in the range 0x00 to 0x3F, check that peer account exists
-	if command&0xC0 == 0 { // Bit 7 (MSB) is 0: Client connection, bit 6 is 0: validate peer account exists
+	// If this is a client connection, check that peer account exists
+	// But only if the command included a peer. The range 0x00 to 0x3F is allocated for commands that do.
+	if command&0xC0 == 0 { // Bit 7 (MSB) is 0, bit 6 is 0
 	    if errorMessage, err := auth.ValidatePeerExists(datagram); err != nil {
 	        log.Printf("Error vaslidating peer existence for user %s: %v", username, err)
 	        comm.SendErrorResponse(errorMessage, session.Conn)
