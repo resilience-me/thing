@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"sync"
 	"ripple/auth"
 	"ripple/comm"
@@ -74,7 +74,7 @@ func (sm *SessionManager) handleSession(session *Session) {
 	defer sm.CloseSession(username)
 
 	// Handle the session here (processing logic)
-	fmt.Printf("Handling session for user: %s\n", username)
+	log.Printf("Handling session for user: %s\n", username)
 
 
 	// If this is a client connection, check that peer account exists
