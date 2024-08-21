@@ -29,6 +29,7 @@ func SyncTrustlineIn(session main.Session) {
         comm.SendErrorResponse("Error preparing datagram.", session.Addr)
         return
     }
+    dgOut.Username = datagram.PeerUsername
     dgOut.Command = main.ServerTrustlines_GetTrustline
     // Include the sync_in value in the datagram's Arguments[0:4]
     binary.BigEndian.PutUint32(dgOut.Arguments[0:4], syncIn)
