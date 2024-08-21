@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"ripple/auth"
 	"ripple/comm"
@@ -14,16 +14,16 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 	for {
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
-			fmt.Printf("Error reading from UDP connection: %v\n", err)
+			log.Printf("Error reading from UDP connection: %v", err)
 			continue
 		}
 
 		if n != len(buffer) {
-			fmt.Printf("Unexpected datagram size: received %d bytes, expected %d bytes\n", n, len(buffer))
+			log.Printf("Unexpected datagram size: received %d bytes, expected %d bytes", n, len(buffer))
 			continue
 		}
 
-		fmt.Printf("Received %d bytes from %s\n", n, remoteAddr.String())
+		log.Printf("Received %d bytes from %s", n, remoteAddr.String())
 
 		// Extract the ACK part (first 4 bytes)
 		ackBuffer := buffer[:4]
@@ -33,7 +33,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 
 		// Send an acknowledgment
 		if err := comm.SendAck(conn, remoteAddr, ackBuffer); err != nil {
-			fmt.Printf("Failed to send ACK: %v\n", err)
+			log.Printf("Failed to send ACK: %v", err)
 			continue
 		}
 
@@ -42,7 +42,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 
 		// Validate the datagram
 		if err := auth.ValidateDatagram(dataBuffer, datagram); err != nil {
-			fmt.Printf("Error validating  datagram: %v\n", err)
+			log.Printf("Error validating datagram: %v", err)
 			continue
 		}
 
