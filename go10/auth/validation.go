@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-// checkPeerExist checks for the existence of user and peer directories
+// ValidatePeerExists checks for the existence of user and peer directories
 // It returns an error message string (empty if successful) and an error object for detailed information if an error occurs.
-func CheckPeerExist(dg *Datagram) (string, error) {
+func ValidatePeerExists(dg *Datagram) (string, error) {
     exists, err = database.CheckPeerExists(dg)
     if err != nil {
         return "Error checking peer existence", fmt.Errorf("error checking peer existence for server '%s' and user '%s': %v", dg.PeerServerAddress, dg.PeerUsername, err)
