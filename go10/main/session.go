@@ -34,6 +34,8 @@ func (sm *SessionManager) RouteSession(session *Session) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
+	sm.wg.Add(1)
+
 	username := session.Datagram.Username
 	if !sm.activeHandlers[username] {
 		// No active handler, process session immediately
@@ -43,7 +45,6 @@ func (sm *SessionManager) RouteSession(session *Session) {
 		// Active handler exists, queue the session
 		sm.queues[username] = append(sm.queues[username], session)
 	}
-	sm.wg.Add(1)
 }
 
 // CloseSession processes the next session in the queue after a session finishes
