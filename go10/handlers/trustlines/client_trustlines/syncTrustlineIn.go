@@ -14,14 +14,6 @@ import (
 func SyncTrustlineIn(session main.Session) {
     datagram := session.Datagram
 
-    // Retrieve and increment the counter_out value
-    counterOut, err := db_trustlines.GetAndIncrementCounterOut(datagram)
-    if err != nil {
-        log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to update counter_out.", session.Conn)
-        return
-    }
-
     // Retrieve the current sync_in value
     syncIn, err := db_trustlines.GetSyncIn(datagram)
     if err != nil {
@@ -30,18 +22,17 @@ func SyncTrustlineIn(session main.Session) {
         return
     }
 
-    // Fetch the server's address
-    serverAddress := config.GetServerAddress()
-
-    // Create the datagram to request the trustline from the peer, including the sync_in value
-    dg := types.Datagram{
-        Command:           main.ServerTrustlines_GetTrustline,
-        Username:          datagram.PeerUsername,      // Switch places: this is the peer's username
-        PeerUsername:      datagram.Username,          // Switch places: this is your server's username
-        PeerServerAddress: serverAddress,              // Your server's address
-        Counter:           counterOut,                 // Use the incremented counter_out value
+    // Retrieve and increment the counter_out value
+    counterOut, err := db_trustlines.GetAndIncrementCounterOut(datagram)
+    if err != nil {
+        log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
+        comm.SendErrorResponse("Failed to update counter_out.", session.Conn)
+        return
     }
 
+    // Create the datagram to request the trustline from the peer, including the sync_in value
+    dg := types.NewDatagram(datagram.PeerUsername, datagram.Username, counterOut)
+    dg.Command = main.ServerTrustlines_GetTrustline
     // Include the sync_in value in the datagram's Arguments[0:4]
     binary.BigEndian.PutUint32(dg.Arguments[0:4], syncIn)
 
