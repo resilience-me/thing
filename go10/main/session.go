@@ -67,20 +67,29 @@ func (sm *SessionManager) CloseSession(username string) {
 // handleSession processes a session and then triggers the next one
 func (sm *SessionManager) handleSession(session *Session) {
 	datagram := session.Datagram
-	defer sm.CloseSession(datagramm.Username)
+	command := datagram.Command
+	username := datagram.Username
+
+	defer sm.CloseSession(username)
 
 	// Handle the session here (processing logic)
-	fmt.Printf("Handling session for user: %s\n", datagram.Username)
+	fmt.Printf("Handling session for user: %s\n", username)
+
 
 	// If this is a client connection and in the range 0x00 to 0x3F, check that peer account exists
-	if datagram.Command&0xC0 == 0 { // Bit 7 (MSB) is 0: Client connection, bit 6 is 0: validate peer account exists
+	if command&0xC0 == 0 { // Bit 7 (MSB) is 0: Client connection, bit 6 is 0: validate peer account exists
 	    if errorMessage, err := auth.ValidatePeerExists(datagram); err != nil {
-	        log.Printf("Error vaslidating peer existence for user %s: %v", datagram.Username, err)
+	        log.Printf("Error vaslidating peer existence for user %s: %v", username, err)
 	        comm.SendErrorResponse(errorMessage, session.Conn)
 	        return
 	    }
 	}
-
-	// Simulate session handling
-	// For example, send a datagram, wait for an ack, etc.
+	
+	handler := commandHandlers[command]
+	if handler == nil {
+		log.Printf("Unknown command: %d\n", command)
+		return
+	}
+	
+	handler(session)
 }
