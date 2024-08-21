@@ -4,10 +4,10 @@ import (
     "log"
     "encoding/binary"
     "ripple/main"
-    "ripple/database/db_trustlines"
+    "ripple/config"
     "ripple/comm"
     "ripple/types"
-    "ripple/config"
+    "ripple/database/db_trustlines"
 )
 
 // SyncTrustlineIn handles the client request to sync the inbound trustline from the peer server.
@@ -18,7 +18,7 @@ func SyncTrustlineIn(session main.Session) {
     syncIn, err := db_trustlines.GetSyncIn(datagram)
     if err != nil {
         log.Printf("Error getting sync_in for user %s: %v", datagram.Username, err)
-        main.SendErrorResponse("Failed to read sync_in value.", session.Conn)
+        comm.SendErrorResponse("Failed to read sync_in value.", session.Conn)
         return
     }
 
