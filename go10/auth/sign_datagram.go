@@ -21,7 +21,7 @@ func SignDatagram(dg *types.Datagram, peerServerAddress string) ([]byte, error) 
     }
 
     // Generate HMAC for the serialized data
-    signature, err := GenerateHMAC(serializedData, secretKey)
+    signature, err := GenerateHMAC(serializedData[:357], secretKey)
     if err != nil {
         return nil, fmt.Errorf("failed to generate HMAC: %w", err)
     }
