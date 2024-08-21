@@ -51,7 +51,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		}
 
 		// If this is a client connection, associate the Conn with the session
-		if datagram.Command&0x80 != 0 { // MSB is 1: Client connection
+		if datagram.Command&0x80 == 0 { // MSB is 0: Client connection
 			// Create a Conn object for the session
 			session.Conn = &Conn{
 				UDPConn: conn,
