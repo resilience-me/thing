@@ -5,6 +5,7 @@ import (
 	"net"
 	"ripple/auth"
 	"ripple/comm"
+	"ripple/types"
 )
 
 func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
@@ -37,7 +38,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
 		}
 
 		// Parse the datagram
-		datagram := DeserializeDatagram(dataBuffer)
+		datagram := types.DeserializeDatagram(dataBuffer)
 
 		// Validate the datagram
 		if err := auth.ValidateDatagram(dataBuffer, datagram); err != nil {
