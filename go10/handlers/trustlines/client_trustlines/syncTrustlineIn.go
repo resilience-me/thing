@@ -14,6 +14,14 @@ import (
 func SyncTrustlineIn(session main.Session) {
     datagram := session.Datagram
 
+    // Prepare the datagram
+    dgOut, err := handlers.PrepareDatagramWithReceipient(datagram)
+    if err != nil {
+        log.Printf("Error preparing datagram for user %s: %v", datagram.Username, err)
+        comm.SendErrorResponse("Error preparing datagram.", session.Addr)
+        return
+    }
+
     // Retrieve the current sync_in value
     syncIn, err := db_trustlines.GetSyncIn(datagram)
     if err != nil {
@@ -22,13 +30,6 @@ func SyncTrustlineIn(session main.Session) {
         return
     }
 
-    // Prepare the datagram
-    dgOut, err := handlers.PrepareDatagramWithReceipient(datagram)
-    if err != nil {
-        log.Printf("Error preparing datagram for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Error preparing datagram.", session.Addr)
-        return
-    }
     dgOut.Command = main.ServerTrustlines_GetTrustline
     // Include the sync_in value in the datagram's Arguments[0:4]
     binary.BigEndian.PutUint32(dgOut.Arguments[0:4], syncIn)
