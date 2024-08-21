@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"sync"
+	"ripple/auth"
+	"ripple/comm"
 )
 
 type Conn struct {
