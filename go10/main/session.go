@@ -5,6 +5,7 @@ import (
 	"sync"
 	"ripple/auth"
 	"ripple/comm"
+	"ripple/types"
 )
 
 type Conn struct {
@@ -13,7 +14,7 @@ type Conn struct {
 }
 
 type Session struct {
-	Datagram *Datagram // The datagram associated with this session
+	Datagram *types.Datagram // The datagram associated with this session
 	Conn     *Conn     // Pointer to Conn; can be nil if not applicable
 }
 
