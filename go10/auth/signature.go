@@ -21,20 +21,18 @@ func loadSecretKeyFromDir(dir string) ([]byte, error) {
 }
 
 func loadClientSecretKey(dg *Datagram) ([]byte, error) {
-    keyDir := database.GetAccountDir(dg)
-    return loadSecretKeyFromDir(keyDir)
+    accountDir := database.GetAccountDir(dg)
+    return loadSecretKeyFromDir(accountDir)
 }
 
 func LoadServerSecretKey(dg *Datagram) ([]byte, error) {
-    keyDir := database.GetPeerDir(dg)
-    return loadSecretKeyFromDir(keyDir)
+    peerDir := database.GetPeerDir(dg)
+    return loadSecretKeyFromDir(peerDir)
 }
 
 func LoadPeerSecretKey(username, peerServerAddress, peerUsername string) ([]byte, error) {
-    datadir := config.GetDataDir()
-    accountDir := filepath.Join(datadir, "accounts", username)
-    peerDir := filepath.Join(accountDir, "peers", peerServerAddress, peerUsername)
-    return loadSecretKeyFromDir(keyDir)
+    peerDir := database.GetPeerDirFromPeerID(username, peerServerAddress, peerUsername)
+    return loadSecretKeyFromDir(peerDir)
 }
 
 // verifyHMAC checks the integrity and authenticity of the received buffer
