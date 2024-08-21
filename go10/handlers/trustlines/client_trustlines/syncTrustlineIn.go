@@ -22,22 +22,20 @@ func SyncTrustlineIn(session main.Session) {
         return
     }
 
-    // Retrieve and increment the counter_out value
-    counterOut, err := db_trustlines.GetAndIncrementCounterOut(datagram)
+    // Initialize the datagram
+    dgOut, err := handlers.InitializeDatagram(datagram)
     if err != nil {
-        log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to update counter_out.", session.Conn)
+        log.Printf("Error initializing datagram for user %s: %v", datagram.Username, err)
+        comm.SendErrorResponse("Error initializing datagram.", session.Addr)
         return
     }
 
-    // Create the datagram to request the trustline from the peer, including the sync_in value
-    dg := types.NewDatagram(datagram.PeerUsername, datagram.Username, counterOut)
-    dg.Command = main.ServerTrustlines_GetTrustline
+    dgOut.Command = main.ServerTrustlines_GetTrustline
     // Include the sync_in value in the datagram's Arguments[0:4]
-    binary.BigEndian.PutUint32(dg.Arguments[0:4], syncIn)
+    binary.BigEndian.PutUint32(dgOut.Arguments[0:4], syncIn)
 
     // Send the GetTrustline command to the peer server
-    if err := comm.SignAndSendDatagram(session, &dg); err != nil {
+    if err := comm.SignAndSendDatagram(session, &dgOut); err != nil {
         log.Printf("Failed to send GetTrustline command for user %s to peer %s: %v", datagram.Username, datagram.PeerUsername, err)
         comm.SendErrorResponse("Failed to send GetTrustline command.", session.Conn)
         return
