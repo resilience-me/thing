@@ -22,7 +22,6 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, shutdownFl
 
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
-			// Handle other errors (unexpected issues)
 			log.Printf("Error reading from UDP connection: %v", err)
 			continue
 		}
