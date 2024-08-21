@@ -23,6 +23,7 @@ type SessionManager struct {
 	activeHandlers map[string]bool
 	queues         map[string][]*Session
 	mu             sync.Mutex
+	wg             sync.WaitGroup
 }
 
 // NewSessionManager creates a new SessionManager
