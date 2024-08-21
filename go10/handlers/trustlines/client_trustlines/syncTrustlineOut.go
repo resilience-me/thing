@@ -5,6 +5,7 @@ import (
     "ripple/database/db_trustlines"
     "ripple/main"
     "ripple/trustlines"
+    "ripple/commands"
 )
 
 // SyncTrustlineOut handles the client request to sync the outbound trustline to the peer server.
@@ -29,7 +30,7 @@ func SyncTrustlineOut(session main.Session) {
 
     if isSynced {
         // Trustline is already synced, so prepare a SetTimestamp command
-        dgOut.Command = main.ServerTrustlines_SetTimestamp
+        dgOut.Command = commands.ServerTrustlines_SetTimestamp
     } else {
         // Trustline is not synced, proceed with sending the trustline
         trustline, err := db_trustlines.GetTrustlineOut(datagram)
@@ -38,7 +39,7 @@ func SyncTrustlineOut(session main.Session) {
             comm.SendErrorResponse("Failed to retrieve trustline.", session.Addr)
             return
         }
-        dgOut.Command = main.ServerTrustlines_SetTrustline
+        dgOut.Command = commands.ServerTrustlines_SetTrustline
         binary.BigEndian.PutUint32(dgOut.Arguments[:4], trustline)
         binary.BigEndian.PutUint32(dgOut.Arguments[4:8], syncCounter)
     }
