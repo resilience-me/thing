@@ -12,7 +12,7 @@ func PrepareDatagram(datagram *types.Datagram) (*types.Datagram, error) {
         return nil, fmt.Errorf("error handling counter_out for user %s: %v", datagram.Username, err)
     }
 
-    dg := types.NewDatagram(datagram.PeerUsername, datagram.Username, counterOut)
+    dg := types.NewDatagram(datagram.Username, counterOut)
 
     return dg, nil
 }
