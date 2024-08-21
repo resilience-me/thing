@@ -5,7 +5,7 @@ import (
     "log"
     "ripple/database/db_trustlines"
     "ripple/main"
-    "ripple/trustlines" // Import the trustlines package for counter validation and incrementing sync counter
+    "ripple/trustlines"
 )
 
 // SetTrustline updates the trustline based on the given session.
