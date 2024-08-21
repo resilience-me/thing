@@ -32,6 +32,8 @@ func main() {
 	// Initialize the shutdown flag
 	var shutdownFlag int32
 
+	go shutdownHandler(&shutdownFlag)
+
 	// Start the server loop
 	runServerLoop(conn, sessionManager, &shutdownFlag)
 }
