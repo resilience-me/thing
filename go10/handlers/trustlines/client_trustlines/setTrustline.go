@@ -12,13 +12,6 @@ import (
 func SetTrustline(session main.Session) {
     datagram := session.Datagram
 
-    // Increment the sync_counter using the function in trustlines package
-    if errorMessage, err := auth.ValidatePeerExists(datagram); err != nil {
-        log.Printf("Error vaslidating peer existence for user %s: %v", datagram.Username, err)
-        main.SendErrorResponse(errorMessage, session.Conn)
-        return
-    }
-
     // Retrieve the trustline amount from the Datagram
     trustlineAmount := binary.BigEndian.Uint32(datagram.Arguments[:4])
 
