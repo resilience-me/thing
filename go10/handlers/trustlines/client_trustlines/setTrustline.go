@@ -5,6 +5,7 @@ import (
     "log"
     "ripple/database/db_trustlines"
     "ripple/main"
+    "ripple/comm"
     "ripple/trustlines"
 )
 
@@ -33,7 +34,7 @@ func SetTrustline(session main.Session) {
     log.Printf("Trustline and sync counter updated successfully for user %s.", datagram.Username)
 
     // Send success response
-    if err := main.SendSuccessResponse([]byte("Trustline updated successfully."), session.Conn); err != nil {
+    if err := comm.SendSuccessResponse([]byte("Trustline updated successfully."), session.Conn); err != nil {
         log.Printf("Failed to send success response to user %s: %v", datagram.Username, err)
         return
     }
