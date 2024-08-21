@@ -30,6 +30,13 @@ func LoadServerSecretKey(dg *Datagram) ([]byte, error) {
     return loadSecretKeyFromDir(keyDir)
 }
 
+func LoadPeerSecretKey(username, peerServerAddress, peerUsername string) ([]byte, error) {
+    datadir := config.GetDataDir()
+    accountDir := filepath.Join(datadir, "accounts", username)
+    peerDir := filepath.Join(accountDir, "peers", peerServerAddress, peerUsername)
+    return loadSecretKeyFromDir(keyDir)
+}
+
 // verifyHMAC checks the integrity and authenticity of the received buffer
 func verifyHMAC(buf []byte, key []byte) bool {
     // The signature is the last 32 bytes of the buffer
