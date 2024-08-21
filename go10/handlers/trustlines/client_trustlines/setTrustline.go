@@ -3,10 +3,10 @@ package client_trustlines
 import (
     "encoding/binary"
     "log"
-    "ripple/database/db_trustlines"
     "ripple/main"
     "ripple/comm"
     "ripple/trustlines"
+    "ripple/database/db_trustlines"
 )
 
 // SetTrustline updates the trustline based on the given session.
