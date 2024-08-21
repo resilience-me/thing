@@ -14,7 +14,7 @@ func SyncTrustlineIn(session main.Session) {
     datagram := session.Datagram
 
     // Prepare the datagram
-    dgOut, err := handlers.PrepareDatagramWithReceipient(datagram)
+    dgOut, err := handlers.PrepareDatagramWithRecipient(datagram)
     if err != nil {
         log.Printf("Error preparing datagram for user %s: %v", datagram.Username, err)
         comm.SendErrorResponse("Error preparing datagram.", session.Addr)
