@@ -2,11 +2,12 @@ package auth
 
 import (
 	"fmt"
+	"ripple/types"
 )
 
 // ValidateAndIncrementClientCounter checks if the datagram's counter is valid by comparing it to the last known counter for client connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
-func ValidateAndIncrementClientCounter(datagram *Datagram) error {
+func ValidateAndIncrementClientCounter(datagram *types.Datagram) error {
 	prevCounter, err := GetCounter(datagram)
 	if err != nil {
 		return fmt.Errorf("error retrieving counter: %v", err)
@@ -22,7 +23,7 @@ func ValidateAndIncrementClientCounter(datagram *Datagram) error {
 
 // ValidateAndIncrementServerCounter checks if the datagram's counter is valid by comparing it to the last known counter for server connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
-func ValidateAndIncrementServerCounter(datagram *Datagram) error {
+func ValidateAndIncrementServerCounter(datagram *types.Datagram) error {
 	prevCounter, err := GetCounterIn(datagram)
 	if err != nil {
 		return fmt.Errorf("error retrieving in-counter: %v", err)
