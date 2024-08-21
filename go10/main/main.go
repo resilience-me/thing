@@ -29,6 +29,9 @@ func main() {
 
 	fmt.Printf("Listening on port %d at server address %s.\n", config.Port, config.GetServerAddress())
 
+	// Initialize the shutdown flag
+	var shutdownFlag int32
+
 	// Start the server loop
-	runServerLoop(conn, sessionManager)
+	runServerLoop(conn, sessionManager, &shutdownFlag)
 }
