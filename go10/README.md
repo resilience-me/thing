@@ -1,1 +1,3 @@
-# Having finished the UDP-Retransmission, I'll now combine it with what I'd already fleshed out for the TCP version (most of which was fleshed out for the UDP-only version). Opening a new folder for that so I can easily revert to the backbone for the udpr-version (that is in Go9 folder... )
+# Ripple in a very simple true peer-to-peer implementation
+
+Custom transport protocol, UDP + retransmission and acknowledgement with ephemeral port as "nonce". At the application layer, counters to prevent datagrams from being replayed.
