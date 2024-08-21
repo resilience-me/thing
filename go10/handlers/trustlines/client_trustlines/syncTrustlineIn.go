@@ -7,6 +7,7 @@ import (
     "ripple/comm"
     "ripple/handlers"
     "ripple/database/db_trustlines"
+    "ripple/commands"
 )
 
 // SyncTrustlineIn handles the client request to sync the inbound trustline from the peer server.
@@ -29,7 +30,7 @@ func SyncTrustlineIn(session main.Session) {
         return
     }
 
-    dgOut.Command = main.ServerTrustlines_GetTrustline
+    dgOut.Command = commands.ServerTrustlines_GetTrustline
     // Include the sync_in value in the datagram's Arguments[0:4]
     binary.BigEndian.PutUint32(dgOut.Arguments[0:4], syncIn)
 
