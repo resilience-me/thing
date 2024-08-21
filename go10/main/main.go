@@ -36,4 +36,7 @@ func main() {
 
 	// Start the server loop
 	runServerLoop(conn, sessionManager, &shutdownFlag)
+
+	sessionManager.wg.Wait()
+	log.Println("All sessions and queues have been processed. Exiting.")
 }
