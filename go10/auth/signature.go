@@ -20,18 +20,18 @@ func loadSecretKeyFromDir(dir string) ([]byte, error) {
     return secretKey, nil
 }
 
-func loadClientSecretKey(dg *Datagram) ([]byte, error) {
+func loadClientSecretKey(dg *types.Datagram) ([]byte, error) {
     accountDir := database.GetAccountDir(dg)
     return loadSecretKeyFromDir(accountDir)
 }
 
-func LoadServerSecretKey(dg *Datagram) ([]byte, error) {
+func LoadServerSecretKey(dg *types.Datagram) ([]byte, error) {
     peerDir := database.GetPeerDir(dg)
     return loadSecretKeyFromDir(peerDir)
 }
 
-func LoadPeerSecretKey(username, peerServerAddress, peerUsername string) ([]byte, error) {
-    peerDir := database.GetPeerDirFromPeerID(username, peerServerAddress, peerUsername)
+func LoadPeerSecretKey(dg *types.Datagram, peerServerAddress string) ([]byte, error) {
+    peerDir := database.GetPeerDirFromPeerID(dg.PeerUsername, peerServerAddress, dg.Username)
     return loadSecretKeyFromDir(peerDir)
 }
 
@@ -67,7 +67,7 @@ func SignDatagram(dg *types.Datagram, peerServerAddress string) ([]byte, error) 
     }
 
     // Load the secret key for HMAC generation
-    secretKey, err := auth.LoadPeerSecretKey(dg.PeerUsername, peerServerAddress, dg.Username)
+    secretKey, err := auth.LoadPeerSecretKey(dg, peerServerAddress)
     if err != nil {
         return nil, fmt.Errorf("failed to load server secret key: %w", err)
     }
