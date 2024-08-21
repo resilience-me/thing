@@ -27,6 +27,8 @@ func SyncTrustlineOut(session main.Session) {
         return
     }
 
+    dgOut.Username = datagram.PeerUsername
+
     if isSynced {
         // Trustline is already synced, so prepare a SetTimestamp command
         dgOut.Command = main.ServerTrustlines_SetTimestamp
