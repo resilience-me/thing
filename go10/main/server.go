@@ -8,10 +8,17 @@ import (
 	"ripple/types"
 )
 
-func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager) {
+// runServerLoop runs the main server loop, processing incoming datagrams
+func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, shutdownFlag *int32) {
 	buffer := make([]byte, 393) // Combined buffer size (389 data + 4 ACK)
 
 	for {
+		// Check the shutdown flag
+		if atomic.LoadInt32(shutdownFlag) != 0 {
+			log.Println("Server is shutting down...")
+			return
+		}
+
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			log.Printf("Error reading from UDP connection: %v", err)
