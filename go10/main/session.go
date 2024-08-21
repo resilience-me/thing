@@ -52,6 +52,8 @@ func (sm *SessionManager) CloseSession(username string) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
+	sm.wg.Done()
+
 	if queue, exists := sm.queues[username]; exists && len(queue) > 0 {
 		// Process the next session in the queue
 		nextSession := queue[0]
@@ -61,7 +63,6 @@ func (sm *SessionManager) CloseSession(username string) {
 		// No more sessions in the queue, mark handler as inactive
 		delete(sm.activeHandlers, username)
 	}
-	sm.wg.Done()
 }
 
 // handleSession processes a session and then triggers the next one
