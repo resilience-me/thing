@@ -12,9 +12,8 @@ type Datagram struct {
 }
 
 // NewDatagram creates a new Datagram instance with the specified parameters
-func NewDatagram(recipient, sender, counter uint32) *Datagram {
+func NewDatagram(sender string, counter uint32) *Datagram {
     return &Datagram{
-        Username:          recipient,
         PeerUsername:      sender,
         PeerServerAddress: config.GetServerAddress(),
         Counter:           counter,
