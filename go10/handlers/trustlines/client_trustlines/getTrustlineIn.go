@@ -5,6 +5,7 @@ import (
     "ripple/database/db_trustlines"
     "ripple/main"
     "ripple/comm"
+    "ripple/types"
 )
 
 // GetTrustlineIn handles fetching the inbound trustline information
@@ -20,7 +21,7 @@ func GetTrustlineIn(session main.Session) {
     }
 
     // Prepare success response
-    responseData := main.Uint32ToBytes(trustline)
+    responseData := types.Uint32ToBytes(trustline)
 
     // Send the success response back to the client
     if err := comm.SendSuccessResponse(responseData, session.Conn); err != nil {
