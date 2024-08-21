@@ -11,7 +11,7 @@ import (
 )
 
 // SyncTrustlineIn handles the client request to sync the inbound trustline from the peer server.
-func SyncTrustlineIn(session types.Session) {
+func SyncTrustlineIn(session main.Session) {
     datagram := session.Datagram
 
     // Prepare the datagram
