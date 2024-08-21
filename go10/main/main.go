@@ -25,7 +25,6 @@ func main() {
 		fmt.Printf("Failed to listen on port %d: %v\n", Port, err)
 		return
 	}
-	defer conn.Close()
 
 	fmt.Printf("Listening on port %d at server address %s.\n", config.Port, config.GetServerAddress())
 
