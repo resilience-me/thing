@@ -27,8 +27,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	fmt.Printf("Server is running at address: %s\n", config.GetServerAddress())
-	fmt.Println("Listening on port 2012...")
+	fmt.Printf("Listening on port %d at server address %s.\n", config.Port, config.GetServerAddress())
 
 	// Start the server loop
 	runServerLoop(conn, sessionManager)
