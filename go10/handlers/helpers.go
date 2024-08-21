@@ -16,3 +16,15 @@ func PrepareDatagram(datagram *types.Datagram) (*types.Datagram, error) {
 
     return dg, nil
 }
+
+// PrepareDatagramWithReceipient prepares datagram with recipient
+func PrepareDatagramWithReceipient(datagram *types.Datagram) (*types.Datagram, error) {
+    // Prepare the datagram
+    dgOut, err := handlers.PrepareDatagram(datagram)
+    if err != nil {
+        return nil, err
+    }
+    dgOut.Username = datagram.PeerUsername
+
+    return dgOut, nil
+}
