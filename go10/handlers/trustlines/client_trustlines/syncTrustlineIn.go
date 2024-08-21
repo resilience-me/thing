@@ -14,19 +14,19 @@ import (
 func SyncTrustlineIn(session main.Session) {
     datagram := session.Datagram
 
-    // Retrieve the current sync_in value
-    syncIn, err := db_trustlines.GetSyncIn(datagram)
-    if err != nil {
-        log.Printf("Error getting sync_in for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to read sync_in value.", session.Conn)
-        return
-    }
-
     // Retrieve and increment the counter_out value
     counterOut, err := db_trustlines.GetAndIncrementCounterOut(datagram)
     if err != nil {
         log.Printf("Error handling counter_out for user %s: %v", datagram.Username, err)
         comm.SendErrorResponse("Failed to update counter_out.", session.Conn)
+        return
+    }
+
+    // Retrieve the current sync_in value
+    syncIn, err := db_trustlines.GetSyncIn(datagram)
+    if err != nil {
+        log.Printf("Error getting sync_in for user %s: %v", datagram.Username, err)
+        comm.SendErrorResponse("Failed to read sync_in value.", session.Conn)
         return
     }
 
