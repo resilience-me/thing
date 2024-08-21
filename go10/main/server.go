@@ -14,14 +14,14 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, shutdownFl
 	buffer := make([]byte, 393) // Combined buffer size (389 data + 4 ACK)
 
 	for {
-		// Check the shutdown flag
-		if atomic.LoadInt32(shutdownFlag) != 0 {
-			log.Println("Server is shutting down...")
-			return
-		}
-
 		n, remoteAddr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
+			// Check if the error is because of a shutdown (e.g., conn.Close() was called)
+			if atomic.LoadInt32(shutdownFlag) != 0 {
+				log.Println("Server is shutting down...")
+				return
+			}
+			// Handle other errors (unexpected issues)
 			log.Printf("Error reading from UDP connection: %v", err)
 			continue
 		}
