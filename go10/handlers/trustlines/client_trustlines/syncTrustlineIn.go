@@ -4,9 +4,8 @@ import (
     "log"
     "encoding/binary"
     "ripple/main"
-    "ripple/config"
     "ripple/comm"
-    "ripple/types"
+    "ripple/handlers"
     "ripple/database/db_trustlines"
 )
 
