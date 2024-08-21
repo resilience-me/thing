@@ -18,7 +18,8 @@ func BytesToUint32(data []byte) uint32 {
     return binary.BigEndian.Uint32(data[:4])
 }
 
-// BytesToTrimmedString trims null characters from byte slices for proper string conversion.
+// BytesToString converts a byte slice to a string, stopping at the first null character.
 func BytesToString(data []byte) string {
-    return string(bytes.TrimRight(data, "\x00"))
+    length := syscall.Clen(data) // Use syscall.clen to find the length up to the first null byte
+    return string(data[:length]) // Convert the trimmed byte slice to a string
 }
