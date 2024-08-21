@@ -10,7 +10,7 @@ import (
 )
 
 // Ensure that the shutdown process is also communicated clearly
-func shutdownHandler(shutdownFlag *int32) {
+func shutdownHandler(conn *net.UDPConn, shutdownFlag *int32) {
     interruptCount := 0 // Scoped to this function
     signals := make(chan os.Signal, 1)
     signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
@@ -23,6 +23,7 @@ func shutdownHandler(shutdownFlag *int32) {
             fmt.Println("Interrupt received, initiating graceful shutdown...")
             fmt.Println("Press Ctrl+C up to 9 times in total to force quit immediately.")
             atomic.StoreInt32(shutdownFlag, 1)  // Signal to shutdown the manager and other components
+            conn.Close()    // Close the listener to stop accepting new connections
             continue           // Skip to the next iteration
         }
 
