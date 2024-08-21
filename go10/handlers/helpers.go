@@ -1,5 +1,9 @@
 package handlers
 
+import (
+    "ripple/types"
+)
+
 // PrepareDatagram prepares common Datagram fields and increments counter_out.
 func PrepareDatagram(datagram *types.Datagram) (*types.Datagram, error) {
     // Retrieve and increment the counter_out value
