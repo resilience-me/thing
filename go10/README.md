@@ -12,7 +12,7 @@ Custom transport protocol, UDP + retransmission and acknowledgement over ephemer
         Signature         [32]byte
     }
 
-The command is one byte, allowing 256 commands. The first 128 commands are client commands, the last 128 are server commands. The signature relies on a symmetric secret key, in client command shared by the server and the client, and in server commands shared by two users with a direct connection in the system. It uses HMAC. And, the 256 byte long arguments field can hold arbitrary data for operands to the command. The datagram is 389 bytes.
+The command is one byte, allowing 256 commands. The first 128 commands are client commands, the last 128 are server commands. The signature relies on a symmetric secret key, in client command shared by the server and the client, and in server commands shared by two users with a direct connection in the system. It uses sha256. And, the 256 byte long arguments field can hold arbitrary data for operands to the command. The datagram is 389 bytes.
 
 ### Counters
 
