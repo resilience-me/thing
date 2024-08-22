@@ -1,6 +1,6 @@
 # Ripple in a very simple true peer-to-peer implementation
 
-Custom transport protocol, UDP + retransmission and acknowledgement with ephemeral port as "nonce". At the application layer, counters to prevent datagrams from being replayed. No encryption, only authentication. An account processes one Datagram at a time (coordinated via SessionManager class. ) Accounts are identified by a username, and, the address of their host server (IP address or domain name). "Database" managed with simple directories, `datadir/accounts/username/peers/server_address/username`. Any data stored in alphanumeric format in text files. This repository is the server only.
+Custom transport protocol, UDP + retransmission and acknowledgement over ephemeral port. At the application layer, counters to prevent datagrams from being replayed. No encryption, only authentication. An account processes one Datagram at a time (coordinated via SessionManager class. ) Accounts are identified by a username, and, the address of their host server (IP address or domain name). "Database" managed with simple directories, `datadir/accounts/username/peers/server_address/username`. Any data stored in alphanumeric format in text files. This repository is the server only.
 
     type Datagram struct {
         Command           byte
