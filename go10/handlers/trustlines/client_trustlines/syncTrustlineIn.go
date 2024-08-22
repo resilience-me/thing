@@ -1,13 +1,14 @@
 package client_trustlines
 
 import (
-    "log"
     "encoding/binary"
-    "ripple/main"
-    "ripple/comm"
-    "ripple/handlers"
-    "ripple/database/db_trustlines"
+    "log"
+
     "ripple/commands"
+    "ripple/comm"
+    "ripple/database/db_trustlines"
+    "ripple/handlers"
+    "ripple/main"
 )
 
 // SyncTrustlineIn handles the client request to sync the inbound trustline from the peer server.
