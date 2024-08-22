@@ -1,11 +1,14 @@
 package client_trustlines
 
 import (
+    "encoding/binary"
     "log"
-    "ripple/main"
+
     "ripple/commands"
+    "ripple/comm"
     "ripple/database/db_trustlines"
     "ripple/handlers"
+    "ripple/main"
     "ripple/trustlines"
 )
 
