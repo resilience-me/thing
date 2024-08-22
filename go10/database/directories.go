@@ -5,21 +5,21 @@ import (
     "path/filepath"
 )
 
-// GetAccountDir constructs the account directory path from a username
+// GetAccountDir constructs the account directory path from a username and returns it
 func GetAccountDir(username string) string {
     datadir := main.GetDataDir()
     return filepath.Join(datadir, "accounts", username)
 }
 
-// GetPeerDir constructs the peer directory path from a username, peer server address and peer username
+// GetPeerDir constructs the peer directory path from a username, peer server address and peer username and returns it
 func GetPeerDir(username, peerServerAddress, peerUsername string) string {
     accountDir := GetAccountDir(username)
     return filepath.Join(accountDir, "peers", peerServerAddress, peerUsername)
 }
 
-// GetTrustlineDir constructs the trustline directory path from the datagram and returns it.
-func GetTrustlineDir(dg *Datagram) string {
-    peerDir := GetPeerDir(dg)
+// GetTrustlineDir constructs the trustline directory path from  a username, peer server address and peer username and returns it
+func GetTrustlineDir(username, peerServerAddress, peerUsername string) string {
+    peerDir := GetPeerDir(username, peerServerAddress, peerUsername)
     return filepath.Join(peerDir, "trustline")
 }
 
