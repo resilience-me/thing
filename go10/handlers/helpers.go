@@ -20,6 +20,7 @@ func PrepareDatagram(username, peerServerAddress, peerUsername string) (*types.D
     return dg, nil
 }
 
+// PrepareDatagram prepares a datagram from an incoming datagram
 func PrepareDatagramResponse(dg *types.Datagram) (*types.Datagram, error) {
     return PrepareDatagram(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
 }
