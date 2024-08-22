@@ -1,5 +1,7 @@
 package main
 
+import "ripple/handlers/trustlines/client_trustlines"
+
 // CommandHandler defines the type for command handling functions
 type CommandHandler func(session Session)
 
