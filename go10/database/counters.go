@@ -5,15 +5,15 @@ import (
 )
 
 // GetCounterIn retrieves the counter_in value using the datagram to determine the directory.
-func GetCounterIn(username, peerServerAddress, peerUsername string) (uint32, error) {
-	peerDir := GetPeerDir(username, peerServerAddress, peerUsername)
+func GetCounterIn(dg *types.Datagram) (uint32, error) {
+	peerDir := GetPeerDir(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
 	return GetUint32FromFile(peerDir, "counter_in.txt")
 }
 
 // SetCounterIn sets the counter_in value.
-func SetCounterIn(username, peerServerAddress, peerUsername string, value uint32) error {
-	peerDir := GetPeerDir(username, peerServerAddress, peerUsername)
-	return WriteUint32ToFile(peerDir, "counter_in.txt", value)
+func SetCounterIn(dg *types.Datagram) error {
+	peerDir := GetPeerDir(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
+	return WriteUint32ToFile(peerDir, "counter_in.txt", dg.Counter)
 }
 
 // GetCounterOut retrieves the counter_out value using the datagram to determine the directory.
@@ -29,16 +29,6 @@ func SetCounterOut(username, peerServerAddress, peerUsername string, value uint3
 }
 
 // wrappers
-
-// GetCounterInFromDatagram retrieves the counter_in value using the incoming datagram
-func GetCounterInFromDatagram(dg *types.Datagram) (uint32, error) {
-	return GetCounterIn(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
-}
-
-// SetCounterInFromDatagram sets the counter_in value from the incoming datagram
-func SetCounterInFromDatagram(dg *types.Datagram) error {
-	return SetCounterIn(dg.Username, dg.PeerServerAddress, dg.PeerUsername, dg.Counter)
-}
 
 // GetCounterOutFromDatagram retrieves the counter_out value using the outgoing datagram
 func GetCounterOutFromDatagram(dg *types.Datagram, peerServerAddress string) (uint32, error) {
