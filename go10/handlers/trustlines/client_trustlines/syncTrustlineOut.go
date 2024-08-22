@@ -45,7 +45,7 @@ func SyncTrustlineOut(session main.Session) {
     }
 
     // Send the prepared datagram
-    if err := comm.SignAndSendDatagram(session, dgOut); err != nil {
+    if err := comm.SignAndSendDatagram(dgOut, datagram.PeerServerAddress); err != nil {
         log.Printf("Failed to send datagram in SyncTrustlineOut for user %s: %v", datagram.Username, err)
         return
     }
