@@ -17,6 +17,12 @@ func ReadFile(dir, filename string) ([]byte, error) {
     return data, nil
 }
 
+// WriteFile writes a byte slice to a file.
+func WriteFile(dir, filename string, data []byte) error {
+    filePath := filepath.Join(dir, filename)
+    return os.WriteFile(filePath, data, 0644)
+}
+
 // GetUint32FromFile reads the contents of a file, parses it as a uint32, and returns the value.
 func GetUint32FromFile(dir, filename string) (uint32, error) {
     data, err := ReadFile(dir, filename)
@@ -47,12 +53,10 @@ func ReadTimeFromFile(dir, filename string) (int64, error) {
 
 // WriteUint32ToFile writes a uint32 value to a file.
 func WriteUint32ToFile(dir, filename string, value uint32) error {
-    filePath := filepath.Join(dir, filename)
-    return os.WriteFile(filePath, []byte(fmt.Sprintf("%d", value)), 0644)
+    return WriteFile(dir, filename, []byte(fmt.Sprintf("%d", value)))
 }
 
-// writeTimeToFile writes a Unix timestamp to a file.
+// WriteTimeToFile writes a Unix timestamp to a file.
 func WriteTimeToFile(dir, filename string, timestamp int64) error {
-	filePath := filepath.Join(dir, filename)
-	return os.WriteFile(filePath, []byte(fmt.Sprintf("%d", timestamp)), 0644)
+    return WriteFile(dir, filename, []byte(fmt.Sprintf("%d", timestamp)))
 }
