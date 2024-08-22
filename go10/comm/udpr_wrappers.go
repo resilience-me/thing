@@ -41,15 +41,15 @@ func SendWithResolvedAddress(address string, data []byte, maxRetries int) error 
 	return SendWithAddress(addr, data, maxRetries)
 }
 
-// Default Send with standard importance (5 retries)
-func Send(destinationAddr string, data []byte) error {
-	return SendWithResolvedAddress(destinationAddr, data, LowImportance)
-}
+// // Default Send with standard importance (5 retries)
+// func Send(destinationAddr string, data []byte) error {
+// 	return SendWithResolvedAddress(destinationAddr, data, LowImportance)
+// }
 
-// Send with priority importance (12 retries)
-func SendPriority(destinationAddr string, data []byte) error {
-	return SendWithResolvedAddress(destinationAddr, data, HighImportance)
-}
+// // Send with priority importance (12 retries)
+// func SendPriority(destinationAddr string, data []byte) error {
+// 	return SendWithResolvedAddress(destinationAddr, data, HighImportance)
+// }
 
 // Wrapper for udpr.SendAck
 func SendAck(conn *net.UDPConn, addr *net.UDPAddr, idBytes []byte) error {
