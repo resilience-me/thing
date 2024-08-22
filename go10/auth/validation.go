@@ -27,7 +27,7 @@ func validateClientDatagram(buf []byte, dg *types.Datagram) error {
 	}
 
 	if !verifyHash(buf, secretKey) {
-		return errors.New("hash verification failed")
+		return errors.New("signature verification failed")
 	}
 
 	// Validate the counter
@@ -46,7 +46,7 @@ func validateServerDatagram(buf []byte, dg *types.Datagram) error {
 	}
 
 	if !verifyHash(buf, secretKey) {
-		return errors.New("hash verification failed")
+		return errors.New("signature verification failed")
 	}
 
 	// Validate the counter
