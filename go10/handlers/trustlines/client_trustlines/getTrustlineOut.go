@@ -2,9 +2,10 @@ package client_trustlines
 
 import (
     "log"
+
+    "ripple/comm"
     "ripple/database/db_trustlines"
     "ripple/main"
-    "ripple/comm"
     "ripple/types"
 )
 
