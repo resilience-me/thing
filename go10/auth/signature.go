@@ -3,8 +3,6 @@ package auth
 import (
     "crypto/sha256"
     "bytes"
-    "os"
-    "path/filepath"
 
     "ripple/database"
 )
