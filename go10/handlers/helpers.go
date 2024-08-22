@@ -8,26 +8,14 @@ import (
 )
 
 // PrepareDatagram prepares common Datagram fields and increments counter_out.
-func PrepareDatagram(datagram *types.Datagram) (*types.Datagram, error) {
+func PrepareDatagram(username, peerServerAddress, peerUsername string) (*types.Datagram, error) {
     // Retrieve and increment the counter_out value
-    counterOut, err := auth.GetAndIncrementCounterOut(datagram)
+    counterOut, err := auth.GetAndIncrementCounterOut(username, peerServerAddress, peerUsername)
     if err != nil {
-        return nil, fmt.Errorf("error handling counter_out for user %s: %v", datagram.Username, err)
+        return nil, fmt.Errorf("error handling counter_out for user %s: %v", username, err)
     }
 
-    dg := types.NewDatagram(datagram.Username, counterOut)
+    dg := types.NewDatagram(peerUsername, username, counterOut)
 
     return dg, nil
-}
-
-// PrepareDatagramWithRecipient prepares datagram with recipient
-func PrepareDatagramWithRecipient(datagram *types.Datagram) (*types.Datagram, error) {
-    // Prepare the datagram
-    dgOut, err := handlers.PrepareDatagram(datagram)
-    if err != nil {
-        return nil, err
-    }
-    dgOut.Username = datagram.PeerUsername
-
-    return dgOut, nil
 }
