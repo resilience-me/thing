@@ -80,7 +80,7 @@ type Payment struct {
 }
 
 // NewPayment is a constructor for creating a Payment struct based on an identifier, datagram, and inOrOut value.
-func NewPayment(datagram *Datagram, identifier string, inOrOut byte) *Payment {
+func NewPayment(datagram *Datagram, identifier string, inOrOut byte, nonce uint32) *Payment {
     // Initialize and return the Payment struct, using NewPeerAccount for the Counterpart field
     return &Payment{
         Identifier: identifier,
@@ -89,5 +89,6 @@ func NewPayment(datagram *Datagram, identifier string, inOrOut byte) *Payment {
             datagram.PeerServerAddress,
         ),
         InOrOut: inOrOut,
+        Nonce: nonce,
     }
 }
