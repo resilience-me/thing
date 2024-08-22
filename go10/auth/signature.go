@@ -10,15 +10,15 @@ import (
     "ripple/database"
 )
 
-func LoadClientSecretKey(dg *types.Datagram) ([]byte, error) {
+func loadClientSecretKey(dg *types.Datagram) ([]byte, error) {
     return database.LoadSecretKey(dg.Username)
 }
 
-func LoadServerSecretKeyIn(dg *types.Datagram) ([]byte, error) {
+func loadServerSecretKey(dg *types.Datagram) ([]byte, error) {
     return database.LoadPeerSecretKey(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
 }
 
-func LoadServerSecretKeyOut(dg *types.Datagram, peerServerAddress string) ([]byte, error) {
+func loadServerSecretKeyOut(dg *types.Datagram, peerServerAddress string) ([]byte, error) {
     return database.LoadPeerSecretKey(dg.PeerUsername, peerServerAddress, dg.Username)
 }
 
