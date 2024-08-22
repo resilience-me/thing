@@ -1,15 +1,10 @@
 package database
 
-import (
-    "fmt"
-    "os"
-    "path/filepath"
-)
+import "fmt"
 
-// loadSecretKey loads the secret key from the specified directory.
+// loadSecretKeyFromDir loads the secret key from the specified directory.
 func loadSecretKeyFromDir(dir string) ([]byte, error) {
-    secretKeyPath := filepath.Join(dir, "secretkey.txt")
-    secretKey, err := os.ReadFile(secretKeyPath)
+    secretKey, err := ReadFile(dir, "secretkey.txt")
     if err != nil {
         return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
     }
