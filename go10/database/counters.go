@@ -40,20 +40,6 @@ func SetCounterOut(username, peerServerAddress, peerUsername string, value uint3
 	return WriteUint32ToFile(peerDir, "counter_out.txt", value)
 }
 
-// wrappers
-
-// GetCounterOutFromDatagram retrieves the counter_out value using the outgoing datagram
-func GetCounterOutFromDatagram(dg *types.Datagram, peerServerAddress string) (uint32, error) {
-	return GetCounterOut(dg.PeerUsername, peerServerAddress, dg.Username)
-}
-
-// SetCounterOutFromDatagram sets the counter_out value from the outgoing datagram
-func SetCounterOutFromDatagram(dg *types.Datagram, peerServerAddress string, value uint32) error {
-	return SetCounterOut(dg.PeerUsername, peerServerAddress, dg.Username, value)
-}
-
-// complex function
-
 // GetAndIncrementCounterOut retrieves the current counter_out, increments it, and updates the database.
 // It returns the counter value before it was incremented.
 func GetAndIncrementCounterOut(username, peerServerAddress, peerUsername string) (uint32, error) {
@@ -70,10 +56,4 @@ func GetAndIncrementCounterOut(username, peerServerAddress, peerUsername string)
 
     // Return the original counter value that was fetched.
     return counterOut, nil
-}
-
-// wrapper
-
-func GetAndIncrementCounterOutFromDatagram(dg *types.Datagram, peerServerAddress string) (uint32, error) {
-	return GetAndIncrementCounterOut(dg.PeerUsername, peerServerAddress, dg.Username)
 }
