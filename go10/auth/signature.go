@@ -14,7 +14,7 @@ func LoadClientSecretKey(dg *types.Datagram) ([]byte, error) {
     return database.LoadSecretKey(dg.Username)
 }
 
-func LoadServerSecretKey(dg *types.Datagram) ([]byte, error) {
+func LoadServerSecretKeyIn(dg *types.Datagram) ([]byte, error) {
     return database.LoadPeerSecretKey(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
 }
 
