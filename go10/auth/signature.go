@@ -10,29 +10,16 @@ import (
     "ripple/database"
 )
 
-// loadSecretKey loads the secret key from the specified directory.
-func loadSecretKeyFromDir(dir string) ([]byte, error) {
-    secretKeyPath := filepath.Join(dir, "secretkey.txt")
-    secretKey, err := os.ReadFile(secretKeyPath)
-    if err != nil {
-        return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
-    }
-    return secretKey, nil
-}
-
-func loadClientSecretKey(dg *types.Datagram) ([]byte, error) {
-    accountDir := database.GetAccountDir(dg)
-    return loadSecretKeyFromDir(accountDir)
+func LoadClientSecretKey(dg *types.Datagram) ([]byte, error) {
+    return database.LoadSecretKey(dg.Username)
 }
 
 func LoadServerSecretKey(dg *types.Datagram) ([]byte, error) {
-    peerDir := database.GetPeerDir(dg)
-    return loadSecretKeyFromDir(peerDir)
+    return database.LoadPeerSecretKey(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
 }
 
 func LoadServerSecretKeyOut(dg *types.Datagram, peerServerAddress string) ([]byte, error) {
-    peerDir := database.GetPeerDirOut(dg, peerServerAddress)
-    return loadSecretKeyFromDir(peerDir)
+    return database.LoadPeerSecretKey(dg.PeerUsername, peerServerAddress, dg.Username)
 }
 
 // verifyHMAC checks the integrity and authenticity of the received buffer
