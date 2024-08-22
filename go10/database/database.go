@@ -39,8 +39,8 @@ func checkDirExists(dirPath string) (bool, error) {
 }
 
 // CheckPeerExists checks if the peer directory exists
-func CheckPeerExists(username, peerServerAddress, peerUsername string) (bool, error) {
-    peerDir := GetPeerDir(username, peerServerAddress, peerUsername)
+func CheckPeerExists(dg *types.Datagram) (bool, error) {
+    peerDir := GetPeerDir(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
     // Ensure the peer directory exists
     return checkDirExists(peerDir)
 }
