@@ -76,6 +76,7 @@ type Payment struct {
     Identifier  string
     Counterpart PeerAccount
     InOrOut     byte  // 0 for incoming, 1 for outgoing, stored as a single byte
+    Nonce       uint32
 }
 
 // NewPayment is a constructor for creating a Payment struct based on an identifier, datagram, and inOrOut value.
