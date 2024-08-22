@@ -4,6 +4,18 @@ import (
 	"ripple/types"
 )
 
+// GetCounter retrieves the counter value using the datagram to determine the directory.
+func GetCounter(dg *types.Datagram) (uint32, error) {
+	accountDir := GetAccountDir(dg.Username)
+	return database.GetUint32FromFile(accountDir, "counter.txt")
+}
+
+// SetCounter sets the counter value.
+func SetCounter(dg *types.Datagram) error {
+	accountDir := GetAccountDir(dg.Username)
+	return database.WriteUint32ToFile(accountDir, "counter.txt", dg.Counter)
+}
+
 // GetCounterIn retrieves the counter_in value using the datagram to determine the directory.
 func GetCounterIn(dg *types.Datagram) (uint32, error) {
 	peerDir := GetPeerDir(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
