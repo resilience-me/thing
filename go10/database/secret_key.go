@@ -19,6 +19,6 @@ func LoadSecretKey(username string) ([]byte, error) {
 
 // LoadPeerSecretKey loads the peer's secret key.
 func LoadPeerSecretKey(username, peerServerAddress, peerUsername string) ([]byte, error) {
-    peerDir := GetPeerDir(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
+    peerDir := GetPeerDir(username, peerServerAddress, peerUsername)
     return loadSecretKeyFromDir(peerDir)
 }
