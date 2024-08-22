@@ -1,5 +1,7 @@
 package types
 
+import "ripple/config"
+
 // Datagram holds the structure of the incoming data
 type Datagram struct {
     Command           byte
@@ -12,8 +14,9 @@ type Datagram struct {
 }
 
 // NewDatagram creates a new Datagram instance with the specified parameters
-func NewDatagram(sender string, counter uint32) *Datagram {
+func NewDatagram(recipient, sender string, counter uint32) *Datagram {
     return &Datagram{
+        Username:          recipient,
         PeerUsername:      sender,
         PeerServerAddress: config.GetServerAddress(),
         Counter:           counter,
