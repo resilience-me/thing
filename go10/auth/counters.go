@@ -6,9 +6,9 @@ import (
 	"ripple/database"
 )
 
-// ValidateAndIncrementClientCounter checks if the datagram's counter is valid by comparing it to the last known counter for client connections.
+// validateAndIncrementClientCounter checks if the datagram's counter is valid by comparing it to the last known counter for client connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
-func ValidateAndIncrementClientCounter(datagram *types.Datagram) error {
+func validateAndIncrementClientCounter(datagram *types.Datagram) error {
 	prevCounter, err := database.GetCounter(datagram)
 	if err != nil {
 		return fmt.Errorf("error retrieving counter: %v", err)
@@ -22,9 +22,9 @@ func ValidateAndIncrementClientCounter(datagram *types.Datagram) error {
 	return nil
 }
 
-// ValidateAndIncrementServerCounter checks if the datagram's counter is valid by comparing it to the last known counter for server connections.
+// validateAndIncrementServerCounter checks if the datagram's counter is valid by comparing it to the last known counter for server connections.
 // If valid, it sets the counter to the value in the datagram to prevent replay attacks.
-func ValidateAndIncrementServerCounter(datagram *types.Datagram) error {
+func validateAndIncrementServerCounter(datagram *types.Datagram) error {
 	prevCounter, err := database.GetCounterIn(datagram)
 	if err != nil {
 		return fmt.Errorf("error retrieving in-counter: %v", err)
