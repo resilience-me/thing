@@ -2,6 +2,7 @@ package auth
 
 import (
     "crypto/sha256"
+    "bytes"
     "os"
     "path/filepath"
 
@@ -32,8 +33,8 @@ func verifyHash(buf []byte, key []byte) bool {
     // Compute the SHA-256 hash
     hash := sha256.Sum256(preimage)
 
-    // Compare the computed hash with the signature
-    return string(signature) == string(hash[:])
+    // Compare the computed hash with the signature directly using bytes.Equal
+    return bytes.Equal(signature, hash[:])
 }
 
 // generateHash generates a SHA-256 hash for the given data using the provided key.
