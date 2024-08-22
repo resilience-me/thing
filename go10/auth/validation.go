@@ -6,6 +6,11 @@ import (
 	"ripple/types"
 )
 
+var (
+	// Predefined error for signature verification failure
+	ErrSignatureVerificationFailed = errors.New("signature verification failed")
+)
+
 // ValidatePeerExists checks for the existence of user and peer directories
 // It returns an error message string (empty if successful) and an error object for detailed information if an error occurs.
 func ValidatePeerExists(dg *types.Datagram) (string, error) {
@@ -27,7 +32,7 @@ func validateClientDatagram(buf []byte, dg *types.Datagram) error {
 	}
 
 	if !verifySignature(buf, secretKey) {
-		return errors.New("signature verification failed")
+		return ErrSignatureVerificationFailed
 	}
 
 	// Validate the counter
@@ -46,7 +51,7 @@ func validateServerDatagram(buf []byte, dg *types.Datagram) error {
 	}
 
 	if !verifySignature(buf, secretKey) {
-		return errors.New("signature verification failed")
+		return ErrSignatureVerificationFailed
 	}
 
 	// Validate the counter
