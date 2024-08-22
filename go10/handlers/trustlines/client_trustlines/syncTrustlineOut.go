@@ -2,10 +2,11 @@ package client_trustlines
 
 import (
     "log"
-    "ripple/database/db_trustlines"
     "ripple/main"
-    "ripple/trustlines"
     "ripple/commands"
+    "ripple/database/db_trustlines"
+    "ripple/handlers"
+    "ripple/trustlines"
 )
 
 // SyncTrustlineOut handles the client request to sync the outbound trustline to the peer server.
