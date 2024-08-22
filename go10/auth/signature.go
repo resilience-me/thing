@@ -19,8 +19,8 @@ func loadServerSecretKeyOut(dg *types.Datagram, peerServerAddress string) ([]byt
     return database.LoadPeerSecretKey(dg.PeerUsername, peerServerAddress, dg.Username)
 }
 
-// verifyHash checks the integrity of the received buffer
-func verifyHash(buf []byte, key []byte) bool {
+// verifySignature checks the integrity of the received buffer
+func verifySignature(buf []byte, key []byte) bool {
     // The signature is the last 32 bytes of the buffer
     data := buf[:len(buf)-32]
     signature := buf[len(buf)-32:]
@@ -35,8 +35,8 @@ func verifyHash(buf []byte, key []byte) bool {
     return bytes.Equal(signature, hash[:])
 }
 
-// generateHash generates a SHA-256 hash for the given data using the provided key.
-func generateHash(data []byte, secret []byte) []byte {
+// generateSignature generates a SHA-256 hash for the given data using the provided key.
+func generateSignature(data []byte, secret []byte) []byte {
     // Concatenate data and secret
     preimage := append(data, secret...)
 
