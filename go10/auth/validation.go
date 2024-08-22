@@ -26,7 +26,7 @@ func validateClientDatagram(buf []byte, dg *types.Datagram) error {
 		return fmt.Errorf("loading client secret key failed: %w", err)
 	}
 
-	if !verifyHash(buf, secretKey) {
+	if !verifySignature(buf, secretKey) {
 		return errors.New("signature verification failed")
 	}
 
@@ -45,7 +45,7 @@ func validateServerDatagram(buf []byte, dg *types.Datagram) error {
 		return fmt.Errorf("loading server secret key failed: %w", err)
 	}
 
-	if !verifyHash(buf, secretKey) {
+	if !verifySignature(buf, secretKey) {
 		return errors.New("signature verification failed")
 	}
 
