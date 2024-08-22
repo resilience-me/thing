@@ -15,7 +15,7 @@ func SignDatagram(dg *types.Datagram, peerServerAddress string) ([]byte, error) 
     }
 
     // Load the secret key for HMAC generation
-    secretKey, err := LoadServerSecretKeyOut(dg, peerServerAddress)
+    secretKey, err := loadServerSecretKeyOut(dg, peerServerAddress)
     if err != nil {
         return nil, fmt.Errorf("failed to load server secret key: %w", err)
     }
