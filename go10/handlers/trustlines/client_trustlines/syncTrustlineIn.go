@@ -35,7 +35,7 @@ func SyncTrustlineIn(session main.Session) {
     binary.BigEndian.PutUint32(dgOut.Arguments[0:4], syncIn)
 
     // Send the GetTrustline command to the peer server
-    if err := comm.SignAndSendDatagram(session, dgOut); err != nil {
+    if err := comm.SignAndSendDatagram(dgOut, datagram.PeerServerAddress); err != nil {
         log.Printf("Failed to send GetTrustline command for user %s to peer %s: %v", datagram.Username, datagram.PeerUsername, err)
         comm.SendErrorResponse("Failed to send GetTrustline command.", session.Addr)
         return
