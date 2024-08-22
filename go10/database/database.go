@@ -38,16 +38,9 @@ func checkDirExists(dirPath string) (bool, error) {
     return true, nil
 }
 
-// CheckAccountExists checks if the account directory exists
-func CheckAccountExists(dg *Datagram) (bool, error) {
-    accountDir := GetAccountDir(dg)
-    // Ensure the account directory exists
-    return checkDirExists(accountDir)
-}
-
 // CheckPeerExists checks if the peer directory exists
-func CheckPeerExists(dg *Datagram) (bool, error) {
-    peerDir := GetPeerDir(dg)
+func CheckPeerExists(username, peerServerAddress, peerUsername string) (bool, error) {
+    peerDir := GetPeerDir(username, peerServerAddress, peerUsername)
     // Ensure the peer directory exists
     return checkDirExists(peerDir)
 }
