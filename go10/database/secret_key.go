@@ -6,7 +6,7 @@ import "fmt"
 func loadSecretKeyFromDir(dir string) ([]byte, error) {
     secretKey, err := ReadFile(dir, "secretkey.txt")
     if err != nil {
-        return nil, fmt.Errorf("error reading secret key from %s: %w", secretKeyPath, err)
+        return nil, fmt.Errorf("error reading secret key: %w", err)
     }
     return secretKey, nil
 }
