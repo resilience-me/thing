@@ -7,7 +7,6 @@ import (
     "ripple/comm"
     "ripple/commands"
     "ripple/handlers"
-    "ripple/payments"
     "ripple/types"
     "ripple/database/db_pathfinding"
 )
@@ -34,7 +33,7 @@ func forwardFindPath(datagram *types.Datagram) {
         }
 
         // Check if the trustline (in or out) is sufficient
-        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, amount, command)
+        sufficient, err := CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, amount, command)
         if err != nil {
             log.Printf("Error checking trustline: %v", err)
             continue
