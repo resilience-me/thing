@@ -18,8 +18,7 @@ func FindPathOut(session *Session) {
     if path == nil {
         // Path is not found, add the new path using the Add method
         incomingPeer := pathfinding.NewPeerAccount(datagram.PeerUsername, datagram.PeerServerAddress)
-        account.Add(pathIdentifier, pathAmount, incomingPeer, pathfinding.PeerAccount{})
-        path = account.Find(pathIdentifier)
+        path = account.Add(pathIdentifier, pathAmount, incomingPeer, pathfinding.PeerAccount{})
         log.Printf("Initialized new path for identifier: %s with amount: %d", pathIdentifier, pathAmount)
 
         // Since this is the first time seeing this path, send a PathFindingRecurse back to the buyer
