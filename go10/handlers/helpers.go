@@ -21,7 +21,7 @@ func PrepareDatagram(username, peerServerAddress, peerUsername string) (*types.D
 }
 
 // PrepareDatagramFull prepares a datagram with all necessary fields including the command and arguments.
-func PrepareDatagramFull(username, peerServerAddress, peerUsername string, command byte, arguments []byte) (*types.Datagram, error) {
+func PrepareDatagramFull(command byte, username, peerServerAddress, peerUsername string, arguments []byte) (*types.Datagram, error) {
     // Prepare the new datagram
     datagram, err := handlers.PrepareDatagram(datagram.Username, peer.ServerAddress, peer.Username)
     if err != nil {
