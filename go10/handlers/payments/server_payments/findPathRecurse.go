@@ -47,9 +47,8 @@ func FindPathRecurse(session *Session) {
     // Check if a Payment is already associated with this account and identifier
     if account.Payment != nil && account.Payment.Identifier == pathIdentifier {
         log.Printf("Reached the root for path %s, sending out new FindPath requests", pathIdentifier)
-        
         // Use the InOrOut field from the Payment object to determine the direction
-        payments_operations.FindPath(datagram, account.Payment.InOrOut)
+        payments_operations.StartFindPath(datagram.Username, pathIdentifier, path.Amount, account.Payment.InOrOut)
         return
     }
 
