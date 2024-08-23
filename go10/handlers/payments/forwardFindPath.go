@@ -13,45 +13,34 @@ import (
 
 // ForwardFindPath forwards the pathfinding request to all connected peers
 func forwardFindPath(datagram *types.Datagram, inOrOut byte) {
-
-    username := datagram.Username
-
     // Retrieve the list of connected peers
-    peers, err := db_pathfinding.GetPeers(username)
+    peers, err := db_pathfinding.GetPeers(datagram.Username)
     if err != nil {
-        log.Printf("Failed to retrieve peers for user %s: %v", username, err)
+        log.Printf("Failed to retrieve peers for user %s: %v", datagram.Username, err)
         return
     }
 
-    // Extract datagram fields outside of the loop for efficiency
-    command := datagram.Command
-    arguments := datagram.Arguments[:]
-    
-    peerUsername := datagram.PeerUsername
-    peerServerAddress := datagram.PeerServerAddress
-
-    // Extract the path amount from the datagram arguments
-    amount := binary.BigEndian.Uint32(arguments[32:36])
+    amount := binary.BigEndian.Uint32(datagram.Arguments[32:36])
 
     for _, peer := range peers {
         // Skip if this peer is the one from which the datagram was received
-        if peer.Username == peerUsername && peer.ServerAddress == peerServerAddress {
+        if peer.Username == datagram.PeerUsername && peer.ServerAddress == datagram.PeerServerAddress {
             continue
         }
 
         // Check if the trustline is sufficient
-        sufficient, err := payments.CheckTrustlineSufficient(username, peer.ServerAddress, peer.Username, amount, inOrOut)
+        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, amount, inOrOut)
         if err != nil {
             log.Printf("Error checking trustline: %v", err)
             continue
         }
         if !sufficient {
-            log.Printf("Trustline insufficient for user %s with peer %s at %s", username, peer.Username, peer.ServerAddress)
+            log.Printf("Trustline insufficient for user %s with peer %s at %s", datagram.Username, peer.Username, peer.ServerAddress)
             continue
         }
 
         // Use PrepareDatagram to create the new datagram with command and arguments
-        newDatagram, err := handlers.PrepareDatagram(command, username, peer.ServerAddress, peer.Username, arguments)
+        newDatagram, err := handlers.PrepareDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, datagram.Arguments[:])
         if err != nil {
             log.Printf("Failed to prepare datagram: %v", err)
             continue
