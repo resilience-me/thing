@@ -44,18 +44,12 @@ func forwardFindPath(datagram *types.Datagram) {
             continue
         }
 
-        // Create the new datagram for the next pathfinding request
-        newDatagram, err := handlers.PrepareDatagram(datagram.Username, peer.ServerAddress, peer.Username)
+        // Use PrepareDatagramFull to create the new datagram
+        newDatagram, err := handlers.PrepareDatagramFull(command, datagram.Username, peer.ServerAddress, peer.Username, arguments)
         if err != nil {
             log.Printf("Failed to prepare pathfinding datagram: %v", err)
             continue
         }
-
-        // Set the command for the outgoing pathfinding request
-        newDatagram.Command = command
-
-        // Copy the identifier and amount from the original datagram's arguments
-        copy(newDatagram.Arguments[:], arguments) // Copy the full Arguments field
 
         // Serialize and sign the datagram
         if err := comm.SignAndSendDatagram(newDatagram, peer.ServerAddress); err != nil {
