@@ -1,5 +1,7 @@
 package pathfinding
 
+var PathManager *PathManager
+
 // Add creates a new account every time, overwriting any existing one.
 func (pm *PathManager) Add(username string) *Account {
     pm.mu.Lock()
