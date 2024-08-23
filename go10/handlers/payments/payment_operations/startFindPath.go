@@ -14,16 +14,18 @@ import (
 
 // StartFindPath initiates a pathfinding request to all connected peers.
 func StartFindPath(username, identifier string, amount uint32, inOrOut byte) {
+    // Retrieve the list of connected peers
     peers, err := db_pathfinding.GetPeers(username)
     if err != nil {
         log.Printf("Failed to retrieve peers for user %s: %v", username, err)
         return
     }
 
-    arguments := append([]byte{inOrOut}, []byte(identifier)...)
-    arguments = append(arguments, types.Uint32ToBytes(amount)...)
+    arguments := append([]byte(identifier), types.Uint32ToBytes(amount)...)
+    command := GetFindPathCommand(inOrOut)
 
     for _, peer := range peers {
+        // Check if the trustline is sufficient
         sufficient, err := payments.CheckTrustlineSufficient(username, peer.ServerAddress, peer.Username, amount, inOrOut)
         if err != nil {
             log.Printf("Error checking trustline: %v", err)
@@ -34,15 +36,17 @@ func StartFindPath(username, identifier string, amount uint32, inOrOut byte) {
             continue
         }
 
-        newDatagram, err := handlers.PrepareDatagram(commands.ServerPayments_FindPath, username, peer.ServerAddress, peer.Username, arguments)
+        // Create a new datagram for each peer
+        newDatagram, err := handlers.PrepareDatagram(command, username, peer.ServerAddress, peer.Username, arguments)
         if err != nil {
             log.Printf("Failed to prepare datagram: %v", err)
             continue
         }
 
+        // Serialize and sign the datagram
         if err := comm.SignAndSendDatagram(newDatagram, peer.ServerAddress); err != nil {
             log.Printf("Failed to send pathfinding request to %s at %s: %v", peer.Username, peer.ServerAddress, err)
-            return
+            return // Exit early on error
         }
 
         log.Printf("Sent pathfinding request to %s at %s", peer.Username, peer.ServerAddress)
