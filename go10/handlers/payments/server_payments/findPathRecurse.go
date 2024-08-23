@@ -57,17 +57,10 @@ func FindPathRecurse(session *Session) {
         log.Printf("Path already found for path %s, ignoring recurse", pathIdentifier)
         return
     }
-
     // Determine the direction based on which peer account is populated in the Path
-    var targetPeer pathfinding.PeerAccount
-    if path.Outgoing.Username != "" {
-        // Path is moving forward, pass it back to the incoming peer
-        targetPeer = path.Incoming
-    } else if path.Incoming.Username != "" {
-        // Path is moving backward, pass it to the outgoing peer
-        targetPeer = path.Outgoing
-    } else {
-        log.Printf("Unable to determine direction for path %s, both Incoming and Outgoing are empty", pathIdentifier)
+    targetPeer, err := GetRecursePeer(path, pathIdentifier)
+    if err != nil {
+        log.Printf("Error determining target peer: %v", err)
         return
     }
 
