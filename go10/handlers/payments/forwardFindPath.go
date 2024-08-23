@@ -45,7 +45,7 @@ func forwardFindPath(datagram *types.Datagram) {
         }
 
         // Use PrepareDatagramFull to create the new datagram
-        newDatagram, err := handlers.PrepareDatagramFull(command, datagram.Username, peer.ServerAddress, peer.Username, arguments)
+        newDatagram, err := handlers.PrepareDatagram(command, datagram.Username, peer.ServerAddress, peer.Username, arguments)
         if err != nil {
             log.Printf("Failed to prepare pathfinding datagram: %v", err)
             continue
