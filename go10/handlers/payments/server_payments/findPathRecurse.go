@@ -53,7 +53,7 @@ func FindPathRecurse(session *Session) {
     }
 
     // Check if both incoming and outgoing are set, indicating a path has already been found
-    if path.Incoming.Username != "" && path.Outgoing.Username != "" {
+    if CheckPathFound(path) {
         log.Printf("Path already found for path %s, ignoring recurse", pathIdentifier)
         return
     }
