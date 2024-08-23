@@ -1,10 +1,9 @@
 package handlers
 
 import (
-    "ripple/types"
     "ripple/auth"
+    "ripple/comm"
     "ripple/types"
-
 )
 
 // PrepareDatagramWithoutCommand prepares common Datagram fields and increments counter_out.
@@ -36,4 +35,20 @@ func PrepareDatagram(command byte, username, peerServerAddress, peerUsername str
 // PrepareDatagramResponse calls PrepareDatagram with fields from an incoming datagram
 func PrepareDatagramResponse(dg *types.Datagram) (*types.Datagram, error) {
     return PrepareDatagramWithoutCommand(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
+}
+
+// PrepareAndSendDatagram prepares, signs, and sends a datagram to a specified peer.
+func PrepareAndSendDatagram(command byte, username, serverAddress, peerUsername string, arguments []byte) error {
+    // Prepare the datagram with the command and arguments
+    newDatagram, err := PrepareDatagram(command, username, serverAddress, peerUsername, arguments)
+    if err != nil {
+        return fmt.Errorf("Failed to prepare datagram: %v", err)
+    }
+
+    // Sign and send the datagram to the target peer
+    if err := comm.SignAndSendDatagram(newDatagram, serverAddress); err != nil {
+        return fmt.Errorf("Failed to sign and send datagram to %s at %s: %v", peerUsername, serverAddress, err)
+    }
+
+    return nil
 }
