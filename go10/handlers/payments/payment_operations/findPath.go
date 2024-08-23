@@ -45,7 +45,7 @@ func FindPath(datagram *types.Datagram, inOrOut byte) {
         log.Printf("Initialized new path for identifier: %s with amount: %d", pathIdentifier, pathAmount)
 
         // Send a PathFindingRecurse back to the appropriate peer
-        FindPathRecurse(datagram, newPeer, 0)
+        PathRecurse(datagram, newPeer, 0)
         return
     }
 
