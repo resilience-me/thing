@@ -58,6 +58,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, pathManage
 		// Create a new session
 		session := &Session{
 			Datagram: datagram,
+			PathManager: pathManager,
 		}
 
 		// If this is a client connection, associate the address with the session
