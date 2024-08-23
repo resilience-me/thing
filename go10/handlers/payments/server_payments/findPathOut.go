@@ -1,35 +1,33 @@
-package main
+package server_payments
 
 import (
     "encoding/binary"
     "log"
 
     "ripple/comm"
-    "ripple/commands"
     "ripple/handlers"
     "ripple/pathfinding"
     "ripple/payments"
-    "ripple/payments_operations"
     "ripple/types"
-    "ripple/database/db_pathfinding"
+    "ripple/payment_operations"
 )
 
-// FindPathOut processes a pathfinding request from the buyer to the seller
-func FindPathOut(session *Session) {
+func FindPath(session *Session) {
     datagram := session.Datagram
 
-    // Inline extraction of the path identifier and amount from datagram arguments
-    pathIdentifier := BytesToString(datagram.Arguments[:32]) // Assuming identifier is in the first 32 bytes
-    pathAmount := binary.BigEndian.Uint32(datagram.Arguments[32:36]) // Assuming amount is in the next 4 bytes
+    // Extract direction (inOrOut) from the first byte of arguments
+    inOrOut := datagram.Arguments[0]
+    pathIdentifier := BytesToString(datagram.Arguments[1:33]) // Assuming identifier is in bytes 1-32
+    pathAmount := binary.BigEndian.Uint32(datagram.Arguments[33:37]) // Assuming amount is in bytes 33-36
 
-    // Check if there is sufficient outgoing trustline for the path amount
-    sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, datagram.PeerServerAddress, datagram.PeerUsername, pathAmount, types.Outgoing)
+    // Check if the trustline is sufficient based on the direction
+    sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, datagram.PeerServerAddress, datagram.PeerUsername, pathAmount, inOrOut)
     if err != nil {
-        log.Printf("Error checking outgoing trustline: %v", err)
+        log.Printf("Error checking trustline: %v", err)
         return
     }
     if !sufficient {
-        log.Printf("Insufficient outgoing trustline for user %s with peer %s at %s for amount: %d", datagram.Username, datagram.PeerUsername, datagram.PeerServerAddress, pathAmount)
+        log.Printf("Insufficient trustline for user %s with peer %s at %s for amount: %d", datagram.Username, datagram.PeerUsername, datagram.PeerServerAddress, pathAmount)
         return
     }
 
@@ -48,12 +46,12 @@ func FindPathOut(session *Session) {
         path = account.Add(pathIdentifier, pathAmount, incomingPeer, pathfinding.PeerAccount{})
         log.Printf("Initialized new path for identifier: %s with amount: %d", pathIdentifier, pathAmount)
 
-        // Since this is the first time seeing this path, send a PathFindingRecurse back to the buyer
-        payments_operations.FindPathRecurse(datagram, path.Incoming, 0)
+        // Since this is the first time seeing this path, send a PathFindingRecurse back to the origin
+        payment_operations.FindPathRecurse(datagram, path.Incoming, 0)
         return
     }
 
     // If the path is already present, forward the PathFinding request to peers
     log.Printf("Path already exists for identifier %s, forwarding to peers", pathIdentifier)
-    payments_operations.ForwardFindPath(datagram, types.Outgoing)
+    payments_operations.ForwardFindPath(datagram, inOrOut)
 }
