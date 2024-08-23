@@ -77,14 +77,13 @@ func forwardFindPathOut(datagram *types.Datagram, path *pathfinding.Path) {
         }
 
         // Check if the incoming trustline is sufficient
-        trustlineIn, err := db_trustlines.GetTrustlineIn(datagram.Username, peer.ServerAddress, peer.Username)
+        sufficient, err := payments.CheckTrustlineInSufficient(datagram.Username, peer.ServerAddress, peer.Username, pathAmount)
         if err != nil {
-            log.Printf("Failed to retrieve incoming trustline for user %s with peer %s at %s: %v", datagram.Username, peer.Username, peer.ServerAddress, err)
+            log.Printf("Error checking trustline: %v", err)
             continue
         }
-
-        if trustlineIn < pathAmount {
-            log.Printf("Insufficient incoming trustline for user %s with peer %s at %s. Required: %d, Available: %d", datagram.Username, peer.Username, peer.ServerAddress, pathAmount, trustlineIn)
+        if !sufficient {
+            log.Printf("Trustline insufficient for user %s with peer %s at %s", datagram.Username, peer.Username, peer.ServerAddress)
             continue
         }
 
