@@ -11,7 +11,7 @@ import (
 )
 
 // runServerLoop runs the main server loop, processing incoming datagrams
-func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, pathManager *pathfinding.PathManager, shutdownFlag *int32) {
+func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, shutdownFlag *int32) {
 	buffer := make([]byte, 393) // Combined buffer size (389 data + 4 ACK)
 
 	for {
@@ -58,7 +58,6 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, pathManage
 		// Create a new session
 		session := &Session{
 			Datagram: datagram,
-			PathManager: pathManager,
 		}
 
 		// If this is a client connection, associate the address with the session
