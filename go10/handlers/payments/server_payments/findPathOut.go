@@ -4,5 +4,5 @@ import "ripple/payments/payment_operations"
 
 // FindPathOut processes a pathfinding request from the buyer to the seller
 func FindPathOut(session *Session) {
-    payment_operations.HandleFindPath(session.Datagram, types.Outgoing)
+    payment_operations.ForwardFindPath(session.Datagram, types.Outgoing)
 }
