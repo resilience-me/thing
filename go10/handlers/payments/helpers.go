@@ -8,6 +8,19 @@ import (
     "ripple/pathfinding"
 )
 
+// GetRecursePeer determines the target peer based on the populated fields in the Path.
+func GetRecursePeer(path *pathfinding.Path, pathIdentifier string) (pathfinding.PeerAccount, error) {
+    if path.Outgoing.Username != "" {
+        // Path is moving forward, pass it back to the incoming peer
+        return path.Incoming, nil
+    } else if path.Incoming.Username != "" {
+        // Path is moving backward, pass it to the outgoing peer
+        return path.Outgoing, nil
+    }
+
+    return pathfinding.PeerAccount{}, fmt.Errorf("Unable to determine direction for path %s, both Incoming and Outgoing are empty", pathIdentifier)
+}
+
 // CheckPathFound checks if both incoming and outgoing peers are set in the path, indicating a complete path.
 func CheckPathFound(path *pathfinding.Path) bool {
     return path.Incoming.Username != "" && path.Outgoing.Username != ""
