@@ -1,15 +1,13 @@
 package server_payments
 
 import (
-    "encoding/binary"
     "log"
 
-    "ripple/comm"
-    "ripple/handlers"
     "ripple/pathfinding"
     "ripple/payments"
     "ripple/types"
     "ripple/database/db_pathfinding"
+    "ripple/handlers"
 )
 
 // StartFindPath initiates a pathfinding request to all connected peers.
@@ -36,16 +34,10 @@ func StartFindPath(username, identifier string, amount uint32, inOrOut byte) {
             continue
         }
 
-        // Create a new datagram for each peer
-        newDatagram, err := handlers.PrepareDatagram(command, username, peer.ServerAddress, peer.Username, arguments)
+        // Prepare, sign, and send the datagram using the helper function from the handlers package
+        err = handlers.PrepareAndSendDatagram(command, username, peer.ServerAddress, peer.Username, arguments)
         if err != nil {
-            log.Printf("Failed to prepare datagram: %v", err)
-            continue
-        }
-
-        // Serialize and sign the datagram
-        if err := comm.SignAndSendDatagram(newDatagram, peer.ServerAddress); err != nil {
-            log.Printf("Failed to send pathfinding request to %s at %s: %v", peer.Username, peer.ServerAddress, err)
+            log.Printf("Failed to prepare and send pathfinding request from %s to peer %s at server %s: %v", username, peer.Username, peer.ServerAddress, err)
             return // Exit early on error
         }
 
