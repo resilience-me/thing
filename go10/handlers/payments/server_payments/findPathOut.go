@@ -1,6 +1,6 @@
 package server_payments
 
-import "ripple/payment_operations"
+import "ripple/payments/payment_operations"
 
 // FindPathOut processes a pathfinding request from the buyer to the seller
 func FindPathOut(session *Session) {
