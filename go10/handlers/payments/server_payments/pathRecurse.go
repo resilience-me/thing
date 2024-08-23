@@ -12,8 +12,8 @@ import (
     "ripple/payments"
 )
 
-// FindPathRecurse processes a pathfinding recurse command
-func FindPathRecurse(session *Session) {
+// PathRecurse processes a pathfinding recurse command
+func PathRecurse(session *Session) {
     datagram := session.Datagram
 
     // Inline extraction of the path identifier and depth from datagram arguments
