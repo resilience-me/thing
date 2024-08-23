@@ -40,7 +40,7 @@ func ForwardFindPath(datagram *types.Datagram, inOrOut byte) {
         }
 
         if err := handlers.PrepareAndSendDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, datagram.Arguments[:]); err != nil {
-            log.Printf("Failed to prepare and send datagram: %v", err)
+            log.Printf("Failed to prepare and send pathfinding request from %s to peer %s at server %s: %v", datagram.Username, peer.Username, peer.ServerAddress, err)
             return
         }
 
