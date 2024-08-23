@@ -4,5 +4,5 @@ import "ripple/payments/payment_operations"
 
 // FindPathIn processes a pathfinding request from the seller to the buyer
 func FindPathIn(session *Session) {
-    payment_operations.HandleFindPath(session.Datagram, types.Incoming)
+    payment_operations.ForwardFindPath(session.Datagram, types.Incoming)
 }
