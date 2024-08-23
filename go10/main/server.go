@@ -7,7 +7,6 @@ import (
 	"ripple/auth"
 	"ripple/comm"
 	"ripple/types"
-	"ripple/pathfinding"
 )
 
 // runServerLoop runs the main server loop, processing incoming datagrams
