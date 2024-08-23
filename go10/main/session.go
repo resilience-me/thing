@@ -11,7 +11,6 @@ import (
 type Session struct {
 	Datagram *types.Datagram // The datagram associated with this session
 	Addr     *net.UDPAdd
-	PathManager *pathfinding.PathManager // Reference to the PathManager
 }
 
 // SessionManager manages sessions and their state
