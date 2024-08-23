@@ -1,4 +1,4 @@
-package payments_operations
+package payment_operations
 
 import (
     "log"
