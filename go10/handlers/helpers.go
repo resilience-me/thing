@@ -35,5 +35,5 @@ func PrepareDatagram(command byte, username, peerServerAddress, peerUsername str
 
 // PrepareDatagramResponse calls PrepareDatagram with fields from an incoming datagram
 func PrepareDatagramResponse(dg *types.Datagram) (*types.Datagram, error) {
-    return PrepareDatagram(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
+    return PrepareDatagramWithoutCommand(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
 }
