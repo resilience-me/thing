@@ -7,6 +7,7 @@ import (
     "ripple/comm"
     "ripple/commands"
     "ripple/handlers"
+    "ripple/payments"
     "ripple/types"
     "ripple/database/db_pathfinding"
 )
@@ -44,6 +45,6 @@ func ForwardFindPath(datagram *types.Datagram, inOrOut byte) {
             return
         }
 
-        log.Printf("Sent pathfinding request to %s at %s", peer.Username, peer.ServerAddress)
+        log.Printf("Successfully sent pathfinding request from %s to peer %s at server %s", datagram.Username, peer.Username, peer.ServerAddress)
     }
 }
