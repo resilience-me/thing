@@ -71,5 +71,5 @@ func FindPathRecurse(session *Session) {
     }
 
     // Forward the command to the appropriate peer
-    payments.forwardPathFindingRecurse(datagram, targetPeer, path.Depth)
+    payments_operations.FindPathRecurse(datagram, targetPeer, path.Depth)
 }
