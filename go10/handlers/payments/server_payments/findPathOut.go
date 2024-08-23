@@ -48,7 +48,7 @@ func FindPathOut(session *Session) {
         log.Printf("Initialized new path for identifier: %s with amount: %d", pathIdentifier, pathAmount)
 
         // Since this is the first time seeing this path, send a PathFindingRecurse back to the buyer
-        findPathOutRecurse(datagram, path.Incoming)
+        findPathRecurse(datagram, path.Incoming)
         return
     }
 
