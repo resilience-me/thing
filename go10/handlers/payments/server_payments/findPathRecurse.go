@@ -1,4 +1,4 @@
-package main
+package server_payments
 
 import (
     "encoding/binary"
@@ -9,6 +9,7 @@ import (
     "ripple/handlers"
     "ripple/pathfinding"
     "ripple/types"
+    "ripple/payments"
 )
 
 // FindPathRecurse processes a pathfinding recurse command
@@ -70,26 +71,5 @@ func FindPathRecurse(session *Session) {
     }
 
     // Forward the command to the appropriate peer
-    forwardPathFindingRecurseCommand(datagram, targetPeer, path.Depth)
-}
-
-func forwardPathFindingRecurseCommand(datagram *types.Datagram, targetPeer pathfinding.PeerAccount, depth uint32) {
-    // Use the PrepareDatagram helper to create the new datagram with incremented counter
-    newDatagram, err := handlers.PrepareDatagram(datagram.Command, datagram.Username, targetPeer.ServerAddress, targetPeer.Username, datagram.Arguments[:])
-    if err != nil {
-        log.Printf("Failed to prepare datagram: %v", err)
-        return
-    }
-
-    // Update the depth in the new datagram arguments
-    binary.BigEndian.PutUint32(newDatagram.Arguments[32:36], depth)
-
-    // Sign and send the datagram
-    err = comm.SignAndSendDatagram(newDatagram, targetPeer.ServerAddress)
-    if err != nil {
-        log.Printf("Failed to sign and send PathFindingRecurse command to %s at %s: %v", targetPeer.Username, targetPeer.ServerAddress, err)
-        return
-    }
-
-    log.Printf("Successfully signed and sent PathFindingRecurse command to %s at %s", targetPeer.Username, targetPeer.ServerAddress)
+    payments.forwardPathFindingRecurse(datagram, targetPeer, path.Depth)
 }
