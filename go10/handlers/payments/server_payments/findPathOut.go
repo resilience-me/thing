@@ -59,11 +59,11 @@ func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
     log.Printf("Successfully signed and sent FindPathRecurse command to %s at %s", targetPeer.Username, targetPeer.ServerAddress)
 }
 
-func forwardFindPathOut(account *pathfinding.Account, path *pathfinding.Path, datagram *types.Datagram) {
+func forwardFindPathOut(datagram *types.Datagram, path *pathfinding.Path) {
     // Retrieve the list of connected peers
-    peers, err := db_pathfinding.GetPeers(account.Username)
+    peers, err := db_pathfinding.GetPeers(datagram.Username)
     if err != nil {
-        log.Printf("Failed to retrieve peers for user %s: %v", account.Username, err)
+        log.Printf("Failed to retrieve peers for user %s: %v", datagram.Username, err)
         return
     }
 
@@ -77,19 +77,19 @@ func forwardFindPathOut(account *pathfinding.Account, path *pathfinding.Path, da
         }
 
         // Check if the incoming trustline is sufficient
-        trustlineIn, err := db_trustlines.GetTrustlineIn(account.Username, peer.ServerAddress, peer.Username)
+        trustlineIn, err := db_trustlines.GetTrustlineIn(datagram.Username, peer.ServerAddress, peer.Username)
         if err != nil {
-            log.Printf("Failed to retrieve incoming trustline for user %s with peer %s at %s: %v", account.Username, peer.Username, peer.ServerAddress, err)
+            log.Printf("Failed to retrieve incoming trustline for user %s with peer %s at %s: %v", datagram.Username, peer.Username, peer.ServerAddress, err)
             continue
         }
 
         if trustlineIn < pathAmount {
-            log.Printf("Insufficient incoming trustline for user %s with peer %s at %s. Required: %d, Available: %d", account.Username, peer.Username, peer.ServerAddress, pathAmount, trustlineIn)
+            log.Printf("Insufficient incoming trustline for user %s with peer %s at %s. Required: %d, Available: %d", datagram.Username, peer.Username, peer.ServerAddress, pathAmount, trustlineIn)
             continue
         }
 
         // Create the new datagram for the next pathfinding request
-        newDatagram, err := handlers.PrepareDatagram(account.Username, peer.ServerAddress, peer.Username)
+        newDatagram, err := handlers.PrepareDatagram(datagram.Username, peer.ServerAddress, peer.Username)
         if err != nil {
             log.Printf("Failed to prepare pathfinding datagram: %v", err)
             continue
