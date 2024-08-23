@@ -14,7 +14,7 @@ import (
 )
 
 // StartFindPath initiates a pathfinding request to all connected peers.
-func StartFindPath(username, identifier string, amount uint32, command, inOrOut byte) {
+func StartFindPath(username, identifier string, amount uint32, inOrOut byte) {
     // Retrieve the list of connected peers
     peers, err := db_pathfinding.GetPeers(username)
     if err != nil {
@@ -23,6 +23,13 @@ func StartFindPath(username, identifier string, amount uint32, command, inOrOut 
     }
 
     arguments := append([]byte(identifier), types.Uint32ToBytes(amount)...)
+
+    var command byte
+    if inOrOut == types.Incoming {
+        command = commands.ServerPayments_FindPathIn
+    } else {
+        command = commands.ServerPayments_FindPathOut
+    }
 
     for _, peer := range peers {
         // Check if the trustline is sufficient
