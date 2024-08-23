@@ -61,7 +61,7 @@ func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
 
 func sendNewPathFindingRequests(account *pathfinding.Account, path *pathfinding.Path, datagram *types.Datagram) {
     // Retrieve the list of connected peers
-    nextPeers, err := db_pathfinding.GetPeers(account.Username)
+    peers, err := db_pathfinding.GetPeers(account.Username)
     if err != nil {
         log.Printf("Failed to retrieve peers for user %s: %v", account.Username, err)
         return
@@ -70,7 +70,7 @@ func sendNewPathFindingRequests(account *pathfinding.Account, path *pathfinding.
     // Extract the path amount from the datagram arguments
     pathAmount := binary.BigEndian.Uint32(datagram.Arguments[32:36])
 
-    for _, peer := range nextPeers {
+    for _, peer := range peers {
         // Skip if this peer is already part of the path as the incoming peer
         if peer.Username == path.Incoming.Username && peer.ServerAddress == path.Incoming.ServerAddress {
             continue
