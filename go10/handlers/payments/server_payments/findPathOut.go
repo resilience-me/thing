@@ -9,6 +9,7 @@ import (
     "ripple/handlers"
     "ripple/pathfinding"
     "ripple/payments"
+    "ripple/payments_operations"
     "ripple/types"
     "ripple/database/db_pathfinding"
 )
@@ -48,11 +49,11 @@ func FindPathOut(session *Session) {
         log.Printf("Initialized new path for identifier: %s with amount: %d", pathIdentifier, pathAmount)
 
         // Since this is the first time seeing this path, send a PathFindingRecurse back to the buyer
-        findPathRecurse(datagram, path.Incoming, 0)
+        payments_operations.FindPathRecurse(datagram, path.Incoming, 0)
         return
     }
 
     // If the path is already present, forward the PathFinding request to peers
     log.Printf("Path already exists for identifier %s, forwarding to peers", pathIdentifier)
-    payments.ForwardFindPath(datagram, 1)
+    payments_operations.FindPath(datagram, 1)
 }
