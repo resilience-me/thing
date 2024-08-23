@@ -12,7 +12,7 @@ import (
     "ripple/database/db_pathfinding"
 )
 
-func forwardFindPath(datagram *types.Datagram, inOrOut byte) {
+func forwardFindPath(datagram *types.Datagram) {
     // Retrieve the list of connected peers
     peers, err := db_pathfinding.GetPeers(datagram.Username)
     if err != nil {
@@ -30,7 +30,7 @@ func forwardFindPath(datagram *types.Datagram, inOrOut byte) {
         }
 
         // Check if the trustline (in or out) is sufficient
-        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, pathAmount, inOrOut)
+        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, pathAmount, datagram.Command)
         if err != nil {
             log.Printf("Error checking trustline: %v", err)
             continue
@@ -48,11 +48,7 @@ func forwardFindPath(datagram *types.Datagram, inOrOut byte) {
         }
 
         // Set the command for the outgoing pathfinding request
-        if inOrOut == 0 {
-            newDatagram.Command = commands.ServerPayments_FindPathIn
-        } else {
-            newDatagram.Command = commands.ServerPayments_FindPathOut
-        }
+        newDatagram.Command = datagram.Command
 
         // Copy the identifier and amount from the original datagram's arguments
         copy(newDatagram.Arguments[:], datagram.Arguments[:]) // Copy the full Arguments field
