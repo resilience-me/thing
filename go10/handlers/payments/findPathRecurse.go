@@ -9,8 +9,8 @@ import (
     "ripple/pathfinding"
 )
 
-// ForwardFindPathRecurse sends a PathFindingRecurse command to the specified peer using the depth and identifier from the datagram.
-func ForwardFindPathRecurse(datagram *types.Datagram, peer pathfinding.PeerAccount, depth uint32) {
+// FindPathRecurse sends a PathFindingRecurse command to the specified peer using the depth and identifier from the datagram.
+func FindPathRecurse(datagram *types.Datagram, peer pathfinding.PeerAccount, depth uint32) {
     // Create the arguments slice by appending the depth to the identifier from the datagram
     arguments := append(datagram.Arguments[:32], types.Uint32ToBytes(depth)...)
 
