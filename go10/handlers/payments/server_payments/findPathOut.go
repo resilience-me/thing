@@ -16,7 +16,7 @@ import (
 // FindPathOut processes a pathfinding request from the buyer to the seller
 func FindPathOut(session *Session) {
     datagram := session.Datagram
-    pm := session.pm // Access PathManager from the session
+    pm := session.PathManager // Access PathManager from the session
 
     // Inline extraction of the path identifier and amount from datagram arguments
     pathIdentifier := BytesToString(datagram.Arguments[:32]) // Assuming identifier is in the first 32 bytes
