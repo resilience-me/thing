@@ -1,3 +1,19 @@
+package main
+
+import (
+    "encoding/binary"
+    "log"
+
+    "ripple/comm"
+    "ripple/commands"
+    "ripple/handlers"
+    "ripple/pathfinding"
+    "ripple/payments"
+    "ripple/types"
+    "ripple/database/db_pathfinding"
+)
+
+// FindPathOut processes a pathfinding request from the buyer to the seller
 func FindPathOut(session *Session) {
     datagram := session.Datagram
     pm := session.pm // Access PathManager from the session
@@ -42,6 +58,7 @@ func FindPathOut(session *Session) {
     forwardFindPathOut(account, path)
 }
 
+// findPathOutRecurse sends a PathFindingRecurse command back to the buyer
 func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
     // Directly target the incoming peer, which represents the direction back to the buyer
     targetPeer := path.Incoming
@@ -70,6 +87,7 @@ func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
     log.Printf("Successfully signed and sent FindPathRecurse command to %s at %s", targetPeer.Username, targetPeer.ServerAddress)
 }
 
+// forwardFindPathOut forwards the pathfinding request to all connected peers
 func forwardFindPathOut(datagram *types.Datagram, path *pathfinding.Path) {
     // Retrieve the list of connected peers
     peers, err := db_pathfinding.GetPeers(datagram.Username)
