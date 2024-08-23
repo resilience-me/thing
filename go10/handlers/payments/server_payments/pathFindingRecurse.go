@@ -1,12 +1,12 @@
-func PathFindingRecurse(session *Session) {
+func PathFindingRecurse(session *Session, pm *pathfinding.PathManager) {
     datagram := session.Datagram
 
-  // Inline extraction of the path identifier and depth from datagram arguments
+    // Inline extraction of the path identifier and depth from datagram arguments
     pathIdentifier := BytesToString(datagram.Arguments[:32]) // Assuming identifier is in the first 32 bytes
-    depth := binary.BigEndian.Uint32(datagram.Arguments[32:36]) // Assuming depth is in bytes 32-36
+    incomingDepth := binary.BigEndian.Uint32(datagram.Arguments[32:36]) // Assuming depth is in bytes 32-36
 
     // Find the account using the username from the datagram
-    account := session.pm.Find(datagram.Username)
+    account := pm.Find(datagram.Username)
     if account == nil {
         log.Printf("Account not found for user: %s", datagram.Username)
         return
@@ -19,9 +19,9 @@ func PathFindingRecurse(session *Session) {
         return
     }
 
-    // Validate the depth
-    if depth != path.Depth {
-        log.Printf("Depth mismatch for path %s: expected %d, got %d", pathIdentifier, path.Depth, depth)
+    // Validate the depth first
+    if incomingDepth != path.Depth {
+        log.Printf("Depth mismatch for path %s: expected %d, got %d", pathIdentifier, path.Depth, incomingDepth)
         return
     }
 
@@ -29,6 +29,32 @@ func PathFindingRecurse(session *Session) {
     path.Depth++
     log.Printf("Incremented depth for path %s: new depth is %d", pathIdentifier, path.Depth)
 
-    // Proceed with further pathfinding logic or response handling
-    // (This could include forwarding the request to peers, sending back a response, etc.)
+    // Check if a Payment is already associated with this account and identifier
+    if account.Payment != nil && account.Payment.Identifier == pathIdentifier {
+        log.Printf("Reached the root for path %s, processing payment", pathIdentifier)
+        processPayment(account, path) // Implement this function to handle the payment
+        return
+    }
+
+    // Check if both incoming and outgoing are set, indicating a path has already been found
+    if path.Incoming.Username != "" && path.Outgoing.Username != "" {
+        log.Printf("Path already found for path %s, ignoring recurse", pathIdentifier)
+        return
+    }
+
+    // Determine the direction based on which peer account is populated in the Path
+    var targetPeer pathfinding.PeerAccount
+    if path.Outgoing.Username != "" {
+        // Path is moving forward, pass it back to the incoming peer
+        targetPeer = path.Incoming
+    } else if path.Incoming.Username != "" {
+        // Path is moving backward, pass it to the outgoing peer
+        targetPeer = path.Outgoing
+    } else {
+        log.Printf("Unable to determine direction for path %s, both Incoming and Outgoing are empty", pathIdentifier)
+        return
+    }
+
+    // Forward the command to the appropriate peer
+    forwardPathFindingRecurseCommand(datagram, targetPeer)
 }
