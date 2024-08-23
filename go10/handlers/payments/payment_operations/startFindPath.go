@@ -5,7 +5,6 @@ import (
     "log"
 
     "ripple/comm"
-    "ripple/commands"
     "ripple/handlers"
     "ripple/pathfinding"
     "ripple/payments"
@@ -23,13 +22,7 @@ func StartFindPath(username, identifier string, amount uint32, inOrOut byte) {
     }
 
     arguments := append([]byte(identifier), types.Uint32ToBytes(amount)...)
-
-    var command byte
-    if inOrOut == types.Incoming {
-        command = commands.ServerPayments_FindPathIn
-    } else {
-        command = commands.ServerPayments_FindPathOut
-    }
+    command := GetFindPathCommand(inOrOut)
 
     for _, peer := range peers {
         // Check if the trustline is sufficient
