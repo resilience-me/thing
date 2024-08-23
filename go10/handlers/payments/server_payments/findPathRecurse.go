@@ -1,4 +1,4 @@
-func PathFindingRecurse(session *Session, pm *pathfinding.PathManager) {
+func FindPathRecurse(session *Session, pm *pathfinding.PathManager) {
     datagram := session.Datagram
 
     // Inline extraction of the path identifier and depth from datagram arguments
