@@ -11,6 +11,7 @@ import (
     "ripple/database/db_pathfinding"
 )
 
+// ForwardFindPath forwards the pathfinding request to all connected peers
 func ForwardFindPath(datagram *types.Datagram) {
     // Retrieve the list of connected peers
     peers, err := db_pathfinding.GetPeers(datagram.Username)
