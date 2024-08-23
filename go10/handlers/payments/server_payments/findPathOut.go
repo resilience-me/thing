@@ -23,7 +23,7 @@ func FindPathOut(session *Session) {
     pathAmount := binary.BigEndian.Uint32(datagram.Arguments[32:36]) // Assuming amount is in the next 4 bytes
 
     // Check if there is sufficient outgoing trustline for the path amount
-    sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, datagram.PeerServerAddress, datagram.PeerUsername, pathAmount, 1)
+    sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, datagram.PeerServerAddress, datagram.PeerUsername, pathAmount, types.Outgoing)
     if err != nil {
         log.Printf("Error checking outgoing trustline: %v", err)
         return
