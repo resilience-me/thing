@@ -3,7 +3,17 @@ package payments
 import (
     "fmt"
     "ripple/database/db_trustlines"
+    "ripple/commands"
+    "ripple/types"
 )
+
+// DetermineCommand returns the appropriate command based on the inOrOut parameter.
+func GetFindPathCommand(inOrOut byte) byte {
+    if inOrOut == types.Incoming {
+        return commands.ServerPayments_FindPathIn
+    }
+    return commands.ServerPayments_FindPathOut
+}
 
 // CheckTrustlineSufficient checks if the trustline (either incoming or outgoing) is sufficient for the given amount.
 func CheckTrustlineSufficient(username, peerServerAddress, peerUsername string, amount uint32, inOrOut byte) (bool, error) {
