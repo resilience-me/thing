@@ -42,8 +42,8 @@ func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
         return
     }
 
-    // Set the command
-    newDatagram.Command = datagram.Command
+    // Set the command directly to ServerPayments_FindPathRecurse
+    newDatagram.Command = commands.ServerPayments_FindPathRecurse
 
     // Copy the path identifier from path.Identifier to the new datagram's Arguments field
     copy(newDatagram.Arguments[:32], []byte(path.Identifier)) // Assuming path.Identifier is at most 32 bytes
@@ -52,9 +52,9 @@ func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
 
     // Sign and send the datagram to the target peer
     if err := comm.SignAndSendDatagram(newDatagram, targetPeer.ServerAddress); err != nil {
-        log.Printf("Failed to sign and send PathFindingRecurse command to %s at %s: %v", targetPeer.Username, targetPeer.ServerAddress, err)
+        log.Printf("Failed to sign and send FindPathRecurse command to %s at %s: %v", targetPeer.Username, targetPeer.ServerAddress, err)
         return
     }
 
-    log.Printf("Successfully signed and sent PathFindingRecurse command to %s at %s", targetPeer.Username, targetPeer.ServerAddress)
+    log.Printf("Successfully signed and sent FindPathRecurse command to %s at %s", targetPeer.Username, targetPeer.ServerAddress)
 }
