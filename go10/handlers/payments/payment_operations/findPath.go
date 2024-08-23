@@ -36,12 +36,10 @@ func FindPath(datagram *types.Datagram, inOrOut byte) {
     path := account.Find(pathIdentifier)
     if path == nil {
         // Path is not found, add the new path using the Add method
-        var newPeer pathfinding.PeerAccount
+        newPeer := pathfinding.NewPeerAccount(datagram.PeerUsername, datagram.PeerServerAddress)
         if inOrOut == types.Outgoing {
-            newPeer = pathfinding.NewPeerAccount(datagram.PeerUsername, datagram.PeerServerAddress)
             path = account.Add(pathIdentifier, pathAmount, newPeer, pathfinding.PeerAccount{})
         } else {
-            newPeer = pathfinding.NewPeerAccount(datagram.PeerUsername, datagram.PeerServerAddress)
             path = account.Add(pathIdentifier, pathAmount, pathfinding.PeerAccount{}, newPeer)
         }
         log.Printf("Initialized new path for identifier: %s with amount: %d", pathIdentifier, pathAmount)
