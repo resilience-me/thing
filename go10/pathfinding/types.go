@@ -1,7 +1,6 @@
 package pathfinding
 
 import (
-    "sync"
     "time"
     "ripple/config"
 )
