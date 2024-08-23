@@ -28,7 +28,7 @@ func FindPathOut(session *Session) {
 
     // If the path is already present, forward the PathFinding request to peers
     log.Printf("Path already exists for identifier %s, forwarding to peers", pathIdentifier)
-    sendNewPathFindingRequests(account, path)
+    forwardFindPathOut(account, path)
 }
 
 func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
@@ -59,7 +59,7 @@ func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
     log.Printf("Successfully signed and sent FindPathRecurse command to %s at %s", targetPeer.Username, targetPeer.ServerAddress)
 }
 
-func sendNewPathFindingRequests(account *pathfinding.Account, path *pathfinding.Path, datagram *types.Datagram) {
+func forwardFindPathOut(account *pathfinding.Account, path *pathfinding.Path, datagram *types.Datagram) {
     // Retrieve the list of connected peers
     peers, err := db_pathfinding.GetPeers(account.Username)
     if err != nil {
