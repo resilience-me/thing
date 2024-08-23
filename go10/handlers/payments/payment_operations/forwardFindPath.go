@@ -39,17 +39,10 @@ func ForwardFindPath(datagram *types.Datagram, inOrOut byte) {
             continue
         }
 
-        // Use PrepareDatagram to create the new datagram with command and arguments
-        newDatagram, err := handlers.PrepareDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, datagram.Arguments[:])
+        err := handlers.PrepareAndSendDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, datagram.Arguments[:])
         if err != nil {
-            log.Printf("Failed to prepare datagram: %v", err)
-            continue
-        }
-
-        // Serialize and sign the datagram
-        if err := comm.SignAndSendDatagram(newDatagram, peer.ServerAddress); err != nil {
-            log.Printf("Failed to send pathfinding request to %s at %s: %v", peer.Username, peer.ServerAddress, err)
-            return // Exit early on error
+            log.Printf("Failed to prepare and send datagram: %v", err)
+            return
         }
 
         log.Printf("Sent pathfinding request to %s at %s", peer.Username, peer.ServerAddress)
