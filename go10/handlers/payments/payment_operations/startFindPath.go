@@ -1,3 +1,19 @@
+package server_payments
+
+import (
+    "encoding/binary"
+    "log"
+
+    "ripple/comm"
+    "ripple/commands"
+    "ripple/handlers"
+    "ripple/pathfinding"
+    "ripple/payments"
+    "ripple/types"
+    "ripple/database/db_pathfinding"
+)
+
+// StartFindPath initiates a pathfinding request to all connected peers.
 func StartFindPath(username, identifier string, amount uint32, command, inOrOut byte) {
     // Retrieve the list of connected peers
     peers, err := db_pathfinding.GetPeers(username)
@@ -6,7 +22,7 @@ func StartFindPath(username, identifier string, amount uint32, command, inOrOut 
         return
     }
 
-    arguments := append([]byte(someIdentifier), types.Uint32ToBytes(amount)...)
+    arguments := append([]byte(identifier), types.Uint32ToBytes(amount)...)
 
     for _, peer := range peers {
         // Check if the trustline is sufficient
