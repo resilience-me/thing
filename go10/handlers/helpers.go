@@ -7,8 +7,8 @@ import (
 
 )
 
-// PrepareDatagram prepares common Datagram fields and increments counter_out.
-func PrepareDatagram(username, peerServerAddress, peerUsername string) (*types.Datagram, error) {
+// PrepareDatagramWithoutCommand prepares common Datagram fields and increments counter_out.
+func PrepareDatagramWithoutCommand(username, peerServerAddress, peerUsername string) (*types.Datagram, error) {
     // Retrieve and increment the counter_out value
     counterOut, err := auth.GetAndIncrementCounterOut(username, peerServerAddress, peerUsername)
     if err != nil {
@@ -20,10 +20,10 @@ func PrepareDatagram(username, peerServerAddress, peerUsername string) (*types.D
     return dg, nil
 }
 
-// PrepareDatagramFull prepares a datagram with all necessary fields including the command and arguments.
-func PrepareDatagramFull(command byte, username, peerServerAddress, peerUsername string, arguments []byte) (*types.Datagram, error) {
+// PrepareDatagram prepares a datagram with all necessary fields including the command and arguments.
+func PrepareDatagram(command byte, username, peerServerAddress, peerUsername string, arguments []byte) (*types.Datagram, error) {
     // Prepare the new datagram
-    datagram, err := handlers.PrepareDatagram(datagram.Username, peer.ServerAddress, peer.Username)
+    datagram, err := handlers.PrepareDatagramWithoutCommand(datagram.Username, peer.ServerAddress, peer.Username)
     if err != nil {
         return nil, fmt.Errorf("Failed to prepare datagram: %v", err)
     }
