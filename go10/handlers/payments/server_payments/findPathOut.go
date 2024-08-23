@@ -88,7 +88,7 @@ func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
 }
 
 // forwardFindPathOut forwards the pathfinding request to all connected peers
-func forwardFindPathOut(datagram *types.Datagram, path *pathfinding.Path) {
+func forwardFindPathOut(datagram *types.Datagram) {
     // Retrieve the list of connected peers
     peers, err := db_pathfinding.GetPeers(datagram.Username)
     if err != nil {
