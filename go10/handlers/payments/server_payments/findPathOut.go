@@ -55,7 +55,7 @@ func FindPathOut(session *Session) {
 
     // If the path is already present, forward the PathFinding request to peers
     log.Printf("Path already exists for identifier %s, forwarding to peers", pathIdentifier)
-    payments.ForwardFindPath(datagram)
+    payments.ForwardFindPath(datagram, 1)
 }
 
 // findPathOutRecurse sends a PathFindingRecurse command back to the buyer
