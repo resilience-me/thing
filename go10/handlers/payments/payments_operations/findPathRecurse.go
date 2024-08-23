@@ -1,4 +1,4 @@
-package common_payments
+package payments_operations
 
 import (
     "log"
