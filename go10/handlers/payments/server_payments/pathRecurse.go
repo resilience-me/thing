@@ -10,6 +10,7 @@ import (
     "ripple/pathfinding"
     "ripple/types"
     "ripple/payments"
+    "ripple/payments/payment_operations"
 )
 
 // PathRecurse processes a pathfinding recurse command
