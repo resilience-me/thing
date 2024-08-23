@@ -29,10 +29,11 @@ func (pm *PathManager) Remove(username string) {
     delete(pm.Accounts, username)
 }
 
-// Add creates and adds a new Path to an Account.
-func (account *Account) Add(identifier string, amount uint32, incoming, outgoing PeerAccount) {
+// Add creates and adds a new Path to an Account and returns it.
+func (account *Account) Add(identifier string, amount uint32, incoming, outgoing PeerAccount) *Path {
     newPath := NewPath(identifier, amount, incoming, outgoing)
     account.Paths[identifier] = newPath
+    return newPath
 }
 
 // Find retrieves a Path from an Account using the identifier.
