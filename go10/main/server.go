@@ -7,10 +7,11 @@ import (
 	"ripple/auth"
 	"ripple/comm"
 	"ripple/types"
+	"ripple/pathfinding"
 )
 
 // runServerLoop runs the main server loop, processing incoming datagrams
-func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, shutdownFlag *int32) {
+func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, pathManager *pathfinding.PathManager, shutdownFlag *int32) {
 	buffer := make([]byte, 393) // Combined buffer size (389 data + 4 ACK)
 
 	for {
