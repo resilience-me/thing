@@ -9,8 +9,8 @@ import (
     "ripple/pathfinding"
 )
 
-// findPathRecurse sends a PathFindingRecurse command to the specified peer.
-func findPathRecurse(datagram *types.Datagram, peer pathfinding.PeerAccount) {    
+// ForwardFindPathRecurse sends a PathFindingRecurse command to the specified peer.
+func ForwardFindPathRecurse(datagram *types.Datagram, peer pathfinding.PeerAccount) {    
     // Prepare the datagram for forwarding with the command and arguments
     newDatagram, err := handlers.PrepareDatagram(commands.ServerPayments_FindPathRecurse, datagram.Username, peer.ServerAddress, peer.Username, datagram.Arguments[:])
     if err != nil {
