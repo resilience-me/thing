@@ -5,7 +5,13 @@ import (
     "ripple/database/db_trustlines"
     "ripple/commands"
     "ripple/types"
+    "ripple/pathfinding"
 )
+
+// CheckPathFound checks if both incoming and outgoing peers are set in the path, indicating a complete path.
+func CheckPathFound(path *pathfinding.Path) bool {
+    return path.Incoming.Username != "" && path.Outgoing.Username != ""
+}
 
 // DetermineCommand returns the appropriate command based on the inOrOut parameter.
 func GetFindPathCommand(inOrOut byte) byte {
