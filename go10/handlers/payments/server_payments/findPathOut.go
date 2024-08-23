@@ -101,7 +101,7 @@ func forwardFindPathOut(datagram *types.Datagram, path *pathfinding.Path) {
 
     for _, peer := range peers {
         // Skip if this peer is already part of the path as the incoming peer
-        if peer.Username == path.Incoming.Username && peer.ServerAddress == path.Incoming.ServerAddress {
+        if peer.Username == datagram.PeerUsername && peer.ServerAddress == datagram.PeerServerAddress {
             continue
         }
 
