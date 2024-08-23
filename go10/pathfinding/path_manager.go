@@ -1,5 +1,9 @@
 package pathfinding
 
+import (
+    "sync"
+)
+
 var PathManager *PathManager
 
 // PathManager manages all Account entries in a system.
