@@ -20,8 +20,11 @@ func forwardFindPath(datagram *types.Datagram) {
         return
     }
 
+    command := datagram.Command
+    arguments := datagram.Arguments[:]
+    
     // Extract the path amount from the datagram arguments
-    pathAmount := binary.BigEndian.Uint32(datagram.Arguments[32:36])
+    amount := binary.BigEndian.Uint32(arguments[32:36])
 
     for _, peer := range peers {
         // Skip if this peer is the one from which the datagram was received
@@ -30,7 +33,7 @@ func forwardFindPath(datagram *types.Datagram) {
         }
 
         // Check if the trustline (in or out) is sufficient
-        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, pathAmount, datagram.Command)
+        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, amount, datagram.Command)
         if err != nil {
             log.Printf("Error checking trustline: %v", err)
             continue
@@ -48,10 +51,10 @@ func forwardFindPath(datagram *types.Datagram) {
         }
 
         // Set the command for the outgoing pathfinding request
-        newDatagram.Command = datagram.Command
+        newDatagram.Command = command
 
         // Copy the identifier and amount from the original datagram's arguments
-        copy(newDatagram.Arguments[:], datagram.Arguments[:]) // Copy the full Arguments field
+        copy(newDatagram.Arguments[:], arguments) // Copy the full Arguments field
 
         // Serialize and sign the datagram
         if err := comm.SignAndSendDatagram(newDatagram, peer.ServerAddress); err != nil {
