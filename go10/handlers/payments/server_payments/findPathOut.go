@@ -16,7 +16,6 @@ import (
 // FindPathOut processes a pathfinding request from the buyer to the seller
 func FindPathOut(session *Session) {
     datagram := session.Datagram
-    pm := session.PathManager // Access PathManager from the session
 
     // Inline extraction of the path identifier and amount from datagram arguments
     pathIdentifier := BytesToString(datagram.Arguments[:32]) // Assuming identifier is in the first 32 bytes
@@ -34,7 +33,7 @@ func FindPathOut(session *Session) {
     }
 
     // Find the account using the username from the datagram
-    account := pm.Find(datagram.Username)
+    account := pathfinding.PathManager.Find(datagram.Username)
     if account == nil {
         log.Printf("Account not found for user: %s", datagram.Username)
         return
