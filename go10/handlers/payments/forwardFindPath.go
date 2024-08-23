@@ -20,6 +20,7 @@ func forwardFindPath(datagram *types.Datagram) {
         return
     }
 
+    // Extract command and arguments outside of the loop for efficiency
     command := datagram.Command
     arguments := datagram.Arguments[:]
     
@@ -33,7 +34,7 @@ func forwardFindPath(datagram *types.Datagram) {
         }
 
         // Check if the trustline (in or out) is sufficient
-        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, amount, datagram.Command)
+        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, amount, command)
         if err != nil {
             log.Printf("Error checking trustline: %v", err)
             continue
