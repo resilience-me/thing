@@ -58,3 +58,30 @@ func PathFindingRecurse(session *Session, pm *pathfinding.PathManager) {
     // Forward the command to the appropriate peer
     forwardPathFindingRecurseCommand(datagram, targetPeer)
 }
+
+func forwardPathFindingRecurseCommand(datagram *types.Datagram, targetPeer pathfinding.PeerAccount) {
+    // Use the PrepareDatagram helper to create the new datagram with incremented counter
+    newDatagram, err := handlers.PrepareDatagram(datagram.Username, targetPeer.ServerAddress, targetPeer.Username)
+    if err != nil {
+        log.Printf("Failed to prepare datagram: %v", err)
+        return
+    }
+
+    // Set the command from the original datagram
+    newDatagram.Command = datagram.Command
+
+    // Copy the arguments from the original datagram
+    newDatagram.Arguments = datagram.Arguments
+
+    // Update the depth in the new datagram arguments based on path.Depth
+    binary.BigEndian.PutUint32(newDatagram.Arguments[32:36], path.Depth)
+
+    // Sign and send the datagram with low priority
+    err = comm.SignAndSendDatagram(newDatagram, targetPeer.ServerAddress)
+    if err != nil {
+        log.Printf("Failed to sign and send PathFindingRecurse command to %s at %s: %v", targetPeer.Username, targetPeer.ServerAddress, err)
+        return
+    }
+
+    log.Printf("Successfully signed and sent PathFindingRecurse command to %s at %s", targetPeer.Username, targetPeer.ServerAddress)
+}
