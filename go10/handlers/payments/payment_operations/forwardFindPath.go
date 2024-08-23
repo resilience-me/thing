@@ -39,8 +39,7 @@ func ForwardFindPath(datagram *types.Datagram, inOrOut byte) {
             continue
         }
 
-        err := handlers.PrepareAndSendDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, datagram.Arguments[:])
-        if err != nil {
+        if err := handlers.PrepareAndSendDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, datagram.Arguments[:]); err != nil {
             log.Printf("Failed to prepare and send datagram: %v", err)
             return
         }
