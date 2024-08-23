@@ -58,3 +58,55 @@ func findPathOutRecurse(datagram *types.Datagram, path *pathfinding.Path) {
 
     log.Printf("Successfully signed and sent FindPathRecurse command to %s at %s", targetPeer.Username, targetPeer.ServerAddress)
 }
+
+func sendNewPathFindingRequests(account *pathfinding.Account, path *pathfinding.Path, datagram *types.Datagram) {
+    // Retrieve the list of connected peers
+    nextPeers, err := db_pathfinding.GetPeers(account.Username)
+    if err != nil {
+        log.Printf("Failed to retrieve peers for user %s: %v", account.Username, err)
+        return
+    }
+
+    // Extract the path amount from the datagram arguments
+    pathAmount := binary.BigEndian.Uint32(datagram.Arguments[32:36])
+
+    for _, peer := range nextPeers {
+        // Skip if this peer is already part of the path as the incoming peer
+        if peer.Username == path.Incoming.Username && peer.ServerAddress == path.Incoming.ServerAddress {
+            continue
+        }
+
+        // Check if the incoming trustline is sufficient
+        trustlineIn, err := db_trustlines.GetTrustlineIn(account.Username, peer.ServerAddress, peer.Username)
+        if err != nil {
+            log.Printf("Failed to retrieve incoming trustline for user %s with peer %s at %s: %v", account.Username, peer.Username, peer.ServerAddress, err)
+            continue
+        }
+
+        if trustlineIn < pathAmount {
+            log.Printf("Insufficient incoming trustline for user %s with peer %s at %s. Required: %d, Available: %d", account.Username, peer.Username, peer.ServerAddress, pathAmount, trustlineIn)
+            continue
+        }
+
+        // Create the new datagram for the next pathfinding request
+        newDatagram, err := handlers.PrepareDatagram(account.Username, peer.ServerAddress, peer.Username)
+        if err != nil {
+            log.Printf("Failed to prepare pathfinding datagram: %v", err)
+            continue
+        }
+
+        // Set the command for the outgoing pathfinding request
+        newDatagram.Command = commands.ServerPayments_FindPathOut
+
+        // Copy the identifier and amount from the original datagram's arguments
+        copy(newDatagram.Arguments[:], datagram.Arguments[:]) // Copy the full Arguments field
+
+        // Serialize and sign the datagram
+        if err := comm.SignAndSendDatagram(newDatagram, peer.ServerAddress); err != nil {
+            log.Printf("Failed to send pathfinding request to %s at %s: %v", peer.Username, peer.ServerAddress, err)
+            return // Exit early on error
+        }
+
+        log.Printf("Sent pathfinding request to %s at %s", peer.Username, peer.ServerAddress)
+    }
+}
