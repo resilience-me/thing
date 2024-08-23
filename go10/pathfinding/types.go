@@ -41,6 +41,7 @@ type Path struct {
     Incoming     PeerAccount     // Details of the incoming peer
     Outgoing     PeerAccount     // Details of the outgoing peer
     Commit       bool
+    Depth        uint32
 }
 
 // NewPath is a constructor for creating a Path struct based on an identifier, incoming and outgoing PeerAccount, and amount.
