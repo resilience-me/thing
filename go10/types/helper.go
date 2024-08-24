@@ -23,3 +23,10 @@ func BytesToString(data []byte) string {
     length := syscall.Clen(data) // Use syscall.clen to find the length up to the first null byte
     return string(data[:length]) // Convert the trimmed byte slice to a string
 }
+
+// PadStringTo32Bytes pads a string into a 32-byte array.
+func PadStringTo32Bytes(str string) [32]byte {
+    var paddedArray [32]byte
+    copy(paddedArray[:], str)
+    return paddedArray
+}
