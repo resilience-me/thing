@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"ripple/pathfinding"
+	"ripple/config"
 )
 
 func main() {
