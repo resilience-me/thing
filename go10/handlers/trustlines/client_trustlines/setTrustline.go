@@ -20,14 +20,14 @@ func SetTrustline(session types.Session) {
     // Write the new trustline amount using the setter in db_trustlines
     if err := db_trustlines.SetTrustlineOut(datagram, trustlineAmount); err != nil {
         log.Printf("Error writing trustline to file for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to write trustline.", session.Addr)
+        comm.SendErrorResponse(session.Addr, "Failed to write trustline.")
         return
     }
 
     // Increment the sync_counter using the function in trustlines package
     if err := trustlines.IncrementSyncCounter(datagram); err != nil {
         log.Printf("Error incrementing sync_counter for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to update sync counter.", session.Addr)
+        comm.SendErrorResponse(session.Addr, "Failed to update sync counter.")
         return
     }
 
