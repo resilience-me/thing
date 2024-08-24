@@ -2,7 +2,6 @@ package server_trustlines
 
 import (
     "log"
-    "ripple/main"
     "ripple/types"
     "ripple/handlers"
     "ripple/handlers/trustlines"
@@ -11,7 +10,7 @@ import (
 )
 
 // GetTrustline handles the request to get the current trustline amount from another server
-func GetTrustline(session main.Session) {
+func GetTrustline(session types.Session) {
     datagram := session.Datagram
 
     // Retrieve the syncCounter and local sync status
