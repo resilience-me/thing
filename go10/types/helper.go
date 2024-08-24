@@ -2,8 +2,17 @@ package types
 
 import (
     "encoding/binary"
-    "syscall" // Imported to use syscall.Clen for finding the length of a null-terminated byte slice.
 )
+
+// Based on syscall.Clen for finding the length of a null-terminated byte slice.
+func clen(n []byte) int {
+    for i := 0; i < len(n); i++ {
+        if n[i] == 0 {
+            return i
+        }
+    }
+    return len(n)
+}
 
 // uint32ToBytes converts a uint32 value to a byte slice.
 func Uint32ToBytes(value uint32) []byte {
@@ -20,7 +29,7 @@ func BytesToUint32(data []byte) uint32 {
 
 // BytesToString converts a byte slice to a string, stopping at the first null character.
 func BytesToString(data []byte) string {
-    length := syscall.Clen(data) // Use syscall.clen to find the length up to the first null byte
+    length := clen(data) // Use clen to find the length up to the first null byte
     return string(data[:length]) // Convert the trimmed byte slice to a string
 }
 
