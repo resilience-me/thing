@@ -10,10 +10,10 @@ func (pm *PathManager) FetchAndRefresh(username string) *Account {
     defer pm.mu.Unlock()
 
     if account, exists := pm.Accounts[username]; exists {
-        newCleanup := time.Now().Add(config.PathFindingTimeout)
+        newTimeout := time.Now().Add(config.PathFindingTimeout)
         // Ensure reinsert does not lower Timeout timer for an account currently committed to a payment
-        if newCleanup.After(account.Timeout) {
-            account.Timeout = newCleanup
+        if newTimeout.After(account.Timeout) {
+            account.Timeout = newTimeout
         }
         return account
     }
