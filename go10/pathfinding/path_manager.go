@@ -4,7 +4,7 @@ import (
     "sync"
 )
 
-var PathManager *PathManager
+var Manager *PathManager
 
 // PathManager manages all Account entries in a system.
 type PathManager struct {
