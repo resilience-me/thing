@@ -35,7 +35,7 @@ func SetTrustline(session types.Session) {
     log.Printf("Trustline and sync counter updated successfully for user %s.", datagram.Username)
 
     // Send success response
-    if err := comm.SendSuccessResponse([]byte("Trustline updated successfully."), session.Addr); err != nil {
+    if err := comm.SendSuccessResponse(session.Addr, []byte("Trustline updated successfully.")); err != nil {
         log.Printf("Failed to send success response to user %s: %v", datagram.Username, err)
         return
     }
