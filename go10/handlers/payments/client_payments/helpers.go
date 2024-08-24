@@ -14,11 +14,11 @@ type PaymentDetails struct {
 }
 
 // NewPaymentDetails is a constructor for creating a NewPaymentDetails struct
-func NewPaymentDetails(counterpart PeerAccount, amount uint32, inOrOut byte, nonce uint32) *PaymentDetails {
+func NewPaymentDetails(counterpart PeerAccount, inOrOut byte, amount, nonce uint32) *PaymentDetails {
     return &PaymentDetails{
         Counterpart: counterpart,
-        Amount:      amount,
         InOrOut:     inOrOut,
+        Amount:      amount,
         Nonce:       nonce,
     }
 }
@@ -58,7 +58,7 @@ func getPaymentDetails(username string) *PaymentDetails {
         return nil // Return nil if no Path is found for the payment
     }
 
-    return NewPaymentDetails(account.Payment.Counterpart, path.Amount, account.Payment.InOrOut, account.Payment.Nonce)
+    return NewPaymentDetails(account.Payment.Counterpart, account.Payment.InOrOut, path.Amount, account.Payment.Nonce)
 }
 
 // Wrapper function to fetch and serialize payment details
