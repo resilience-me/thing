@@ -37,7 +37,7 @@ func SyncTrustlineOut(session types.Session) {
         dgOut.Command = commands.ServerTrustlines_SetTimestamp
     } else {
         // Trustline is not synced, proceed with sending the trustline
-        trustline, err := db_trustlines.GetTrustlineOut(datagram)
+        trustline, err := db_trustlines.GetTrustlineOutFromDatagram(datagram)
         if err != nil {
             log.Printf("Error getting trustline for user %s in SyncTrustlineOut: %v", datagram.Username, err)
             comm.SendErrorResponse(session.Addr, "Failed to retrieve trustline.")
