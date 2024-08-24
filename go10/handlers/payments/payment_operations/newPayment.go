@@ -4,12 +4,11 @@ import (
     "log"                 // For logging errors and success messages
     "ripple/comm"         // For sending error and success responses to the client
     "ripple/handlers/payments"  // For calling the GenerateAndInitiatePayment function
-    "ripple/main"         // For the Session type, which is passed into the newPayment function
     "ripple/types"        // For the types, particularly the inOrOut byte constants
 )
 
 // NewPayment is a shared function to handle the payment initialization process.
-func NewPayment(session main.Session, inOrOut byte) {
+func NewPayment(session types.Session, inOrOut byte) {
     // Retrieve the Datagram from the session
     datagram := session.Datagram
 
