@@ -88,5 +88,5 @@ func (sm *SessionManager) handleSession(session *types.Session) {
 		return
 	}
 	
-	handler(session)
+	handler(*session)
 }
