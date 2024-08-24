@@ -10,7 +10,7 @@ import (
 // FindPath handles the common logic for processing FindPath requests.
 func FindPath(datagram *types.Datagram, inOrOut byte) {
     // Extract the path identifier and amount from datagram arguments
-    pathIdentifier := BytesToString(datagram.Arguments[:32])
+    pathIdentifier := types.BytesToString(datagram.Arguments[:32])
     pathAmount := binary.BigEndian.Uint32(datagram.Arguments[32:36])
 
     // Check if the trustline (incoming or outgoing) is sufficient for the path amount
