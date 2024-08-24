@@ -1,7 +1,6 @@
 package client_payments
 
 import (
-    "log"
     "ripple/types"
     "ripple/handlers/payments/payment_operations"
 )
