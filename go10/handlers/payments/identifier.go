@@ -30,10 +30,10 @@ func generatePaymentIdentifier(dg *Datagram, inOrOut byte) string {
 
 
 // GenerateAndInitiatePayment handles the generation of the payment identifier and initiation of the payment.
-func GenerateAndInitiatePayment(datagram *types.Datagram, inOrOut byte) {
+func GenerateAndInitiatePayment(datagram *types.Datagram, inOrOut byte, nonce uint32) {
     // Generate the Payment struct for an incoming payment
     identifier := generatePaymentIdentifier(datagram, inOrOut)
-    payment := pathfinding.NewPayment(datagram, identifier, inOrOut)
+    payment := pathfinding.NewPayment(datagram, identifier, inOrOut, nonce)
 
     // Initiate the incoming payment using the constructed Payment struct
     pathfinding.PathManager.InitiatePayment(datagram.Username, payment)
