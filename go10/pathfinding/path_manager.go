@@ -4,19 +4,22 @@ import (
     "sync"
 )
 
-var Manager *PathManager
+var pathManager *PathManager
+
+func GetPathManager() *PathManager {
+    return pathManager
+}
+
+func InitPathManager() *PathManager {
+    pathManager = &PathManager{
+        Accounts: make(map[string]*Account), // Properly initialize the map.
+    }
+}
 
 // PathManager manages all Account entries in a system.
 type PathManager struct {
     Accounts map[string]*Account // Map usernames to their respective Accounts.
     mu       sync.Mutex          // Protects the Accounts map.
-}
-
-// NewPathManager initializes and returns a new PathManager instance.
-func NewPathManager() *PathManager {
-    return &PathManager{
-        Accounts: make(map[string]*Account), // Properly initialize the map.
-    }
 }
 
 // Add creates a new account every time, overwriting any existing one.
