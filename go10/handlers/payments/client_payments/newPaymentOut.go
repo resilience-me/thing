@@ -4,6 +4,7 @@ import (
     "log"
     "ripple/handlers/payments"
     "ripple/main"
+    "ripple/types"
 )
 
 // NewPaymentOut handles the command to initiate a new outgoing payment.
@@ -16,7 +17,7 @@ func NewPaymentOut(session main.Session) {
     username := datagram.Username
     
     // Generate the payment identifier and initiate the outgoing payment
-    err := payments.GenerateAndInitiatePaymentOut(session, datagram, username)
+    err := payments.GenerateAndInitiatePayment(datagram, username, types.Outgoing)
     if err != nil {
         log.Printf("Failed to initiate outgoing payment for user %s: %v", username, err)
         comm.SendErrorResponse("Failed to initiate payment.", session.Addr)
