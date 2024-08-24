@@ -8,7 +8,7 @@ import (
 )
 
 func concatNameAndServer(username, serverAddress string) []byte {
-  return append(types.PadStringTo32Bytes(username), types.PadStringTo32Bytes(serverAddress))
+  return append(types.PadStringTo32Bytes(username), types.PadStringTo32Bytes(serverAddress)...)
 }
 
 func generatePaymentIdentifier(dg *Datagram, inOrOut byte) string {
