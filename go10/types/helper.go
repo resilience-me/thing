@@ -26,7 +26,9 @@ func BytesToString(data []byte) string {
 
 // PadStringTo32Bytes pads a string into a 32-byte byte slice.
 func PadStringTo32Bytes(str string) []byte {
-    var paddedArray [32]byte
-    copy(paddedArray[:], str)
-    return paddedArray
+    // Create a byte slice of size 32, initialized to zero values
+    paddedSlice := make([]byte, 32)
+    // Copy the contents of the string into the slice
+    copy(paddedSlice, str)
+    return paddedSlice
 }
