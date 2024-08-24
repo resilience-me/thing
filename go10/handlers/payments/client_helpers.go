@@ -9,7 +9,7 @@ import (
 func serializePaymentDetails(payment *pathfinding.Payment, amount uint32) []byte {
     buffer := concatNameAndServer(payment.Counterpart.Username, payment.Counterpart.ServerAddress)
     buffer = append(buffer, payment.InOrOut)
-    amountAndNonce := append(types.Uint32ToBytes(path.Amount), types.Uint32ToBytes(payment.Nonce)...)
+    amountAndNonce := append(types.Uint32ToBytes(amount), types.Uint32ToBytes(payment.Nonce)...)
     buffer = append(buffer, amountAndNonce...)
     return buffer
 }
