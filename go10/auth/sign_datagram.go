@@ -6,7 +6,7 @@ import (
 )
 
 // SignDatagram creates a signed datagram by serializing it and adding a signature.
-// It requires the session to load the secret key for HMAC generation.
+// It requires the session to load the secret key for signature generation.
 func SignDatagram(dg *types.Datagram, peerServerAddress string) ([]byte, error) {
     // Serialize the datagram without the signature field
     serializedData, err := types.SerializeDatagram(dg)
@@ -14,16 +14,16 @@ func SignDatagram(dg *types.Datagram, peerServerAddress string) ([]byte, error) 
         return nil, fmt.Errorf("failed to serialize datagram: %w", err)
     }
 
-    // Load the secret key for HMAC generation
+    // Load the secret key for signature generation
     secretKey, err := loadServerSecretKeyOut(dg, peerServerAddress)
     if err != nil {
         return nil, fmt.Errorf("failed to load server secret key: %w", err)
     }
 
     // Generate HMAC for the serialized data
-    signature, err := generateHMAC(serializedData[:357], secretKey)
+    signature, err := generateSignature(serializedData[:357], secretKey)
     if err != nil {
-        return nil, fmt.Errorf("failed to generate HMAC: %w", err)
+        return nil, fmt.Errorf("failed to generate signature: %w", err)
     }
 
     // Update the datagram's signature field with the generated signature
