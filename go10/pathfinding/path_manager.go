@@ -48,6 +48,17 @@ func (pm *PathManager) Remove(username string) {
     delete(pm.Accounts, username)
 }
 
+func (pm *PathManager) Cleanup() {
+    pm.mu.Lock()
+    defer pm.mu.Unlock()
+    now := time.Now()
+    for username, account := range pm.Accounts {
+        if now.After(account.Cleanup) {
+            delete(pm.Accounts, username)
+        }
+    }
+}
+
 // Add creates and adds a new Path to an Account and returns it.
 func (account *Account) Add(identifier string, amount uint32, incoming, outgoing PeerAccount) *Path {
     newPath := NewPath(identifier, amount, incoming, outgoing)
