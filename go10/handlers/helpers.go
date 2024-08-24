@@ -1,6 +1,7 @@
 package handlers
 
 import (
+    "fmt"
     "ripple/auth"
     "ripple/comm"
     "ripple/types"
@@ -22,19 +23,19 @@ func PrepareDatagramWithoutCommand(username, peerServerAddress, peerUsername str
 // PrepareDatagram prepares a datagram with all necessary fields including the command and arguments.
 func PrepareDatagram(command byte, username, peerServerAddress, peerUsername string, arguments []byte) (*types.Datagram, error) {
     // Prepare the new datagram
-    datagram, err := handlers.PrepareDatagramWithoutCommand(datagram.Username, peer.ServerAddress, peer.Username)
+    datagram, err := PrepareDatagramWithoutCommand(username, peerServerAddress, peerUsername)
     if err != nil {
         return nil, fmt.Errorf("Failed to prepare datagram: %v", err)
     }
     datagram.Command = command
-    copy(dg.Arguments[:], arguments)
+    copy(datagram.Arguments[:], arguments)
 
     return datagram, nil
 }
 
 // PrepareDatagramResponse calls PrepareDatagram with fields from an incoming datagram
-func PrepareDatagramResponse(dg *types.Datagram) (*types.Datagram, error) {
-    return PrepareDatagramWithoutCommand(dg.Username, dg.PeerServerAddress, dg.PeerUsername)
+func PrepareDatagramResponse(datagram *types.Datagram) (*types.Datagram, error) {
+    return PrepareDatagramWithoutCommand(datagram.Username, datagram.PeerServerAddress, datagram.PeerUsername)
 }
 
 // PrepareAndSendDatagram prepares, signs, and sends a datagram to a specified peer.
