@@ -18,7 +18,7 @@ func SetTrustline(session types.Session) {
     trustlineAmount := binary.BigEndian.Uint32(datagram.Arguments[:4])
 
     // Write the new trustline amount using the setter in db_trustlines
-    if err := db_trustlines.GetTrustlineInFromDatagram(datagram, trustlineAmount); err != nil {
+    if err := db_trustlines.SetTrustlineOutFromDatagram(datagram, trustlineAmount); err != nil {
         log.Printf("Error writing trustline to file for user %s: %v", datagram.Username, err)
         comm.SendErrorResponse(session.Addr, "Failed to write trustline.")
         return
