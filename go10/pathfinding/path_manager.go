@@ -10,7 +10,7 @@ func GetPathManager() *PathManager {
     return pathManager
 }
 
-func InitPathManager() *PathManager {
+func InitPathManager() {
     pathManager = &PathManager{
         Accounts: make(map[string]*Account), // Properly initialize the map.
     }
