@@ -2,13 +2,12 @@ package server_trustlines
 
 import (
     "log"
-    "ripple/main"
     "ripple/types"
     "ripple/database/db_trustlines"
 )
 
 // SetSyncOut handles updating the sync_out counter from a received context
-func SetSyncOut(session main.Session) {
+func SetSyncOut(session types.Session) {
     datagram := session.Datagram
 
     // Load the new sync_out value from the Arguments in the Datagram
