@@ -26,7 +26,7 @@ func CheckPathFound(path *pathfinding.Path) bool {
     return path.Incoming.Username != "" && path.Outgoing.Username != ""
 }
 
-// DetermineCommand returns the appropriate command based on the inOrOut parameter.
+// GetFindPathCommand returns the appropriate command based on the inOrOut parameter.
 func GetFindPathCommand(inOrOut byte) byte {
     if inOrOut == types.Incoming {
         return commands.ServerPayments_FindPathIn
