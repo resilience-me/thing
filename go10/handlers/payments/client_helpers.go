@@ -15,7 +15,7 @@ func serializePaymentDetails(payment *Payment, amount uint32) []byte {
 }
 
 // Wrapper function to fetch and serialize payment details
-func fetchAndSerializePaymentDetails(username string) []byte {
+func FetchAndSerializePaymentDetails(username string) []byte {
     // Use the existing Find method from PathManager to retrieve the account
     account := pathfinding.PathManager.Find(username)
     if account == nil || account.Payment == nil {
