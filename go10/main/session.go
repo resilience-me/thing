@@ -8,15 +8,10 @@ import (
 	"ripple/types"
 )
 
-type Session struct {
-	Datagram *types.Datagram // The datagram associated with this session
-	Addr     *net.UDPAdd
-}
-
 // SessionManager manages sessions and their state
 type SessionManager struct {
 	activeHandlers map[string]bool
-	queues         map[string][]*Session
+	queues         map[string][]*types.Session
 	mu             sync.Mutex
 	wg             sync.WaitGroup
 }
@@ -25,12 +20,12 @@ type SessionManager struct {
 func NewSessionManager() *SessionManager {
 	return &SessionManager{
 		activeHandlers: make(map[string]bool),
-		queues:         make(map[string][]*Session),
+		queues:         make(map[string][]*types.Session),
 	}
 }
 
 // RouteSession routes a new session or queues it if a handler is already active
-func (sm *SessionManager) RouteSession(session *Session) {
+func (sm *SessionManager) RouteSession(session *types.Session) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
@@ -66,7 +61,7 @@ func (sm *SessionManager) CloseSession(username string) {
 }
 
 // handleSession processes a session and then triggers the next one
-func (sm *SessionManager) handleSession(session *Session) {
+func (sm *SessionManager) handleSession(session *types.Session) {
 	datagram := session.Datagram
 	command := datagram.Command
 	username := datagram.Username
