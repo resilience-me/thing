@@ -47,18 +47,13 @@ func serializePaymentDetails(details *PaymentDetails) []byte {
 // getPaymentDetails fetches the payment details from the account, including the related Path.
 func getPaymentDetails(username string) *PaymentDetails {
     // Use the existing Find method from PathManager to retrieve the account
-    account := pathfinding.PathManager.Find(username)
-    if account == nil || account.Payment == nil {
-        return nil // Return nil if no account or no payment is found
+    if account := pathfinding.PathManager.Find(username); account != nil && account.Payment != nil {
+        // Find the Path using the identifier in the Payment
+        if path := account.Find(account.Payment.Identifier); path != nil {
+            return NewPaymentDetails(account.Payment.Counterpart, path.Amount, account.Payment.InOrOut, account.Payment.Nonce)
+        }
     }
-
-    // Find the Path using the identifier in the Payment
-    path := account.Find(account.Payment.Identifier)
-    if path == nil {
-        return nil // Return nil if no Path is found for the payment
-    }
-
-    return NewPaymentDetails(account.Payment.Counterpart, path.Amount, account.Payment.InOrOut, account.Payment.Nonce)
+    return nil // Return nil if no account or no payment is found
 }
 
 // Wrapper function to fetch and serialize payment details
