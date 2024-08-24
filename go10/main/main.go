@@ -43,4 +43,7 @@ func main() {
 
 	sessionManager.wg.Wait()
 	log.Println("All sessions and queues have been processed. Exiting.")
+
+	// Final console message before shutting down
+	fmt.Println("Server shutdown complete.")
 }
