@@ -3,7 +3,6 @@ package payment_operations
 import (
     "log"
     "ripple/handlers"
-    "ripple/payments"
     "ripple/types"
     "ripple/database/db_pathfinding"
 )
