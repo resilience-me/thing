@@ -6,9 +6,9 @@ import (
 )
 
 // serializePaymentDetails constructs a byte array from the payment details
-func serializePaymentDetails(payment *Payment, amount uint32) []byte {
+func serializePaymentDetails(payment *pathfinding.Payment, amount uint32) []byte {
     buffer := concatNameAndServer(payment.Counterpart.Username, payment.Counterpart.ServerAddress)
-    buffer = append(buffer, inOrOut)
+    buffer = append(buffer, payment.InOrOut)
     amountAndNonce := append(types.Uint32ToBytes(path.Amount), types.Uint32ToBytes(payment.Nonce))
     buffer = append(buffer, amountAndNonce)
     return buffer
