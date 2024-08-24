@@ -44,7 +44,7 @@ func NewPath(identifier string, amount uint32, incoming, outgoing PeerAccount) *
 // Account holds all path-related information and payment details
 type Account struct {
     Username      string
-    Cleanup       time.Time
+    Timeout       time.Time
     Paths         map[string]*Path // Maps string identifiers to Path.
     Payment       *Payment
 }
