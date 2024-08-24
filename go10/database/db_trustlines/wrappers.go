@@ -13,12 +13,12 @@ func GetTrustlineInFromDatagram(dg *types.Datagram) (uint32, error) {
 }
 
 // SetTrustlineOutFromDatagram sets the outbound trustline amount using fields from datagram
-func SetTrustlineOutFromDatagram(dg *types.Datagram, value uint32) (uint32, error) {
+func SetTrustlineOutFromDatagram(dg *types.Datagram, value uint32) error {
 	return SetTrustlineOut(dg.Username, dg.PeerServerAddress, dg.PeerUsername, value)
 }
 
 // SetTrustlineInFromDatagram sets the inbound trustline amount using fields from datagram
-func SetTrustlineInFromDatagram(dg *types.Datagram, value uint32) (uint32, error) {
+func SetTrustlineInFromDatagram(dg *types.Datagram, value uint32) error {
 	return SetTrustlineIn(dg.Username, dg.PeerServerAddress, dg.PeerUsername, value)
 }
 
