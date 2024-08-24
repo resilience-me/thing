@@ -6,7 +6,6 @@ import (
     "ripple/handlers"
     "ripple/handlers/trustlines"
     "ripple/database/db_trustlines"
-    "ripple/database/db_server"
 )
 
 // GetTrustline handles the request to get the current trustline amount from another server
