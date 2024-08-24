@@ -28,5 +28,5 @@ func GetPayment(session main.Session) {
         return
     }
 
-    log.Printf("Sent payment details successfully to client for user %s.", username)
+    log.Printf("Sent payment details successfully to client for user %s.", datagram.Username)
 }
