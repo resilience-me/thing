@@ -3,9 +3,6 @@ package payment_operations
 import (
     "encoding/binary"
     "log"
-
-    "ripple/comm"
-    "ripple/commands"
     "ripple/handlers"
     "ripple/payments"
     "ripple/types"
@@ -29,20 +26,10 @@ func ForwardFindPath(datagram *types.Datagram, inOrOut byte) {
             continue
         }
 
-        // Check if the trustline is sufficient
-        sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, peer.ServerAddress, peer.Username, amount, inOrOut)
-        if err != nil {
-            log.Printf("Error checking trustline: %v", err)
+        // Use the new CheckAndSendDatagram helper function to handle trustline checking and datagram sending
+        if err := handlers.CheckAndSendDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, amount, inOrOut, datagram.Arguments[:]); err != nil {
+            log.Printf("Failed to process pathfinding request from %s to peer %s at server %s: %v", datagram.Username, peer.Username, peer.ServerAddress, err)
             continue
-        }
-        if !sufficient {
-            log.Printf("Trustline insufficient for user %s with peer %s at %s", datagram.Username, peer.Username, peer.ServerAddress)
-            continue
-        }
-
-        if err := handlers.PrepareAndSendDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, datagram.Arguments[:]); err != nil {
-            log.Printf("Failed to prepare and send pathfinding request from %s to peer %s at server %s: %v", datagram.Username, peer.Username, peer.ServerAddress, err)
-            return
         }
 
         log.Printf("Successfully sent pathfinding request from %s to peer %s at server %s", datagram.Username, peer.Username, peer.ServerAddress)
