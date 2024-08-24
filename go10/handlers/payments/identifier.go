@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"ripple/types"
 	"ripple/pathfinding"
+	"ripple/config"
 )
 
 func concatNameAndServer(username, serverAddress string) []byte {
@@ -12,7 +13,7 @@ func concatNameAndServer(username, serverAddress string) []byte {
 }
 
 func generatePaymentIdentifier(dg *types.Datagram, inOrOut byte) string {
-  user := concatNameAndServer(dg.Username, GetServerAddress())
+  user := concatNameAndServer(dg.Username, config.GetServerAddress())
   peer := concatNameAndServer(dg.PeerUsername, dg.PeerServerAddress)
   
   var preimage []byte
