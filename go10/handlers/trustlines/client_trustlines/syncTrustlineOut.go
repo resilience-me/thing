@@ -9,7 +9,7 @@ import (
     "ripple/database/db_trustlines"
     "ripple/handlers"
     "ripple/types"
-    "ripple/trustlines"
+    "ripple/handlers/payments/trustlines"
 )
 
 // SyncTrustlineOut handles the client request to sync the outbound trustline to the peer server.
