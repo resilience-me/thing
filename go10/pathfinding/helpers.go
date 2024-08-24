@@ -1,9 +1,6 @@
 package pathfinding
 
-import (
-    "sync"
-    "time"
-)
+import "time"
 
 func FetchAndRefresh() *Account {
     pm.mu.Lock()
