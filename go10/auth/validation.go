@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"ripple/types"
+	"ripple/database"
 )
 
 var (
