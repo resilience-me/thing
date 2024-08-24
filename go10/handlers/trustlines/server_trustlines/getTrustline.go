@@ -3,6 +3,7 @@ package server_trustlines
 import (
     "log"
     "ripple/main"
+    "ripple/types"
     "ripple/handlers"
     "ripple/handlers/trustlines"
     "ripple/database/db_trustlines"
@@ -28,7 +29,7 @@ func GetTrustline(session main.Session) {
     }
 
     // Extract sync_in value from the datagram's Arguments[0:4]
-    syncIn := main.BytesToUint32(datagram.Arguments[:4])
+    syncIn := types.BytesToUint32(datagram.Arguments[:4])
 
     if syncIn < syncCounter {
         // The peer is not synced, prepare to send trustline data to synchronize
