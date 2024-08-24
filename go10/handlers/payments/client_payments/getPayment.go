@@ -3,13 +3,13 @@ package client_payments
 import (
     "log"
     "ripple/handlers/payments"
-    "ripple/main"
+    "ripple/types"
     "ripple/comm"
 
 )
 
 // GetPayment handles the command to retrieve payment parameters.
-func GetPayment(session main.Session) {
+func GetPayment(session types.Session) {
 
     // Extract username from the datagram
     username := session.Datagram.Username
