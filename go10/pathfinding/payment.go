@@ -1,11 +1,5 @@
 package pathfinding
 
-import (
-    "sync"        // For using sync.Mutex
-    "time"        // For using time.Now()
-    "ripple/config" // For using config.PathFindingTimeout
-)
-
 func (pm *PathManager) CleanupCacheAndFetchAccount(username string) *Account {
     // Cleanup all accounts first
     pm.Cleanup()
