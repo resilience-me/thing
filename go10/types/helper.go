@@ -24,8 +24,8 @@ func BytesToString(data []byte) string {
     return string(data[:length]) // Convert the trimmed byte slice to a string
 }
 
-// PadStringTo32Bytes pads a string into a 32-byte array.
-func PadStringTo32Bytes(str string) [32]byte {
+// PadStringTo32Bytes pads a string into a 32-byte byte slice.
+func PadStringTo32Bytes(str string) []byte {
     var paddedArray [32]byte
     copy(paddedArray[:], str)
     return paddedArray
