@@ -62,9 +62,7 @@ func getPaymentDetails(username string) *PaymentDetails {
 }
 
 // Wrapper function to fetch and serialize payment details
-func fetchAndSerializePaymentDetails(session main.Session) []byte {
-    // Retrieve the username from the session datagram
-    username := session.Datagram.Username
+func fetchAndSerializePaymentDetails(username string) []byte {
     // Fetch the payment details
     details := getPaymentDetails(username)
     if details == nil {
