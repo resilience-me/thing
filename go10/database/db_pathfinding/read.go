@@ -3,9 +3,9 @@ package db_pathfinding
 import (
     "fmt"
     "io/ioutil"
-    "os"
     "path/filepath"
     "ripple/config"
+    "ripple/pathfinding"
 )
 
 // GetPeers retrieves a list of all peer accounts for a given username
@@ -34,7 +34,7 @@ func GetPeers(username string) ([]PeerAccount, error) {
             // Iterate over all peer directories and create PeerAccount structs
             for _, peerDir := range peerDirs {
                 if peerDir.IsDir() {
-                    peer := PeerAccount{
+                    peer := pathfinding.PeerAccount{
                         Username:      peerDir.Name(),
                         ServerAddress: serverAddress,
                     }
