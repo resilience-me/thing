@@ -2,7 +2,6 @@ package payments
 
 import (
     "fmt"
-    "ripple/handlers"
     "ripple/database/db_trustlines"
 )
 
@@ -15,7 +14,7 @@ func CheckTrustlineSufficient(username, peerServerAddress, peerUsername string, 
     }
 
     // Get the relevant credit line
-    creditline, err := GetCreditline(username, peerServerAddress, peerUsername, inOrOut)
+    creditline, err := db_trustlines.GetCreditline(username, peerServerAddress, peerUsername, inOrOut)
     if err != nil {
         return false, fmt.Errorf("failed to retrieve creditline: %v", err)
     }
@@ -34,7 +33,7 @@ func CheckTrustlineSufficient(username, peerServerAddress, peerUsername string, 
 // CheckTrustlineAndSendFindPathDatagram checks the trustline and sends the datagram if sufficient.
 func CheckTrustlineAndSendFindPathDatagram(command byte, username, peerServerAddress, peerUsername string, amount uint32, inOrOut byte, arguments []byte) error {
     // Check if the trustline is sufficient
-    sufficient, err := payments.CheckTrustlineSufficient(username, peerServerAddress, peerUsername, amount, inOrOut)
+    sufficient, err := CheckTrustlineSufficient(username, peerServerAddress, peerUsername, amount, inOrOut)
     if err != nil {
         return fmt.Errorf("error checking trustline: %v", err)
     }
