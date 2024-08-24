@@ -4,7 +4,7 @@ import (
     "log"                 // For logging errors and success messages
     "ripple/comm"         // For sending error and success responses to the client
     "ripple/handlers/payments"  // For calling the GenerateAndInitiatePayment function
-    "ripple/types"        // For the types, particularly the inOrOut byte constants
+    "ripple/types"
 )
 
 // NewPayment is a shared function to handle the payment initialization process.
