@@ -26,3 +26,14 @@ func generatePaymentIdentifier(dg *Datagram, inOrOut byte) string {
   
   return fmt.Sprintf("%x", hash[:])
 }
+
+
+// GenerateAndInitiatePayment handles the generation of the payment identifier and initiation of the payment.
+func GenerateAndInitiatePayment(session main.Session, inOrOut byte) {
+    // Generate the Payment struct for an incoming payment
+    identifier := generatePaymentIdentifier(session.Datagram, inOrOut)
+    payment := pathfinding.NewPayment(datagram, identifier, inOrOut)
+
+    // Initiate the incoming payment using the constructed Payment struct
+    session.PathManager.InitiatePayment(session.Datagram.Username, payment)
+}
