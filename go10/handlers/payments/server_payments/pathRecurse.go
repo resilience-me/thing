@@ -66,5 +66,5 @@ func PathRecurse(session types.Session) {
     }
 
     // Forward the command to the appropriate peer
-    payments_operations.PathRecurse(datagram, targetPeer, path.Depth)
+    payment_operations.PathRecurse(datagram, targetPeer, path.Depth)
 }
