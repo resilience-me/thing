@@ -6,7 +6,6 @@ import (
     "ripple/handlers/trustlines/server_trustlines"
     "ripple/handlers/payments/client_payments"
     "ripple/handlers/payments/server_payments"
-
 )
 
 // CommandHandler defines the type for command handling functions
