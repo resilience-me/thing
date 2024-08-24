@@ -3,12 +3,12 @@ package server_trustlines
 import (
     "log"
     "time"
-    "ripple/main"
+    "ripple/types"
     "ripple/database/db_trustlines"
 )
 
 // SetTimestamp handles updating the sync timestamp for trustlines
-func SetTimestamp(session main.Session) {
+func SetTimestamp(session types.Session) {
     datagram := session.Datagram
 
     // Retrieve the current timestamp
