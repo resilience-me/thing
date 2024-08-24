@@ -4,7 +4,8 @@ import (
     "log"
     "ripple/handlers/payments"
     "ripple/main"
-    "ripple/database/db_client"
+    "ripple/comm"
+
 )
 
 // GetPayment handles the command to retrieve payment parameters.
