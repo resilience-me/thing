@@ -3,8 +3,8 @@ package auth
 import (
     "crypto/sha256"
     "bytes"
-
     "ripple/database"
+    "ripple/types"
 )
 
 func loadClientSecretKey(dg *types.Datagram) ([]byte, error) {
