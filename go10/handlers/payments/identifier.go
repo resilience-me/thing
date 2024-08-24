@@ -38,5 +38,5 @@ func GenerateAndInitiatePayment(datagram *types.Datagram, inOrOut byte) {
     payment := pathfinding.NewPayment(datagram, identifier, inOrOut, nonce)
     amount := types.BytesToUint32(datagram.Arguments[0:4])
     // Initiate the incoming payment using the constructed Payment struct
-    pathfinding.PathManager.InitiatePayment(datagram.Username, payment, amount)
+    pathfinding.GetPathManager().InitiatePayment(datagram.Username, payment, amount)
 }
