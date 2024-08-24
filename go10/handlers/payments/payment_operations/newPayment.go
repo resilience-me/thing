@@ -20,13 +20,13 @@ func NewPayment(session main.Session, inOrOut byte) {
     err := payments.GenerateAndInitiatePayment(datagram, username, inOrOut)
     if err != nil {
         log.Printf("Failed to initiate payment for user %s: %v", username, err)
-        comm.SendErrorResponse("Failed to initiate payment.", session.Addr)
+        comm.SendErrorResponse(session.Addr, "Failed to initiate payment.")
         return
     }
     log.Printf("Payment initialized successfully for user %s.", username)
 
     // Send success response
-    if err := comm.SendSuccessResponse([]byte("Payment initialized successfully."), session.Addr); err != nil {
+    if err := comm.SendSuccessResponse(session.Addr, []byte("Payment initialized successfully.")); err != nil {
         log.Printf("Failed to send success response to user %s: %v", username, err)
         return
     }
