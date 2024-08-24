@@ -6,12 +6,12 @@ import (
 
     "ripple/comm"
     "ripple/database/db_trustlines"
-    "ripple/main"
+    "ripple/types"
     "ripple/handlers/trustlines"
 )
 
 // SetTrustline updates the trustline based on the given session.
-func SetTrustline(session main.Session) {
+func SetTrustline(session types.Session) {
     datagram := session.Datagram
 
     // Retrieve the trustline amount from the Datagram
