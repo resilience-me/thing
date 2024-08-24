@@ -5,12 +5,11 @@ import (
 
     "ripple/comm"
     "ripple/database/db_trustlines"
-    "ripple/main"
     "ripple/types"
 )
 
 // GetTrustlineOut handles fetching the outbound trustline information
-func GetTrustlineOut(session main.Session) {
+func GetTrustlineOut(session types.Session) {
     datagram := session.Datagram
 
     // Fetch the outbound trustline
