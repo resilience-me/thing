@@ -4,7 +4,7 @@ func (pm *PathManager) CleanupCacheAndFetchAccount(username string) *Account {
     // Cleanup all accounts first
     pm.Cleanup()
 
-    account := FetchAndRefresh()
+    account := pm.FetchAndRefresh()
     if account != nil {
         account.Cleanup()
         return account
