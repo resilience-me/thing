@@ -3,6 +3,7 @@ package database
 import (
     "fmt"
     "os"
+    "io/ioutil"
     "path/filepath"
     "strconv"
 )
@@ -10,7 +11,7 @@ import (
 // ReadFile reads the content of a file and returns it as a byte slice.
 func ReadFile(dir, filename string) ([]byte, error) {
     filePath := filepath.Join(dir, filename)
-    data, err := os.ReadFile(filePath)
+    data, err := ioutil.ReadFile(filePath)
     if err != nil {
         return nil, fmt.Errorf("error reading file %s: %w", filePath, err)
     }
@@ -20,7 +21,7 @@ func ReadFile(dir, filename string) ([]byte, error) {
 // WriteFile writes a byte slice to a file.
 func WriteFile(dir, filename string, data []byte) error {
     filePath := filepath.Join(dir, filename)
-    return os.WriteFile(filePath, data, 0644)
+    return ioutil.WriteFile(filePath, data, 0644)
 }
 
 // GetUint32FromFile reads the contents of a file, parses it as a uint32, and returns the value.
