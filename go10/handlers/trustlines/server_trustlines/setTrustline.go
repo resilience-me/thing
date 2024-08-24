@@ -3,7 +3,6 @@ package server_trustlines
 import (
     "log"
     "time"
-    "ripple/main"
     "ripple/handlers"
     "ripple/commands"
     "ripple/types"
@@ -11,7 +10,7 @@ import (
 )
 
 // SetTrustline handles setting or updating a trustline from another server's perspective.
-func SetTrustline(session main.Session) {
+func SetTrustline(session types.Session) {
     datagram := session.Datagram
 
     // Retrieve the sync_in value using the new getter
