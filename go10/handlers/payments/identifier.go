@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"crypto/sha256"
 	"ripple/types"
+	"ripple/pathfinding"
 )
 
 func concatAccounts(username, serverAddress string) []byte {
@@ -29,11 +30,11 @@ func generatePaymentIdentifier(dg *Datagram, inOrOut byte) string {
 
 
 // GenerateAndInitiatePayment handles the generation of the payment identifier and initiation of the payment.
-func GenerateAndInitiatePayment(session main.Session, inOrOut byte) {
+func GenerateAndInitiatePayment(datagram *types.Datagram, inOrOut byte) {
     // Generate the Payment struct for an incoming payment
-    identifier := generatePaymentIdentifier(session.Datagram, inOrOut)
+    identifier := generatePaymentIdentifier(datagram, inOrOut)
     payment := pathfinding.NewPayment(datagram, identifier, inOrOut)
 
     // Initiate the incoming payment using the constructed Payment struct
-    session.PathManager.InitiatePayment(session.Datagram.Username, payment)
+    pathfinding.PathManager.InitiatePayment(datagram.Username, payment)
 }
