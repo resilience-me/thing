@@ -16,7 +16,7 @@ func GetTrustlineOut(session types.Session) {
     trustline, err := db_trustlines.GetTrustlineOut(datagram)
     if err != nil {
         log.Printf("Error reading outbound trustline for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Error reading outbound trustline.", session.Conn)
+        comm.SendErrorResponse(session.Addr, "Error reading outbound trustline.")
         return
     }
 
@@ -24,7 +24,7 @@ func GetTrustlineOut(session types.Session) {
     responseData := types.Uint32ToBytes(trustline)
 
     // Send the success response back to the client
-    if err := comm.SendSuccessResponse(responseData, session.Addr); err != nil {
+    if err := comm.SendSuccessResponse(session.Addr, responseData); err != nil {
         log.Printf("Error sending success response to user %s: %v", datagram.Username, err)
         return
     }
