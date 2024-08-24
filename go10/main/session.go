@@ -77,7 +77,7 @@ func (sm *SessionManager) handleSession(session *types.Session) {
 	if command&0x80 == 0 && datagram.PeerUsername != "" { // Bit 7 (MSB) is 0
 	    if errorMessage, err := auth.ValidatePeerExists(datagram); err != nil {
 	        log.Printf("Error validating peer existence for user %s: %v", username, err)
-	        comm.SendErrorResponse(errorMessage, session.Conn)
+	        comm.SendErrorResponse(errorMessage, session.Addr)
 	        return
 	    }
 	}
