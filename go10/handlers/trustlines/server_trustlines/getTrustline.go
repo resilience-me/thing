@@ -2,6 +2,9 @@ package server_trustlines
 
 import (
     "log"
+    "encoding/binary"
+
+    "ripple/comm"
     "ripple/types"
     "ripple/handlers"
     "ripple/handlers/trustlines"
