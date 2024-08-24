@@ -26,7 +26,7 @@ func FindPath(datagram *types.Datagram, inOrOut byte) {
     }
 
     // Find the account using the username from the datagram
-    account := pathfinding.Manager.Find(datagram.Username)
+    account := pathfinding.GetPathManager().Find(datagram.Username)
     if account == nil {
         log.Printf("Account not found for user: %s", datagram.Username)
         return
