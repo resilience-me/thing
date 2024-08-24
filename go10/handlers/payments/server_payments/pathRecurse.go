@@ -4,7 +4,6 @@ import (
     "encoding/binary"
     "log"
 
-    "ripple/main"
     "ripple/comm"
     "ripple/commands"
     "ripple/handlers"
@@ -15,7 +14,7 @@ import (
 )
 
 // PathRecurse processes a pathfinding recurse command
-func PathRecurse(session main.Session) {
+func PathRecurse(session types.Session) {
     datagram := session.Datagram
 
     // Inline extraction of the path identifier and depth from datagram arguments
