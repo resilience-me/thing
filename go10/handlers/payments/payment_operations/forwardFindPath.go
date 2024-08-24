@@ -25,8 +25,8 @@ func ForwardFindPath(datagram *types.Datagram, inOrOut byte) {
             continue
         }
 
-        // Use the new CheckAndSendDatagram helper function to handle trustline checking and datagram sending
-        if err := handlers.CheckAndSendDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, amount, inOrOut, datagram.Arguments[:]); err != nil {
+        // Use the new CheckTrustlineAndSendFindPathDatagram helper function to handle trustline checking and datagram sending
+        if err := CheckTrustlineAndSendFindPathDatagram(datagram.Command, datagram.Username, peer.ServerAddress, peer.Username, amount, inOrOut, datagram.Arguments[:]); err != nil {
             log.Printf("Failed to process pathfinding request from %s to peer %s at server %s: %v", datagram.Username, peer.Username, peer.ServerAddress, err)
             continue
         }
