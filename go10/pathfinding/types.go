@@ -3,6 +3,7 @@ package pathfinding
 import (
     "time"
     "ripple/config"
+    "ripple/types"
 )
 
 // PeerAccount holds details about a peer account
@@ -67,7 +68,7 @@ type Payment struct {
 }
 
 // NewPayment is a constructor for creating a Payment struct based on an identifier, datagram, and inOrOut value.
-func NewPayment(datagram *Datagram, identifier string, inOrOut byte, nonce uint32) *Payment {
+func NewPayment(datagram *types.Datagram, identifier string, inOrOut byte, nonce uint32) *Payment {
     // Initialize and return the Payment struct, using NewPeerAccount for the Counterpart field
     return &Payment{
         Identifier: identifier,
