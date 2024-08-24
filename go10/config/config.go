@@ -4,6 +4,7 @@ import (
     "fmt"
     "log"
     "os"
+    "io/ioutil"
     "path/filepath"
 )
 
@@ -27,7 +28,7 @@ func GetDataDir() string {
 // loadServerAddress reads the server address from the configuration file.
 func loadServerAddress() error {
     addressPath := filepath.Join(datadir, "server_address.txt")
-    address, err := os.ReadFile(addressPath)
+    address, err := ioutil.ReadFile(addressPath)
     if err != nil {
         return fmt.Errorf("error loading server address from %s: %w", addressPath, err)
     }
