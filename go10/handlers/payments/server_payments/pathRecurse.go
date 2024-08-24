@@ -9,7 +9,6 @@ import (
     "ripple/handlers"
     "ripple/pathfinding"
     "ripple/types"
-    "ripple/payments"
     "ripple/handlers/payments/payment_operations"
 )
 
