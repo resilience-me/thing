@@ -13,7 +13,7 @@ func GetTrustlineIn(session types.Session) {
     datagram := session.Datagram
 
     // Fetch the inbound trustline
-    trustline, err := db_trustlines.GetTrustlineIn(datagram)
+    trustline, err := db_trustlines.GetTrustlineInFromDatagram(datagram)
     if err != nil {
         log.Printf("Error reading inbound trustline for user %s: %v", datagram.Username, err)
         comm.SendErrorResponse(session.Addr, "Error reading inbound trustline.")
