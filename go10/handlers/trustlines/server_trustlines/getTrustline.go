@@ -17,7 +17,6 @@ func GetTrustline(session main.Session) {
     syncCounter, isSyncedLocally, err := trustlines.GetSyncStatus(datagram)
     if err != nil {
         log.Printf("Failed to retrieve sync status in GetTrustline for user %s: %v", datagram.Username, err)
-        main.SendErrorResponse("Failed to retrieve sync status.", session.Conn)
         return
     }
 
