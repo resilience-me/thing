@@ -1,4 +1,4 @@
-package payments
+package payment_operations
 
 import (
     "fmt"
