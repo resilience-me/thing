@@ -1,5 +1,5 @@
-// newPayment is a shared function to handle the payment initialization process.
-func newPayment(session main.Session, inOrOut byte) {
+// NewPayment is a shared function to handle the payment initialization process.
+func NewPayment(session main.Session, inOrOut byte) {
     // Retrieve the Datagram from the session
     datagram := session.Datagram
 
