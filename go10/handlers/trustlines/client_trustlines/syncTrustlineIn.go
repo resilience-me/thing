@@ -8,11 +8,11 @@ import (
     "ripple/comm"
     "ripple/database/db_trustlines"
     "ripple/handlers"
-    "ripple/main"
+    "ripple/types"
 )
 
 // SyncTrustlineIn handles the client request to sync the inbound trustline from the peer server.
-func SyncTrustlineIn(session main.Session) {
+func SyncTrustlineIn(session types.Session) {
     datagram := session.Datagram
 
     // Prepare the datagram
