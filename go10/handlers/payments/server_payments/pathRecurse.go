@@ -6,9 +6,10 @@ import (
 
     "ripple/comm"
     "ripple/commands"
-    "ripple/handlers"
-    "ripple/pathfinding"
     "ripple/types"
+    "ripple/pathfinding"
+    "ripple/handlers"
+    "ripple/handlers/payments"
     "ripple/handlers/payments/payment_operations"
 )
 
@@ -17,8 +18,8 @@ func PathRecurse(session types.Session) {
     datagram := session.Datagram
 
     // Inline extraction of the path identifier and depth from datagram arguments
-    pathIdentifier := BytesToString(datagram.Arguments[:32]) // Assuming identifier is in the first 32 bytes
-    incomingDepth := binary.BigEndian.Uint32(datagram.Arguments[32:36]) // Assuming depth is in bytes 32-36
+    pathIdentifier := types.BytesToString(datagram.Arguments[:32]) // Assuming identifier is in the first 32 bytes
+    incomingDepth := types.BytesToUint32(datagram.Arguments[32:36]) // Assuming depth is in bytes 32-36
 
     // Find the account using the username from the datagram
     account := pathfinding.GetPathManager().Find(datagram.Username)
@@ -48,12 +49,12 @@ func PathRecurse(session types.Session) {
     if account.Payment != nil && account.Payment.Identifier == pathIdentifier {
         log.Printf("Reached the root for path %s, sending out new FindPath requests", pathIdentifier)
         // Use the InOrOut field from the Payment object to determine the direction
-        payments_operations.StartFindPath(datagram.Username, pathIdentifier, path.Amount, account.Payment.InOrOut)
+        payment_operations.StartFindPath(datagram.Username, pathIdentifier, path.Amount, account.Payment.InOrOut)
         return
     }
 
     // Check if both incoming and outgoing are set, indicating a path has already been found
-    if CheckPathFound(path) {
+    if payments.CheckPathFound(path) {
         log.Printf("Path already found for path %s, ignoring recurse", pathIdentifier)
         return
     }
