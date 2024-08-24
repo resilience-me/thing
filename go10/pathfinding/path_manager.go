@@ -78,3 +78,13 @@ func (account *Account) Find(identifier string) *Path {
 func (account *Account) Remove(identifier string) {
     delete(account.Paths, identifier)
 }
+
+// cleanupPaths removes expired paths within the Account.
+func (account *Account) Cleanup() {
+    now := time.Now()
+    for pathID, path := range account.Paths {
+        if now.After(path.Timeout) {
+            delete(account.Paths, pathID)  // Remove expired paths
+        }
+    }
+}
