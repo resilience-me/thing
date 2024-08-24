@@ -21,19 +21,19 @@ func GetTrustline(session main.Session) {
         return
     }
 
-    // Extract sync_in value from the datagram's Arguments[0:4]
-    syncIn := main.BytesToUint32(datagram.Arguments[:4])
-
-    // Initialize the datagram
-    dg, err := trustlines.InitializeDatagram(datagram)
+    // Prepare the datagram
+    dg, err := handlers.PrepareDatagramResponse(datagram)
     if err != nil {
-        log.Printf("Error initializing datagram in GetTrustline for user %s: %v", datagram.Username, err)
+        log.Printf("Error preparing datagram in GetTrustline for user %s: %v", datagram.Username, err)
         return
     }
 
+    // Extract sync_in value from the datagram's Arguments[0:4]
+    syncIn := main.BytesToUint32(datagram.Arguments[:4])
+
     if syncIn < syncCounter {
         // The peer is not synced, prepare to send trustline data to synchronize
-        dg.Command = main.ServerTrustlines_SetTrustline
+        dg.Command = commands.ServerTrustlines_SetTrustline
 
         trustline, err := db_trustlines.GetTrustlineOut(session.Datagram)
         if err != nil {
@@ -45,7 +45,7 @@ func GetTrustline(session main.Session) {
         binary.BigEndian.PutUint32(dg.Arguments[4:8], syncCounter)
     } else {
         // Use the SetTimestamp command to the peer to acknowledge synchronization
-        dg.Command = main.ServerTrustlines_SetTimestamp
+        dg.Command = commands.ServerTrustlines_SetTimestamp
         if !isSyncedLocally {
             // The peer is synced, but the local server is not aware
             // Update the local sync_out to match the sync_counter
