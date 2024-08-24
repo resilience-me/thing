@@ -9,8 +9,8 @@ import (
 )
 
 // GetPeers retrieves a list of all peer accounts for a given username
-func GetPeers(username string) ([]PeerAccount, error) {
-    var peers []PeerAccount
+func GetPeers(username string) ([]pathfinding.PeerAccount, error) {
+    var peers []pathfinding.PeerAccount
     baseDir := filepath.Join(config.GetDataDir(), "accounts", username, "peers")
 
     // Read all server address directories in the peers directory
