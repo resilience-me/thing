@@ -53,7 +53,7 @@ type Account struct {
 func NewAccount(username string) *Account {
     return &Account{
         Username: username,
-        Cleanup:  time.Now().Add(config.PathFindingTimeout), // Set the initial Cleanup time
+        Timeout:  time.Now().Add(config.PathFindingTimeout), // Set the initial Cleanup time
         Paths:    make(map[string]*Path),
     }
 }
