@@ -17,7 +17,7 @@ func main() {
 	sessionManager := NewSessionManager()
 
 	// Initialize the path manager
-	pathfinding.PathManager := NewPathManager()
+	pathfinding.InitPathManager()
 
 	// Set up the UDP server
 	addr := net.UDPAddr{
