@@ -1,3 +1,5 @@
+package pathfinding
+
 import (
     "sync"
     "time"
