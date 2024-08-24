@@ -57,7 +57,7 @@ func (pm *PathManager) Cleanup() {
     defer pm.mu.Unlock()
     now := time.Now()
     for username, account := range pm.Accounts {
-        if now.After(account.Cleanup) {
+        if now.After(account.Timeout) {
             delete(pm.Accounts, username)
         }
     }
