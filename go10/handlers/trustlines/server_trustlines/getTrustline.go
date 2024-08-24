@@ -34,7 +34,7 @@ func GetTrustline(session types.Session) {
         // The peer is not synced, prepare to send trustline data to synchronize
         dg.Command = commands.ServerTrustlines_SetTrustline
 
-        trustline, err := db_trustlines.GetTrustlineOut(session.Datagram)
+        trustline, err := db_trustlines.GetTrustlineOutFromDatagram(session.Datagram)
         if err != nil {
             log.Printf("Error getting trustline for user %s in GetTrustline: %v", session.Datagram.Username, err)
             return
