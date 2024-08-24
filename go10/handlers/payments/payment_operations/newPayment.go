@@ -1,4 +1,4 @@
-package client_payments
+package payment_operations
 
 import (
     "log"                 // For logging errors and success messages
