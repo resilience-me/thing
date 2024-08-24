@@ -7,7 +7,7 @@ import (
     "ripple/comm"
     "ripple/database/db_trustlines"
     "ripple/main"
-    "ripple/trustlines"
+    "ripple/handlers/trustlines"
 )
 
 // SetTrustline updates the trustline based on the given session.
