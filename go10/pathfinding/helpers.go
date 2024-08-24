@@ -1,6 +1,9 @@
 package pathfinding
 
-import "time"
+import (
+    "time"
+    "ripple/config"
+)
 
 func (pm *PathManager) FetchAndRefresh(username string) *Account {
     pm.mu.Lock()
