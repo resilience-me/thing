@@ -59,7 +59,7 @@ func PathRecurse(session types.Session) {
         return
     }
     // Determine the direction based on which peer account is populated in the Path
-    targetPeer, err := GetRecursePeer(path)
+    targetPeer, err := payments.GetRecursePeer(path)
     if err != nil {
         log.Printf("Error determining target peer: %v", err)
         return
