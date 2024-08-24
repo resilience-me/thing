@@ -2,7 +2,6 @@ package database
 
 import (
     "fmt"
-    "os"
     "io/ioutil"
     "path/filepath"
     "strconv"
