@@ -4,7 +4,7 @@ import (
     "encoding/binary"
     "log"
     "ripple/pathfinding"
-    "ripple/payments"
+    "ripple/handlers/payments"
     "ripple/types"
 )
 
