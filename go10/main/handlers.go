@@ -1,9 +1,12 @@
 package main
 
-import "ripple/handlers/trustlines/client_trustlines"
+import (
+    "ripple/types"
+    "ripple/handlers/trustlines/client_trustlines"
+)
 
 // CommandHandler defines the type for command handling functions
-type CommandHandler func(session Session)
+type CommandHandler func(session types.Session)
 
 // CommandHandlers maps command bytes to handler functions
 var commandHandlers = [256]CommandHandler{
