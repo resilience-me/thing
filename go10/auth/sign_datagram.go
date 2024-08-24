@@ -20,11 +20,8 @@ func SignDatagram(dg *types.Datagram, peerServerAddress string) ([]byte, error) 
         return nil, fmt.Errorf("failed to load server secret key: %w", err)
     }
 
-    // Generate HMAC for the serialized data
-    signature, err := generateSignature(serializedData[:357], secretKey)
-    if err != nil {
-        return nil, fmt.Errorf("failed to generate signature: %w", err)
-    }
+    // Generate signature for the serialized data
+    signature := generateSignature(serializedData[:357], secretKey)
 
     // Update the datagram's signature field with the generated signature
     copy(dg.Signature[:], []byte(signature)) // Ensure we copy the signature into the byte array
