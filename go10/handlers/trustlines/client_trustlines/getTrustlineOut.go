@@ -25,7 +25,7 @@ func GetTrustlineOut(session main.Session) {
     responseData := types.Uint32ToBytes(trustline)
 
     // Send the success response back to the client
-    if err := comm.SendSuccessResponse(responseData, session.Conn); err != nil {
+    if err := comm.SendSuccessResponse(responseData, session.Addr); err != nil {
         log.Printf("Error sending success response to user %s: %v", datagram.Username, err)
         return
     }
