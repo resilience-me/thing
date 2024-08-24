@@ -55,7 +55,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, shutdownFl
 		}
 
 		// Create a new session
-		session := &Session{
+		session := &types.Session{
 			Datagram: datagram,
 		}
 
