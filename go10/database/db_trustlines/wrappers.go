@@ -38,4 +38,5 @@ func GetCreditline(username, peerServerAddress, peerUsername string, inOrOut byt
     // } else { // Assume 1 means outgoing trustline
     //     return GetCreditlineOut(username, peerServerAddress, peerUsername)
     // }
+	return 0, nil
 }
