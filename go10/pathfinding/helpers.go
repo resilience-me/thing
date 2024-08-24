@@ -2,7 +2,7 @@ package pathfinding
 
 import "time"
 
-func FetchAndRefresh() *Account {
+func (pm *PathManager) FetchAndRefresh() *Account {
     pm.mu.Lock()
     defer pm.mu.Unlock()
 
