@@ -38,7 +38,7 @@ func loadServerAddress() error {
 }
 
 // setupLogger initializes the logging configuration.
-func setupLogger(logDir string) error {
+func setupLogger() error {
     // Construct the full path to the log file
     logFilePath := filepath.Join(datadir, "ripple.log")
     
