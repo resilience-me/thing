@@ -3,6 +3,7 @@ package payment_operations
 import (
     "log"
     "ripple/handlers"
+    "ripple/handlers/payments"
     "ripple/types"
     "ripple/database/db_pathfinding"
 )
@@ -17,7 +18,7 @@ func StartFindPath(username, identifier string, amount uint32, inOrOut byte) {
     }
 
     arguments := append([]byte(identifier), types.Uint32ToBytes(amount)...)
-    command := GetFindPathCommand(inOrOut)
+    command := payments.GetFindPathCommand(inOrOut)
 
     for _, peer := range peers {
         // Use the new helper function to check the trustline and send the datagram
