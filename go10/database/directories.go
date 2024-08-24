@@ -4,11 +4,12 @@ import (
     "os"
     "path/filepath"
     "ripple/types"
+    "ripple/config"
 )
 
 // GetAccountDir constructs the account directory path from a username and returns it
 func GetAccountDir(username string) string {
-    datadir := main.GetDataDir()
+    datadir := config.GetDataDir()
     return filepath.Join(datadir, "accounts", username)
 }
 
