@@ -20,7 +20,7 @@ func SyncTrustlineOut(session types.Session) {
     dgOut, err := handlers.PrepareDatagramResponse(datagram)
     if err != nil {
         log.Printf("Error preparing datagram for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Error preparing datagram.", session.Addr)
+        comm.SendErrorResponse(session.Addr, "Error preparing datagram.")
         return
     }
 
@@ -28,7 +28,7 @@ func SyncTrustlineOut(session types.Session) {
     syncCounter, isSynced, err := trustlines.GetSyncStatus(datagram)
     if err != nil {
         log.Printf("Failed to retrieve sync status in SyncTrustlineOut for user %s: %v", datagram.Username, err)
-        comm.SendErrorResponse("Failed to retrieve sync status.", session.Addr)
+        comm.SendErrorResponse(session.Addr, "Failed to retrieve sync status.")
         return
     }
 
@@ -40,7 +40,7 @@ func SyncTrustlineOut(session types.Session) {
         trustline, err := db_trustlines.GetTrustlineOut(datagram)
         if err != nil {
             log.Printf("Error getting trustline for user %s in SyncTrustlineOut: %v", datagram.Username, err)
-            comm.SendErrorResponse("Failed to retrieve trustline.", session.Addr)
+            comm.SendErrorResponse(session.Addr, "Failed to retrieve trustline.")
             return
         }
         dgOut.Command = commands.ServerTrustlines_SetTrustline
@@ -55,7 +55,7 @@ func SyncTrustlineOut(session types.Session) {
     }
 
     // Send success response to the client
-    if err := comm.SendSuccessResponse([]byte("Outbound trustline sync request processed successfully."), session.Addr); err != nil {
+    if err := comm.SendSuccessResponse(session.Addr, []byte("Outbound trustline sync request processed successfully.")); err != nil {
         log.Printf("Failed to send success response in SyncTrustlineOut for user %s: %v", datagram.Username, err)
         return
     }
