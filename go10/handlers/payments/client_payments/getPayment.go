@@ -15,7 +15,7 @@ func GetPayment(session main.Session) {
     username := session.Datagram.Username
 
     // Retrieve and serialize payment details using the wrapper method
-    paymentDetails := fetchAndSerializePaymentDetails(username)
+    paymentDetails := payments.FetchAndSerializePaymentDetails(username)
     if paymentDetails == nil {
         paymentDetails = []byte{}  // Send an empty response if no payment details
     }
