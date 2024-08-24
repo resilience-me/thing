@@ -23,7 +23,7 @@ func PathRecurse(session main.Session) {
     incomingDepth := binary.BigEndian.Uint32(datagram.Arguments[32:36]) // Assuming depth is in bytes 32-36
 
     // Find the account using the username from the datagram
-    account := pathfinding.Manager.Find(datagram.Username)
+    account := pathfinding.GetPathManager().Find(datagram.Username)
     if account == nil {
         log.Printf("Account not found for user: %s", datagram.Username)
         return
