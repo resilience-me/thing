@@ -8,12 +8,12 @@ import (
     "ripple/comm"
     "ripple/database/db_trustlines"
     "ripple/handlers"
-    "ripple/main"
+    "ripple/types"
     "ripple/trustlines"
 )
 
 // SyncTrustlineOut handles the client request to sync the outbound trustline to the peer server.
-func SyncTrustlineOut(session main.Session) {
+func SyncTrustlineOut(session types.Session) {
     datagram := session.Datagram
 
     // Prepare the datagram
