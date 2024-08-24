@@ -3,6 +3,7 @@ package database
 import (
     "os"
     "path/filepath"
+    "ripple/types"
 )
 
 // GetAccountDir constructs the account directory path from a username and returns it
