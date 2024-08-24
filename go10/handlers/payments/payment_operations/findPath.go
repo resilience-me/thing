@@ -4,7 +4,6 @@ import (
     "encoding/binary"
     "log"
     "ripple/pathfinding"
-    "ripple/handlers/payments"
     "ripple/types"
 )
 
@@ -15,7 +14,7 @@ func FindPath(datagram *types.Datagram, inOrOut byte) {
     pathAmount := binary.BigEndian.Uint32(datagram.Arguments[32:36])
 
     // Check if the trustline (incoming or outgoing) is sufficient for the path amount
-    sufficient, err := payments.CheckTrustlineSufficient(datagram.Username, datagram.PeerServerAddress, datagram.PeerUsername, pathAmount, inOrOut)
+    sufficient, err := CheckTrustlineSufficient(datagram.Username, datagram.PeerServerAddress, datagram.PeerUsername, pathAmount, inOrOut)
     if err != nil {
         log.Printf("Error checking trustline: %v", err)
         return
