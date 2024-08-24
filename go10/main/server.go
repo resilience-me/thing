@@ -62,7 +62,7 @@ func runServerLoop(conn *net.UDPConn, sessionManager *SessionManager, shutdownFl
 		// If this is a client connection, associate the address with the session
 		if datagram.Command&0x80 == 0 { // MSB is 0: Client connection
 			// Add the client address to the session object
-			session.Addr = remoteAddr,
+			session.Addr = remoteAddr
 		}
 
 		// Route the session through the SessionManager
