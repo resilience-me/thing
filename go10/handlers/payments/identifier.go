@@ -33,10 +33,9 @@ func generatePaymentIdentifier(dg *Datagram, inOrOut byte) string {
 func GenerateAndInitiatePayment(datagram *types.Datagram, inOrOut byte) {
     // Generate the Payment struct for an incoming payment
     identifier := generatePaymentIdentifier(datagram, inOrOut)
-    amount := types.BytesToUint32(datagram.Arguments[0:4])
     nonce := types.BytesToUint32(datagram.Arguments[4:8])
     payment := pathfinding.NewPayment(datagram, identifier, inOrOut, nonce)
-
+    amount := types.BytesToUint32(datagram.Arguments[0:4])
     // Initiate the incoming payment using the constructed Payment struct
     pathfinding.PathManager.InitiatePayment(datagram.Username, payment, amount)
 }
