@@ -6,16 +6,6 @@ import (
     "ripple/config" // For using config.PathFindingTimeout
 )
 
-// cleanupPaths removes expired paths within the Account.
-func (account *Account) cleanupPaths() {
-    now := time.Now()
-    for pathID, path := range account.Paths {
-        if now.After(path.Timeout) {
-            delete(account.Paths, pathID)  // Remove expired paths
-        }
-    }
-}
-
 func FetchAndRefresh() *Account {
     pm.mu.Lock()
     defer pm.mu.Unlock()
@@ -37,7 +27,7 @@ func (pm *PathManager) cleanupCacheAndFetchAccount(username string) *Account {
 
     account := FetchAndRefresh()
     if != nil {
-        account.cleanupPaths()
+        account.Cleanup()
         return account
     }
     return pm.Add(username)
