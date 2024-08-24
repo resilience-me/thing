@@ -3,7 +3,6 @@ package payment_operations
 import (
     "encoding/binary"
     "log"
-    "ripple/handlers"
     "ripple/types"
     "ripple/database/db_pathfinding"
 )
