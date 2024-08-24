@@ -2,7 +2,6 @@ package payments
 
 import (
     "fmt"
-    "ripple/database/db_trustlines"
     "ripple/commands"
     "ripple/types"
     "ripple/pathfinding"
