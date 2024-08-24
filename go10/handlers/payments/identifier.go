@@ -7,13 +7,13 @@ import (
 	"ripple/pathfinding"
 )
 
-func concatAccounts(username, serverAddress string) []byte {
+func concatNameAndServer(username, serverAddress string) []byte {
   return append(types.PadStringTo32Bytes(username), types.PadStringTo32Bytes(serverAddress))
 }
 
 func generatePaymentIdentifier(dg *Datagram, inOrOut byte) string {
-  user := concatAccounts(dg.Username, GetServerAddress())
-  peer := concatAccounts(dg.PeerUsername, dg.PeerServerAddress)
+  user := concatNameAndServer(dg.Username, GetServerAddress())
+  peer := concatNameAndServer(dg.PeerUsername, dg.PeerServerAddress)
   
   var preimage []byte
   
