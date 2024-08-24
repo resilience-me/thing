@@ -1,6 +1,9 @@
 package comm
 
-import "fmt"
+import (
+	"fmt"
+	"net"
+)
 
 // SendSuccessResponse sends a success message using the provided address with retry logic.
 func SendSuccessResponse(addr *net.UDPAddr, data []byte) error {
