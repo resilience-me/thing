@@ -21,7 +21,7 @@ func GetPayment(session main.Session) {
     }
 
     // Send the payment details as a success response
-    if err := comm.SendSuccessResponse(paymentDetails, session.Addr); err != nil {
+    if err := comm.SendSuccessResponse(session.Addr, paymentDetails); err != nil {
         log.Printf("Failed to send payment details to client for user %s: %v", username, err)
         return
     }
