@@ -27,7 +27,7 @@ func main() {
 	}
 	conn, err := net.ListenUDP("udp", &addr)
 	if err != nil {
-		fmt.Printf("Failed to listen on port %d: %v\n", Port, err)
+		fmt.Printf("Failed to listen on port %d: %v\n", config.Port, err)
 		return
 	}
 
