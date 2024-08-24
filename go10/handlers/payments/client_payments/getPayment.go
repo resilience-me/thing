@@ -9,15 +9,12 @@ import (
 
 // GetPayment handles the command to retrieve payment parameters.
 func GetPayment(session main.Session) {
-    // Retrieve the Datagram from the session
-    datagram := session.Datagram
 
     // Extract username from the datagram
-    username := datagram.Username
-
+    username := session.Datagram.Username
 
     // Retrieve and serialize payment details using the wrapper method
-    paymentDetails := fetchAndSerializePaymentDetails(session)
+    paymentDetails := fetchAndSerializePaymentDetails(username)
     if paymentDetails == nil {
         paymentDetails = []byte{}  // Send an empty response if no payment details
     }
