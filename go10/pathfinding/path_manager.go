@@ -2,6 +2,7 @@ package pathfinding
 
 import (
     "sync"
+    "time"
 )
 
 var pathManager *PathManager
